@@ -82,6 +82,8 @@ sudo crontab -u root -l | cat - /home/pi/UKRAA_Magnetometer/install/crontab-webp
 echo "UKRAA Magnetometer webpage update crontab entry installed"
 
 echo "Final cleanup..."
+sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/docs
+sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/images
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/WWW
 sudo -u pi rm -v /home/pi/UKRAA_Magnetometer/README.md
 echo "Finished final cleanup"
