@@ -67,7 +67,7 @@ echo ""
 
 echo "Install mariadb..."
 apt install mariadb-server -y
-mariadb-secure-installation
+#mariadb-secure-installation
 echo "Finished installing mariadb"
 echo ""
 
