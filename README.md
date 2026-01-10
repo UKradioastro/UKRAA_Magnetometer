@@ -100,7 +100,7 @@ Other scripts (Python, gnuplot and shell) are run from **cron**
 
 2. Open a terminal window, type the following command and press enter
 ```
-git clone https://github.com/UKradioastro/UKRAA_PicoMagnetometer
+git clone https://github.com/UKradioastro/UKRAA_Magnetometer
 ```
 
 ![img_01](images/RPi_imager_01.PNG)
