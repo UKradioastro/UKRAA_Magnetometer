@@ -37,7 +37,7 @@ echo "Start installing UKRAA Magnetometer crontab entry..."
 echo "Clearing current crontab entry..."
 echo "NOTE: if you have edited your sudo crontab - this will be deleted.  You will need to reedit sudo crontab post update."
 sudo crontab -u root -r
-sudo crontab -u root -l  | cat - /home/pi/UKRAA_Magnetometer/install/crontab-magnetometerACM0-entry.cron | sudo crontab -u root -
+sudo crontab -u root -l  | cat - /home/pi/UKRAA_Magnetometer/install/crontab-MagnetometerACM0-entry.cron | sudo crontab -u root -
 echo "UKRAA Magnetometer crontab entry installed"
 
 
@@ -54,7 +54,7 @@ apt install php libapache2-mod-php -y
 
 echo "Install mariadb..."
 apt install mariadb-server -y
-mysql_secure_installation
+mariadb-secure-installation
 
 echo "Install the php-mysql connector..."
 apt install php-mysql -y
