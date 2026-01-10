@@ -24,12 +24,13 @@ body {font-family: "Lato", sans-serif}
     <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
     <a href="#home" class="w3-bar-item w3-button w3-padding-large">HOME</a>
     <a href="#who" class="w3-bar-item w3-button w3-padding-large w3-hide-small">ABOUT US</a>
-    <a href="#detector" class="w3-bar-item w3-button w3-padding-large w3-hide-small">DETECTOR</a>
+    <a href="#detector" class="w3-bar-item w3-button w3-padding-large w3-hide-small">MAGNETOMETER</a>
     <div class="w3-dropdown-hover w3-hide-small">
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
         <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
         <a href="#daily_HDZ" class="w3-bar-item w3-button">DAY HDZ GRAPHS</a>
+        <a href="#daily_BI" class="w3-bar-item w3-button">DAY BI GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -39,9 +40,10 @@ body {font-family: "Lato", sans-serif}
 <!-- Navbar on small screens (remove the onclick attribute if you want the navbar to always show on top of the content when clicking on the links) -->
 <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
-  <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DETECTOR</a>
+  <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
   <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XZY GRAPHS</a>
   <a href="#daily_HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY HDZ GRAPHS</a>
+  <a href="#daily_BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY BI GRAPHS</a>
 </div>
 
 
@@ -144,7 +146,26 @@ body {font-family: "Lato", sans-serif}
     </div>
   </div>
 
-  
+    <!-- daily BI plots -->
+  <div class="w3-white" id="daily_BI">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+    <h2 class="w3-wide">MY DAILY BI RESULTS</h2>
+    <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
+    <p class="w3-center">No accuracy is claimed for any published data</p>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-auto">
+        <p>B magnetic field variation for last day</p>
+        <img src="./temp/B.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+      </div>
+    </div>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-auto">
+        <p>I magnetic field angle variation for last day</p>
+        <img src="./temp/I.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+      </div>
+    </div>
+  </div>
+
 
   <!-- The Contact Section -->
   <div class="w3-grey" id="contact">
