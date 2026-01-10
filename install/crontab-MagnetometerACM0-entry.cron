@@ -1,27 +1,11 @@
 
+# UKRAA Magnetometer crontab entry
+
 # cron entry to process yesterdays raw magnetometer data
-30 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataCpmACM0.py   >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-30 02 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataDayACM0.py   >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-30 04 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataWeekACM0.py  >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-30 05 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataMonthACM0.py >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
+00 04 * * * su pi -c "sudo bash /home/pi/UKRAA_Magnetometer/scripts/processData.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
 
-# cron entry to process yesterdays raw muon adc values
-45 00 * * * su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataAdcACM0.py   >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
+# cron entry to manage logfiles - on a Sunday 00:00 each week
+00 00 * * 00 bash /home/pi/UKRAA_Magnetometer/scripts/managelogfiles.sh
 
-# cron entry to plot yesterdays counts per minute
-50 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataCpmACM0.gp      >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-
-# cron entry to plot yesterdays counts per minute frequency
-51 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataFreqACM0.gp     >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-
-# cron entry to plot yesterdays adc frequency
-52 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataAdcACM0.gp      >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-
-# cron entry to plot yesterdays % muons & % neutron deviation
-53 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataDayACM0.gp      >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-
-# cron entry to plot last weeks % muons & % neutron deviation
-54 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataWeekACM0.gp     >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-
-# cron entry to plot last months % muons & % neutron deviation
-55 07 * * * su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataMonthACM0.gp    >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
+# cron entry to upload plot files to www
+30 09 * * * cp -r /home/pi/UKRAA_Magnetometer/temp /var/www/html/

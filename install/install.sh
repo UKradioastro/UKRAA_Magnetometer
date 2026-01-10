@@ -6,8 +6,6 @@ echo "Start installing UKRAA Magnetometer software..."
 
 echo "Start installing gnuplot software..."
 apt install gnuplot -y
-apt install gnuplot-doc -y
-apt install gnuplot-x11 -y
 echo "gnuplot software installed"
 
 echo "Creating UKRAA Magnetometer directory structure..."
@@ -42,10 +40,6 @@ sudo crontab -u root -r
 sudo crontab -u root -l  | cat - /home/pi/UKRAA_Magnetometer/install/crontab-magnetometerACM0-entry.cron | sudo crontab -u root -
 echo "UKRAA Magnetometer crontab entry installed"
 
-cho "Start installing UKRAA Magnetometer log file manager update crontab entry..."
-sudo crontab -u root -l | cat - /home/pi/UKRAA_Magnetometer/install/crontab-managelogfiles.cron | sudo crontab -u root -
-echo "UKRAA Magnetometer log file update crontab entry installed"
-
 
 echo "Start installing web server on RPi..."
 
@@ -76,9 +70,6 @@ cp -vr /home/pi/UKRAA_Magnetometer/WWW/images /var/www/html/
 cp -vr /home/pi/UKRAA_Magnetometer/WWW/temp /var/www/html/
 echo "Files moved to /var/www/html"
 
-echo "Start installing UKRAA Magnetometer webpage update crontab entry..."
-sudo crontab -u root -l | cat - /home/pi/UKRAA_Magnetometer/install/crontab-webpage-update-entry.cron | sudo crontab -u root -
-echo "UKRAA Magnetometer webpage update crontab entry installed"
 
 echo "Final cleanup..."
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/docs
