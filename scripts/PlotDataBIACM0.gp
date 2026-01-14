@@ -116,11 +116,11 @@ set ylabel textcolor rgb "dark-violet" rotate
 set yrange [ * : * ] noreverse nowriteback
 
 
-# Plot command # top detector
+# Plot command # B(nT)
 GraphTitle = GraphTitle1
 set key title GraphTitle
 set output pathPlot1
-plot FileData using 1:11 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "B magnetic field variation" with lines
+plot FileData using 1:14 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "B magnetic field variation" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
@@ -137,7 +137,7 @@ set output pathPlot.".png"
 replot
 # end replot
 
-# Plot command # bottom detector
+# Plot command # I(angle?)
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
@@ -149,7 +149,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_Magnetometer/temp/I
+pathPlot = "/home/pi/UKRAA_Magnetometer/temp/I"
 # set output path to Plot folder
 set output pathPlot.".png"
 

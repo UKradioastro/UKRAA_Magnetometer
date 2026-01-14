@@ -16,9 +16,12 @@ print('ProcessDataRawACM0.py      :', \
 
 # Set file headers for data file structure
 RawFieldNames    = ['RawDateTime',\
-                    'RawX', \
-                    'RawY', \
-                    'RawZ', \
+                    'RawX_V', \
+                    'RawX_nT', \
+                    'RawY_V', \
+                    'RawY_nT', \
+                    'RawZ_V', \
+                    'RawZ_nT', \
                     'RawTMP36Temp', \
                     'RawBMP280Temp', \
                     'RawBMP280Pres', \
@@ -112,15 +115,21 @@ for i in range(1, n+1):
     RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
 
     # set counters to zero
-    List_X            = list()
-    List_Y            = list()
-    List_Z            = list()
+    List_X_V          = list()
+    List_Y_V          = list()
+    List_Z_V          = list()
+    List_X_nT         = list()
+    List_Y_nT         = list()
+    List_Z_nT         = list()
     List_TMP36Temp    = list()
     List_BMP280Temp   = list()
     List_BMP280Pres   = list()
-    Median_X          = 0.000000
-    Median_Y          = 0.000000
-    Median_Z          = 0.000000
+    Median_X_V        = 0.000000
+    Median_Y_V        = 0.000000
+    Median_Z_V        = 0.000000
+    Median_X_nT       = 0.0
+    Median_Y_nT       = 0.0
+    Median_Z_nT       = 0.0
     Median_TMP36Temp  = 0.00
     Median_BMP280Temp = 0.00
     Median_BMP280Pres = 0.00
@@ -139,9 +148,12 @@ for i in range(1, n+1):
         
         # search file for data between two time points
         if (RawDatetime >= StartBinTime) and (RawDatetime < EndBinTime):
-            List_X.append(float(RawLine['RawX']))
-            List_Y.append(float(RawLine['RawY']))
-            List_Z.append(float(RawLine['RawZ']))
+            List_X_V.append(float(RawLine['RawX_V']))
+            List_X_nT.append(float(RawLine['RawX_nT']))
+            List_Y_V.append(float(RawLine['RawY_V']))
+            List_Y_nT.append(float(RawLine['RawY_nT']))
+            List_Z_V.append(float(RawLine['RawZ_V']))
+            List_Z_nT.append(float(RawLine['RawZ_nT']))
             List_TMP36Temp.append(float(RawLine['RawTMP36Temp']))
             List_BMP280Temp.append(float(RawLine['RawBMP280Temp']))
             List_BMP280Pres.append(float(RawLine['RawBMP280Pres']))
@@ -151,22 +163,37 @@ for i in range(1, n+1):
 
     
     # check if there is some x-axis data
-    if (len(List_X) != 0):
-        Median_X = '{:.6f}'.format(statistics.median(List_X))
+    if (len(List_X_V) != 0):
+        Median_X_V = '{:.6f}'.format(statistics.median(List_X_V))
     else:
-        Median_X = math.nan
+        Median_X_V = math.nan
+        
+    if (len(List_X_nT) != 0):
+        Median_X_nT = '{:.2f}'.format(statistics.median(List_X_nT))
+    else:
+        Median_X_nT = math.nan
         
     # check if there is some y-axis data
-    if (len(List_Y) != 0):
-        Median_Y = '{:.6f}'.format(statistics.median(List_Y))
+    if (len(List_Y_V) != 0):
+        Median_Y_V = '{:.6f}'.format(statistics.median(List_Y_V))
     else:
-        Median_Y = math.nan
+        Median_Y_V = math.nan
+    
+    if (len(List_Y_nT) != 0):
+        Median_Y_nT = '{:.2f}'.format(statistics.median(List_Y_nT))
+    else:
+        Median_Y_nT = math.nan
         
     # check if there is some z-axis data
-    if (len(List_Z) != 0):
-        Median_Z = '{:.6f}'.format(statistics.median(List_Z))
+    if (len(List_Z_V) != 0):
+        Median_Z_V = '{:.6f}'.format(statistics.median(List_Z_V))
     else:
-        Median_Z = math.nan
+        Median_Z_V = math.nan
+        
+    if (len(List_Z_nT) != 0):
+        Median_Z_nT = '{:.2f}'.format(statistics.median(List_Z_nT))
+    else:
+        Median_Z_nT = math.nan
         
     # check if there is some TMP36 temp data
     if (len(List_TMP36Temp) != 0):
@@ -188,16 +215,16 @@ for i in range(1, n+1):
 
 
     # Process XYZ data to HDZ data
-    Calc_H = '{:.6f}'.format(math.sqrt((float(Median_X) * float(Median_X)) + (float(Median_Y) * float(Median_Y))))
+    Calc_H = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT))))
     if (Calc_H == 0):
         Calc_H = math.nan
-    Calc_D = '{:.1f}'.format(math.degrees(math.atan(float(Median_Y) / float(Median_X))))
+    Calc_D = '{:.1f}'.format(math.degrees(math.atan(float(Median_Y_nT) / float(Median_X_nT))))
     if (Calc_D == 0):
         Calc_D = math.nan
-    Calc_Z = '{:.6f}'.format(float(Median_Z))
+    Calc_Z = '{:.6f}'.format(float(Median_Z_nT))
     if (Calc_Z == 0):
         Calc_Z = math.nan
-    Calc_B = '{:.6f}'.format(math.sqrt((float(Median_X) * float(Median_X)) + (float(Median_Y) * float(Median_Y)) + (float(Median_Z) * float(Median_Z))))
+    Calc_B = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT)) + (float(Median_Z_nT) * float(Median_Z_nT))))
     if (Calc_B == 0):
         Calc_B = math.nan
     Calc_I = '{:.1f}'.format(math.degrees(math.atan(float(Calc_Z) / float(Calc_H))))
@@ -208,11 +235,17 @@ for i in range(1, n+1):
     # write processed data to file
     ProcessedData.write(str(ProcessedTime))          # Data time date
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_X))               # 1 minute average X
+    ProcessedData.write(str(Median_X_V))             # 1 minute average X(V)
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_Y))               # 1 minute average Y
+    ProcessedData.write(str(Median_Y_V))             # 1 minute average Y(V)
     ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_Z))               # 1 minute average Z
+    ProcessedData.write(str(Median_Z_V))             # 1 minute average Z(V)
+    ProcessedData.write(",")                         # "," separator
+    ProcessedData.write(str(Median_X_nT))            # 1 minute average X(nT)
+    ProcessedData.write(",")                         # "," separator
+    ProcessedData.write(str(Median_Y_nT))            # 1 minute average Y(nT)
+    ProcessedData.write(",")                         # "," separator
+    ProcessedData.write(str(Median_Z_nT))            # 1 minute average Z(nT)
     ProcessedData.write(",")                         # "," separator
     ProcessedData.write(str(Median_TMP36Temp))       # 1 minute average TMP36 temperature
     ProcessedData.write(",")                         # "," separator

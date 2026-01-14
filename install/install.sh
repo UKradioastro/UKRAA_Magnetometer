@@ -86,7 +86,7 @@ echo ""
 
 
 echo "Move files to /var/www/html..."
-cp -v /home/pi/UKRAA_Magnetometer/WWW/index.html /var/www/html/index.html
+cp -v  /home/pi/UKRAA_Magnetometer/WWW/index.html /var/www/html/index.html
 cp -vr /home/pi/UKRAA_Magnetometer/WWW/images /var/www/html/
 cp -vr /home/pi/UKRAA_Magnetometer/WWW/temp /var/www/html/
 echo "Files moved to /var/www/html"
@@ -97,7 +97,7 @@ echo "Final cleanup..."
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/docs
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/images
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/WWW
-sudo -u pi rm -v /home/pi/UKRAA_Magnetometer/README.md
+sudo -u pi rm -v   /home/pi/UKRAA_Magnetometer/README.md
 echo "Finished final cleanup"
 echo ""
 

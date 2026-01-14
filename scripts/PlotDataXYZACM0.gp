@@ -120,11 +120,11 @@ set ylabel textcolor rgb "dark-violet" rotate
 set yrange [ * : * ] noreverse nowriteback
 
 
-# Plot command # top detector
+# Plot command # X(nT)
 GraphTitle = GraphTitle1
 set key title GraphTitle
 set output pathPlot1
-plot FileData using 1:2 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "X magnetic field variation" with lines
+plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "X magnetic field variation" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
@@ -141,11 +141,11 @@ set output pathPlot.".png"
 replot
 # end replot
 
-# Plot command # bottom detector
+# Plot command # Y(nT)
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
-plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Y magnetic field variation" with lines
+plot FileData using 1:5 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Y magnetic field variation" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
@@ -153,7 +153,7 @@ set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,5
 # setting output path to include data stamp
 
 # Path to directory to store file
-pathPlot = "/home/pi/UKRAA_Magnetometer/temp/Y
+pathPlot = "/home/pi/UKRAA_Magnetometer/temp/Y"
 # set output path to Plot folder
 set output pathPlot.".png"
 
@@ -161,11 +161,11 @@ set output pathPlot.".png"
 replot
 # end replot
 
-# Plot command # muon detector
+# Plot command # Z(nT)
 GraphTitle = GraphTitle3
 set key title GraphTitle
 set output pathPlot3
-plot FileData using 1:4 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Z magnetic field variation" with lines
+plot FileData using 1:7 linetype 1 linewidth 1 linecolor rgb "#00FF00" title "Z magnetic field variation" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
