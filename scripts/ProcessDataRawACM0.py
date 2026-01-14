@@ -224,6 +224,8 @@ for i in range(1, n+1):
     Calc_Z = '{:.6f}'.format(float(Median_Z_nT))
     if (Calc_Z == 0):
         Calc_Z = math.nan
+
+    # Process XYZ & HZ data to BI data
     Calc_B = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT)) + (float(Median_Z_nT) * float(Median_Z_nT))))
     if (Calc_B == 0):
         Calc_B = math.nan
