@@ -118,7 +118,7 @@ set yrange [ * : * ] noreverse nowriteback
 GraphTitle = GraphTitle1
 set key title GraphTitle
 set output pathPlot1
-plot FileData using 1:3 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "X magnetic field variation" with lines
+plot FileData using 1:5 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "X magnetic field variation" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
@@ -139,7 +139,7 @@ replot
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
-plot FileData using 1:5 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Y magnetic field variation" with lines
+plot FileData using 1:6 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "Y magnetic field variation" with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
