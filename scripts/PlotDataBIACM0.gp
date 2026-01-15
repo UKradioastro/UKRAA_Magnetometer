@@ -14,9 +14,6 @@
 # Reset gnuplot variables
 reset
 
-# Clear gnuplot terminal
-#clear
-
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
@@ -30,7 +27,7 @@ print "PlotDataBIACM0.gp          : "\
     .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
-pathData        = "/home/pi/UKRAA_Magnetometer/data/processed"
+pathData = "/home/pi/UKRAA_Magnetometer/data/processed"
 
 # Year folder
 YearFolder = "/".system("date -d yesterday +'%Y'")
@@ -39,10 +36,10 @@ YearFolder = "/".system("date -d yesterday +'%Y'")
 YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
 
 # YearMonthDay file
-YmdFile = "/".system("date -d yesterday +'%Y-%m-%d'").".csv"
+YearMontDayFile = "/".system("date -d yesterday +'%Y-%m-%d'").".csv"
 
 # Path to each data file for graphing
-FileData        = pathData.YearFolder.YearMonthFolder.YmdFile
+FileData = pathData.YearFolder.YearMonthFolder.YearMontDayFile
 
 # date to be processed
 date = system("date -d yesterday +'%Y-%m-%d'")
@@ -55,21 +52,18 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
 # Path to directory to store file
-# top detector
+# B plot (nT)
 pathPlot1 = "/home/pi/UKRAA_Magnetometer/plots/BI/".date."_B_plot.png"
-# bottom detector
+# I plot (deg)
 pathPlot2 = "/home/pi/UKRAA_Magnetometer/plots/BI/".date."_I_plot.png"
-
-# set output path to Plot folder
-#set output pathPlot
 
 # Set separator to ","
 set datafile separator ","
 
 # Title for graph
-# top detector
+# B plot (nT)
 GraphTitle1 = "B magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
-# bottom detector
+# I plot (deg)
 GraphTitle2 = "I magnetic field angle per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 
 # Set data types
@@ -78,7 +72,6 @@ set xdata time
 # Set format types
 set format x "%H:%M" timedate
 set format y "%.1f" 
-set format y2 "%.1f" 
 set timefmt "%Y-%m-%d %H:%M:%S"
 
 # Set grid format
@@ -115,7 +108,6 @@ set ylabel "Arbitary units"
 set ylabel textcolor rgb "dark-violet" rotate
 set yrange [ * : * ] noreverse nowriteback
 
-
 # Plot command # B(nT)
 GraphTitle = GraphTitle1
 set key title GraphTitle
@@ -124,8 +116,6 @@ plot FileData using 1:14 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "B
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_Magnetometer/temp/B"
@@ -137,7 +127,7 @@ set output pathPlot.".png"
 replot
 # end replot
 
-# Plot command # I(angle?)
+# Plot command # I(deg)
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
@@ -145,8 +135,6 @@ plot FileData using 1:12 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "I
 
 # Replot to terminal and create .png image with data tag for future upload to web page
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# setting output path to include data stamp
 
 # Path to directory to store file
 pathPlot = "/home/pi/UKRAA_Magnetometer/temp/I"
@@ -157,13 +145,16 @@ set output pathPlot.".png"
 replot
 # end replot
 
+# Restore the terminal settings
+set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
+
+# This is important because it closes our output file.
+set output
+
 # print to log file
 print "PlotDataBIACM0.gp          : "\
     .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Completed BI plots for "\
     .system("date -d yesterday +'%Y-%m-%d'")
-
-# This is important because it closes our output file.
-set output
 
 # EOF

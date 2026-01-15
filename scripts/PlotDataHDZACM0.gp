@@ -14,9 +14,6 @@
 # Reset gnuplot variables
 reset
 
-# Clear gnuplot terminal
-#clear
-
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
@@ -69,11 +66,11 @@ pathPlot3 = "/home/pi/UKRAA_Magnetometer/plots/HDZ/".date."_Z_plot.png"
 set datafile separator ","
 
 # Title for graph
-# top detector
+# H plot (nT)
 GraphTitle1 = "H magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
-# bottom detector
+# D plot (deg)
 GraphTitle2 = "D magnetic field angle per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
-# muons detected
+# Z plot (nT)
 GraphTitle3 = "Z magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 
 # Set data types
@@ -141,7 +138,7 @@ set output pathPlot.".png"
 replot
 # end replot
 
-# Plot command # D(angle?)
+# Plot command # D(deg)
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
@@ -182,13 +179,16 @@ set output pathPlot.".png"
 replot
 # end replot
 
+# Restore the terminal settings
+set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
+
+# This is important because it closes our output file.
+set output
+
 # print to log file
 print "PlotDataHDZACM0.gp         : "\
     .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Completed HDZ plot for "\
     .system("date -d yesterday +'%Y-%m-%d'")
-
-# This is important because it closes our output file.
-set output
 
 # EOF

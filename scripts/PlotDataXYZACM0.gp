@@ -14,9 +14,6 @@
 # Reset gnuplot variables
 reset
 
-# Clear gnuplot terminal
-#clear
-
 # Set terminal 
 set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
@@ -55,25 +52,22 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 
 # setting output path to include data stamp
 # Path to directory to store file
-# top detector
+# X plot (nT)
 pathPlot1 = "/home/pi/UKRAA_Magnetometer/plots/XYZ/".date."_X_plot.png"
-# bottom detector
+# Y plot (nT)
 pathPlot2 = "/home/pi/UKRAA_Magnetometer/plots/XYZ/".date."_Y_plot.png"
-# muons detected
+# Z plot (nT)
 pathPlot3 = "/home/pi/UKRAA_Magnetometer/plots/XYZ/".date."_Z_plot.png"
-
-# set output path to Plot folder
-#set output pathPlot
 
 # Set separator to ","
 set datafile separator ","
 
 # Title for graph
-# top detector
+# X plot (nT)
 GraphTitle1 = "X magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
-# bottom detector
+# Y plot (nT)
 GraphTitle2 = "Y magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
-# muons detected
+# Z plot (nT)
 GraphTitle3 = "Z magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
 
 # Set data types
@@ -182,13 +176,16 @@ set output pathPlot.".png"
 replot
 # end replot
 
+# Restore the terminal settings
+set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
+
+# This is important because it closes our output file.
+set output
+
 # print to log file
 print "PlotDataXYZACM0.gp         : "\
     .system("date +'%Y-%m-%d %H:%M:%S'")\
     ." : Completed XYZ plot for "\
     .system("date -d yesterday +'%Y-%m-%d'")
-
-# This is important because it closes our output file.
-set output
 
 # EOF
