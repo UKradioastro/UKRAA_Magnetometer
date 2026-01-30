@@ -8,4 +8,5 @@
 00 00 * * 00 bash /home/pi/UKRAA_Magnetometer/scripts/managelogfiles.sh
 
 # cron entry to upload plot files to www
-30 09 * * * cp -r /home/pi/UKRAA_Magnetometer/temp /var/www/html/
+30 09 * * * bash /home/pi/UKRAA_Magnetometer/scripts/moveGraphs.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
+

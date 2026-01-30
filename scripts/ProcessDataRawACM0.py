@@ -9,7 +9,7 @@ import statistics
 
 # print message to log file to say started
 
-print('ProcessDataRawACM0.py      :', \
+print('ProcessDataRawACM0.py :', \
       datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Started processing yesterdays magnetometer data for', \
       datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
@@ -50,7 +50,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataRawACM0.py      :', \
+    print('ProcessDataRawACM0.py :', \
           datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
           ': New directory created :', \
           ProcessedPath)
@@ -275,7 +275,7 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataRawACM0.py      :', \
+print('ProcessDataRawACM0.py :', \
       datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
       ': Completed processing yesterdays magnetometer data for', \
       datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))

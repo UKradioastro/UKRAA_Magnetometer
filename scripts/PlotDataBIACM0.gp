@@ -15,31 +15,58 @@
 reset
 
 # Set terminal 
-set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
+set terminal pngcairo \
+             background "#ffffff"\
+             enhanced \
+             font "DejaVuSansCondensed, 10"\
+             fontscale 1.0\
+             size 640,540\
+             rounded
 
 # Set print to <stdout>
 set print "-"
 
 # print to log file
-print "PlotDataBIACM0.gp          : "\
-    .system("date +'%Y-%m-%d %H:%M:%S'")\
-    ." : Started BI plots for "\
-    .system("date -d yesterday +'%Y-%m-%d'")
+print "PlotDataBIACM0.gp     : "\
+       .system("date +'%Y-%m-%d %H:%M:%S'")\
+       ." : Started BI plot for "\
+       .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
 pathData = "/home/pi/UKRAA_Magnetometer/data/processed"
 
-# Year folder
-YearFolder = "/".system("date -d yesterday +'%Y'")
-
-# YearMonth folder
-YearMonthFolder = "/".system("date -d yesterday +'%Y-%m'")
-
-# YearMonthDay file
-YearMontDayFile = "/".system("date -d yesterday +'%Y-%m-%d'").".csv"
-
 # Path to each data file for graphing
-FileData = pathData.YearFolder.YearMonthFolder.YearMontDayFile
+FileData = pathData\
+           ."/"\
+           .system("date -d yesterday +'%Y'")\
+           ."/"\
+           .system("date -d yesterday +'%Y-%m'")\
+           ."/"\
+           .system("date -d yesterday +'%Y-%m-%d'")\
+           .".csv"
+
+# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
+is_missing = system("/home/pi/UKRAA_Magnetometer/scripts/ismissing.sh ".FileData)
+if (is_missing == 1) \
+           {
+           print "PlotDataBIACM0.gp     : "\
+                  .system("date +'%Y/%M/%d %H:%M:%S'")\
+                  ." : data file missing, so..."; 
+           print "PlotDataBIACM0.gp     : "\
+                  .system("date +'%Y/%M/%d %H:%M:%S'")\
+                  ." : **FAILED** to complete BI plot for "\
+                  .system("date -d yesterday +'%Y-%m-%d'")
+           exit
+           }
+
+# FileData exists - good to continue...
+
+# Set separator to ","
+set datafile separator ","
+
+# undertake stats before setting timeformat and xdata
+stats FileData using 14 output prefix "BTdata" nooutput
+stats FileData using 15 output prefix "ITdata" nooutput
 
 # date to be processed
 date = system("date -d yesterday +'%Y-%m-%d'")
@@ -53,18 +80,25 @@ EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
 # setting output path to include data stamp
 # Path to directory to store file
 # B plot (nT)
-pathPlot1 = "/home/pi/UKRAA_Magnetometer/plots/BI/".date."_B_plot.png"
+pathPlot1 = "/home/pi/UKRAA_Magnetometer/plots/BI/"\
+             .date\
+             ."_B_plot.png"
+pathTemp1 = "/home/pi/UKRAA_Magnetometer/temp/B.png"
 # I plot (deg)
-pathPlot2 = "/home/pi/UKRAA_Magnetometer/plots/BI/".date."_I_plot.png"
-
-# Set separator to ","
-set datafile separator ","
+pathPlot2 = "/home/pi/UKRAA_Magnetometer/plots/BI/"\
+             .date\
+             ."_I_plot.png"
+pathTemp2 = "/home/pi/UKRAA_Magnetometer/temp/I.png"
 
 # Title for graph
 # B plot (nT)
-GraphTitle1 = "B magnetic field per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle1 = "B magnetic field data for "\
+               .system("date -d yesterday +'%A %d %B %Y'")\
+               ."\n Graph is updated every day at 9.30am \n"
 # I plot (deg)
-GraphTitle2 = "I magnetic field angle per minute data for ".system("date -d yesterday +'%A %d %B %Y'")."\n Graph is updated every day at 9.30am \n"
+GraphTitle2 = "I magnetic angle data for "\
+               .system("date -d yesterday +'%A %d %B %Y'")\
+               ."\n Graph is updated every day at 9.30am \n"
 
 # Set data types
 set xdata time
@@ -72,12 +106,14 @@ set xdata time
 # Set format types
 set format x "%H:%M" timedate
 set format y "%.1f" 
+set format y2 "%.1f" 
 set timefmt "%Y-%m-%d %H:%M:%S"
 
 # Set grid format
 set grid xtics nomxtics ytics nomytics noztics nomztics nortics nomrtics \
- nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
-set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,  linetype 0 linecolor 0 linewidth 0.500 dashtype solid
+         nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
+set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,\
+         linetype 0 linecolor 0 linewidth 0.500 dashtype solid
 
 # Set Legend (Key) above plot
 set key outside above center
@@ -103,58 +139,73 @@ set xlabel "Time (UTC)"
 set xlabel textcolor rgb "black" norotate
 set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
 
-# Y-axis labels and ranges
-set ylabel "Arbitary units" 
-set ylabel textcolor rgb "dark-violet" rotate
-set yrange [ * : * ] noreverse nowriteback
+##### Plot command # B(nT)
 
-# Plot command # B(nT)
+# Y-axis labels and ranges
+set ylabel "B (nT)" 
+set ylabel textcolor rgb "dark-violet" rotate
+set yrange [ (BTdata_min - 500) : (BTdata_max + 500) ] noreverse nowriteback
+
+# set STATS labels on graph
+set label 1 sprintf("Mean B(nT) : %0.1f nT", BTdata_mean)
+set label 1 at graph 0.02, 0.95 tc default
+set label 2 sprintf("Max B(nT) : %0.1f nT", BTdata_max)
+set label 2 at graph 0.02, 0.90 tc default
+set label 3 sprintf("Min B(nT) : %0.1f nT", BTdata_min)
+set label 3 at graph 0.02, 0.85 tc default
+
 GraphTitle = GraphTitle1
 set key title GraphTitle
 set output pathPlot1
-plot FileData using 1:14 linetype 1 linewidth 1 linecolor rgb "#0000FF" title "B magnetic field variation" with lines
+plot FileData using 1:14 \
+                    linetype 1 \
+                    linewidth 1 \
+                    linecolor rgb "#0000FF" \
+                    title "B magnetic field variation" \
+                    with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
-set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# Path to directory to store file
-pathPlot = "/home/pi/UKRAA_Magnetometer/temp/B"
-
-# set output path to Plot folder
-set output pathPlot.".png"
-
-# replot graph to Plot folder with added date tag
+set output pathTemp1
 replot
 # end replot
 
-# Plot command # I(deg)
+###### Plot command # I(deg)
+
+# Y-axis labels and ranges
+set ylabel "I (deg)" 
+set ylabel textcolor rgb "dark-violet" rotate
+set yrange [ (ITdata_min - 5) : (ITdata_max + 5) ] noreverse nowriteback
+
+# set STATS labels on graph
+set label 1 sprintf("Mean I(deg) : %0.1f deg", ITdata_mean)
+set label 1 at graph 0.02, 0.95 tc default
+set label 2 sprintf("Max I(deg) : %0.1f deg", ITdata_max)
+set label 2 at graph 0.02, 0.90 tc default
+set label 3 sprintf("Min I(deg) : %0.1f deg", ITdata_min)
+set label 3 at graph 0.02, 0.85 tc default
+
 GraphTitle = GraphTitle2
 set key title GraphTitle
 set output pathPlot2
-plot FileData using 1:12 linetype 1 linewidth 1 linecolor rgb "#FF0000" title "I magnetic field angle variation" with lines
+plot FileData using 1:15 \
+                    linetype 1 \
+                    linewidth 1 \
+                    linecolor rgb "#FF0000" \
+                    title "I magnetic angle variation" \
+                    with lines
 
 # Replot to terminal and create .png image with data tag for future upload to web page
-set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
-
-# Path to directory to store file
-pathPlot = "/home/pi/UKRAA_Magnetometer/temp/I"
-# set output path to Plot folder
-set output pathPlot.".png"
-
-# replot graph to Plot folder with added date tag
+set output pathTemp2
 replot
 # end replot
-
-# Restore the terminal settings
-set terminal pngcairo enhanced font "DejaVuSansCondensed, 10" rounded size 640,540 
 
 # This is important because it closes our output file.
 set output
 
 # print to log file
-print "PlotDataBIACM0.gp          : "\
-    .system("date +'%Y-%m-%d %H:%M:%S'")\
-    ." : Completed BI plots for "\
-    .system("date -d yesterday +'%Y-%m-%d'")
+print "PlotDataBIACM0.gp     : "\
+       .system("date +'%Y-%m-%d %H:%M:%S'")\
+       ." : Completed BI plot for "\
+       .system("date -d yesterday +'%Y-%m-%d'")
 
 # EOF
