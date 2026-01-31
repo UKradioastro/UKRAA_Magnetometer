@@ -39,11 +39,15 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that your UKRAA Magnetometer is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/tty*** in a terminal window on the RPi4/5 and reviewing the response.
+The code assumes that your UKRAA Magnetometer is connected to a RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/ttyAC*** in a terminal window on the RPi4/5 and reviewing the response.
 
-The code assumes username is **pi**.  If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python and gnuplot scripts, where *username* is the username you have selected for your RPi4/5.
+The code assumes username is **pi**. 
 
-The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**, if there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
+If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
+
+The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
+
+If there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
 
 **GetDataRawACM0.py** is run as a service.
 
