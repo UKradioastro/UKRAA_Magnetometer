@@ -43,7 +43,7 @@ The code assumes that your UKRAA Magnetometer is connected to a RPi4/5 via suppl
 
 The code assumes username is **pi**. 
 
-If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
+If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in all the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
 
 The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
 
@@ -62,7 +62,7 @@ Other scripts (Python, gnuplot and shell) are run from **cron**
 &nbsp;<!-- =============================================================================== --> 
 ### Where is my detector
 
-Plug your detector into any of the RPi USB ports - I normally use the blue ports (USB3).
+Plug your detector into any of the RPi USB ports - I normally use one of the blue ports (USB3).
 
 1. Open a terminal window and type the following command and press enter
 ```
@@ -104,7 +104,7 @@ ls /dev/tty*
 
 2. Open a terminal window, type the following command and press enter
 ```
-git clone https://github.com/UKradioastro/UKRAA_PicoMagnetometer.git
+git clone https://github.com/UKradioastro/UKRAA_Magnetometer.git
 ```
 
 ![img_01](images/RPi_imager_01.PNG)
@@ -151,19 +151,9 @@ sudo bash install.sh
 
 This will run the install script.
 
-There will be occasions during the running of the install script that require you to make a keyboard entry.
+There may be occasions during the running of the install script that require you to make a keyboard entry.
 
 When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
-
-During **mysql_secure_installation** you will be asked a number of questions.  
-
-* Enter current password for root (enter for none): ------> press **enter**
-* Switch to unix_socket authentication [Y/n] -------------> type **n** and press **enter**
-* Change the root password? [Y/n] -----------------------> type **n** and press **enter**
-* Remove anonymous users? [Y/n] -----------------------> type **y** and press **enter**
-* Disallow root login remotely? [Y/n] ---------------------> type **y** and press **enter**
-* Remove test database and access to it? [Y/n] ----------> type **y** and press **enter**
-* Reload privilege tables now? [Y/n] ----------------------> type **y** and press **enter**
 
 That's it!
 
@@ -179,20 +169,20 @@ The code is now set up to run automatically; it will get the data from the detec
 <!-- =============================================================================== --> 
 ## What does the code do
 
-The code receives the event data from the UKRAA Magnetometer detector via serial over the supplied USB cable and stores the event data to the raw data folder:
+The code receives the event data from the UKRAA Magnetometer detector via serial over the supplied USB cable and stores the event data to the raw data folder.
 
-The raw data will be processed overnight, via CRON, to get counts per minute, the frequency of the counts per minute and the frequency of the adc values for your previous day's data.
+The raw data will be processed overnight, via CRON, to get magnetic field values per minute, in the x, y and z directions, from your previous day's data.
 
 A number of plots will be created:
-* counts per minute
-* frequency of counts per minute
-* frequency of ADC values recorded
+* X, Y and Z (North/South, East/West and up/down)
+* H, D and Z (Local horizontal plane, declination angle and up/down)
+* B and I (Total strength Earths magnetic field and angle of Earths magnetic field)
 
-The raw data will also be processed overnight, via CRON, to produce % deviation of muon counts, this data is supplemented by a request  to [NMDB](https://www.nmdb.eu/) via NEST to get the previous days recorded neutron count, which will be overlaid onto the day / week / month / etc % deviation counts graphs.
+The raw data will also be processed and graphed overnight, via CRON, to produce a weekly summary of absolute change in magnetic field and % change of magnetic field and plot .
 
-These will appear as the required amount of data is recorded by the detector
+These will appear as the required amount of data is recorded by the magnetometer.
 
-A simple web server and web page is set up on your RPi so that you can view your detector's results on your desktop PC and/or smart phone when connected to your home network.
+A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.
 
 To access the webpage on your desktop PC or your smart phone…
 
@@ -200,7 +190,7 @@ To access the webpage on your desktop PC or your smart phone…
 
 2.	In the search bar type the following and press enter
 ```
-http://rpi4-UKRAA.local
+http://rpi4-UKRAA-MAG.local
 ```
 
 This will take you to the web page for your detector, displaying yesterday’s events graphs.
