@@ -2,7 +2,7 @@
 # UKRAA Magnetometer crontab entry
 
 # cron entry to process yesterdays raw magnetometer data
-00 04 * * * su pi -c "sudo bash /home/pi/UKRAA_Magnetometer/scripts/processData.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
+00 04 * * * su pi -c "sudo bash /home/pi/UKRAA_Magnetometer/scripts/processData.sh >> /home/pi/UKRAA_MagnetometerACM0/logfiles/log-Magnetometer.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
 
 # cron entry to manage logfiles - on a Sunday 00:00 each week
 00 00 * * 00 bash /home/pi/UKRAA_Magnetometer/scripts/managelogfiles.sh
