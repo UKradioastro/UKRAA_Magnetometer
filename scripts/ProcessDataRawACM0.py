@@ -134,10 +134,10 @@ for i in range(1, n+1):
     Median_BMP280Temp = 0.00
     Median_BMP280Pres = 0.00
     Calc_H            = 0.000000
-    Calc_D            = 0.0
+    Calc_D            = 0.0000
     Calc_Z            = 0.000000
     Calc_B            = 0.000000
-    Calc_I            = 0.0
+    Calc_I            = 0.0000
     
 
     for RawLine in RawCSV_reader:
@@ -218,7 +218,7 @@ for i in range(1, n+1):
     Calc_H = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT))))
     if (Calc_H == 0):
         Calc_H = math.nan
-    Calc_D = '{:.1f}'.format(math.degrees(math.atan(float(Median_Y_nT) / float(Median_X_nT))))
+    Calc_D = '{:.4f}'.format(math.degrees(math.atan(float(Median_Y_nT) / float(Median_X_nT))))
     if (Calc_D == 0):
         Calc_D = math.nan
     Calc_Z = '{:.6f}'.format(float(Median_Z_nT))
@@ -229,7 +229,7 @@ for i in range(1, n+1):
     Calc_B = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT)) + (float(Median_Z_nT) * float(Median_Z_nT))))
     if (Calc_B == 0):
         Calc_B = math.nan
-    Calc_I = '{:.1f}'.format(math.degrees(math.atan(float(Calc_Z) / float(Calc_H))))
+    Calc_I = '{:.4f}'.format(math.degrees(math.atan(float(Calc_Z) / float(Calc_H))))
     if (Calc_I == 0):
         Calc_I = math.nan
 
