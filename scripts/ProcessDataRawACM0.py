@@ -164,74 +164,75 @@ for i in range(1, n+1):
     
     # check if there is some x-axis data
     if (len(List_X_V) != 0):
-        Median_X_V = '{:.6f}'.format(statistics.median(List_X_V))
+        Median_X_V = statistics.median(List_X_V)
     else:
         Median_X_V = math.nan
         
     if (len(List_X_nT) != 0):
-        Median_X_nT = '{:.2f}'.format(statistics.median(List_X_nT))
+        Median_X_nT = statistics.median(List_X_nT)
     else:
         Median_X_nT = math.nan
         
     # check if there is some y-axis data
     if (len(List_Y_V) != 0):
-        Median_Y_V = '{:.6f}'.format(statistics.median(List_Y_V))
+        Median_Y_V = statistics.median(List_Y_V)
     else:
         Median_Y_V = math.nan
     
     if (len(List_Y_nT) != 0):
-        Median_Y_nT = '{:.2f}'.format(statistics.median(List_Y_nT))
+        Median_Y_nT = statistics.median(List_Y_nT)
     else:
         Median_Y_nT = math.nan
         
     # check if there is some z-axis data
     if (len(List_Z_V) != 0):
-        Median_Z_V = '{:.6f}'.format(statistics.median(List_Z_V))
+        Median_Z_V = statistics.median(List_Z_V)
     else:
         Median_Z_V = math.nan
         
     if (len(List_Z_nT) != 0):
-        Median_Z_nT = '{:.2f}'.format(statistics.median(List_Z_nT))
+        Median_Z_nT = statistics.median(List_Z_nT)
     else:
         Median_Z_nT = math.nan
         
     # check if there is some TMP36 temp data
     if (len(List_TMP36Temp) != 0):
-        Median_TMP36Temp = '{:.2f}'.format(statistics.median(List_TMP36Temp))
+        Median_TMP36Temp = statistics.median(List_TMP36Temp)
     else:
         Median_TMP36Temp = math.nan
         
     # check if there is some BMP280 temp data
     if (len(List_BMP280Temp) != 0):
-        Median_BMP280Temp = '{:.2f}'.format(statistics.median(List_BMP280Temp))
+        Median_BMP280Temp = statistics.median(List_BMP280Temp)
     else:
         Median_BMP280Temp = math.nan
 
     # check if there is some BMP280 pres data
     if (len(List_BMP280Pres) != 0):
-        Median_BMP280Pres = '{:.2f}'.format(statistics.median(List_BMP280Pres))
+        Median_BMP280Pres = statistics.median(List_BMP280Pres)
     else:
         Median_BMP280Pres = math.nan
 
 
     # Process XYZ data to HDZ data
-    Calc_H = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT))))
-    if (Calc_H == 0):
-        Calc_H = math.nan
-    Calc_D = '{:.4f}'.format(math.degrees(math.atan(float(Median_Y_nT) / float(Median_X_nT))))
-    if (Calc_D == 0):
-        Calc_D = math.nan
-    Calc_Z = '{:.6f}'.format(float(Median_Z_nT))
-    if (Calc_Z == 0):
-        Calc_Z = math.nan
+    Calc_H = math.nan
+    Calc_D = math.nan
+    Calc_Z = math.nan
+
+    if not (math.isnan(Median_X_nT) or math.isnan(Median_Y_nT)):
+        Calc_H = math.sqrt((Median_X_nT * Median_X_nT) + (Median_Y_nT * Median_Y_nT))
+        if (Calc_H != 0):
+            Calc_D = math.degrees(math.atan2(Median_Y_nT, Median_X_nT))
+        if not math.isnan(Median_Z_nT):
+            Calc_Z = Median_Z_nT
 
     # Process XYZ & HZ data to BI data
-    Calc_B = '{:.6f}'.format(math.sqrt((float(Median_X_nT) * float(Median_X_nT)) + (float(Median_Y_nT) * float(Median_Y_nT)) + (float(Median_Z_nT) * float(Median_Z_nT))))
-    if (Calc_B == 0):
-        Calc_B = math.nan
-    Calc_I = '{:.4f}'.format(math.degrees(math.atan(float(Calc_Z) / float(Calc_H))))
-    if (Calc_I == 0):
-        Calc_I = math.nan
+    Calc_B = math.nan
+    Calc_I = math.nan
+    if not (math.isnan(Median_X_nT) or math.isnan(Median_Y_nT) or math.isnan(Median_Z_nT)):
+        Calc_B = math.sqrt((Median_X_nT * Median_X_nT) + (Median_Y_nT * Median_Y_nT) + (Median_Z_nT * Median_Z_nT))
+        if (Calc_B != 0) and (not math.isnan(Calc_H)) and (Calc_H != 0):
+            Calc_I = math.degrees(math.atan2(Calc_Z, Calc_H))
 
 
     # write processed data to file

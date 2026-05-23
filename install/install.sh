@@ -39,10 +39,12 @@ echo "MagnetometerACM0.service installed and started"
 echo ""
 
 echo "Start installing UKRAA Magnetometer crontab entry..."
-echo "Clearing current crontab entry..."
-echo "NOTE: if you have edited your sudo crontab - this will be deleted.  You will need to reedit sudo crontab post update."
-sudo crontab -u root -r
-sudo crontab -u root -l  | cat - /home/pi/UKRAA_Magnetometer/install/crontabMagnetometerACM0.cron | sudo crontab -u root -
+echo "Updating current crontab entry..."
+tmpCronFile=$(mktemp)
+sudo crontab -u root -l 2>/dev/null | grep -v 'UKRAA_Magnetometer' > "$tmpCronFile"
+cat /home/pi/UKRAA_Magnetometer/install/crontabMagnetometerACM0.cron >> "$tmpCronFile"
+sudo crontab -u root "$tmpCronFile"
+rm -f "$tmpCronFile"
 echo "UKRAA Magnetometer crontab entry installed"
 echo ""
 
