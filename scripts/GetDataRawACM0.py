@@ -18,37 +18,40 @@ def main():
                         dsrdtr = False,
                         inter_byte_timeout = None,
                         exclusive = None)
-       
-    for line in ser:
-        # path for data storage
-        path = '/home/pi/UKRAA_Magnetometer/data/raw/'\
-                + datetime.strftime(datetime.now(timezone.utc), '%Y')\
-                + '/'\
-                + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
-        # check if the specific path exists
-        pathExists = os.path.exists(path)
-        if not pathExists:
-            # create directory structure
-            os.makedirs(path)
-        # output file to write data to
-        outfile = open('/home/pi/UKRAA_Magnetometer/data/raw/'
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y')
-                    + '/'
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
-                    + '/'
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
-                    + '.csv', mode = 'a')
-        # if data write to file
-        if line:
-            timetowrite = (datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
-                        + " "
-                        + datetime.strftime(datetime.now(timezone.utc), '%H:%M:%S'))
-            texttowrite = (line.decode('utf-8', 'ignore').strip())
 
-            print(timetowrite
-                + ','
-                + texttowrite
-                , file = outfile)
+    try:
+        for line in ser:
+            # path for data storage
+            path = '/home/pi/UKRAA_Magnetometer/data/raw/'\
+                    + datetime.strftime(datetime.now(timezone.utc), '%Y')\
+                    + '/'\
+                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
+            # check if the specific path exists
+            pathExists = os.path.exists(path)
+            if not pathExists:
+                # create directory structure
+                os.makedirs(path, exist_ok=True)
+            # if data write to file
+            if line:
+                timetowrite = (datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
+                            + " "
+                            + datetime.strftime(datetime.now(timezone.utc), '%H:%M:%S'))
+                texttowrite = (line.decode('utf-8', 'ignore').strip())
+                outfilePath = '/home/pi/UKRAA_Magnetometer/data/raw/'
+                outfilePath += datetime.strftime(datetime.now(timezone.utc), '%Y')
+                outfilePath += '/'
+                outfilePath += datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
+                outfilePath += '/'
+                outfilePath += datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
+                outfilePath += '.csv'
+
+                with open(outfilePath, mode='a', encoding='UTF-8') as outfile:
+                    print(timetowrite
+                        + ','
+                        + texttowrite
+                        , file = outfile)
+    finally:
+        ser.close()
         
                         
 if __name__ == "__main__":
