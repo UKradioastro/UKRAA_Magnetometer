@@ -46,7 +46,7 @@ FileData = pathData\
            .".csv"
 
 # check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("/home/pi/UKRAA_Magnetometer/scripts/isMissing.sh ".FileData)
+is_missing = system("sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/isMissing.sh ".FileData)
 if (is_missing == 1) \
            {
            print "PlotDataXYZACM0.gp    : "\
