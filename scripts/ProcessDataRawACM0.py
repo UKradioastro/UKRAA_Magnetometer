@@ -22,10 +22,10 @@ RawFieldNames    = ['RawDateTime',\
                     'RawY_nT', \
                     'RawZ_V', \
                     'RawZ_nT', \
-                    'RawTMP36Temp', \
-                    'RawBMP280Temp', \
-                    'RawBMP280Pres', \
-                    'RawName']
+                    'RawTMP36_degC', \
+                    'RawDelta_nT', \
+                    'RawColour', \
+                    'RawDetectorName']
 
 # Set path for data file structure
 
@@ -121,18 +121,16 @@ for i in range(1, n+1):
     List_X_nT         = list()
     List_Y_nT         = list()
     List_Z_nT         = list()
-    List_TMP36Temp    = list()
-    List_BMP280Temp   = list()
-    List_BMP280Pres   = list()
+    List_TMP36_degC   = list()
+    List_Delta_nT     = list()
     Median_X_V        = 0.000000
     Median_Y_V        = 0.000000
     Median_Z_V        = 0.000000
     Median_X_nT       = 0.0
     Median_Y_nT       = 0.0
     Median_Z_nT       = 0.0
-    Median_TMP36Temp  = 0.00
-    Median_BMP280Temp = 0.00
-    Median_BMP280Pres = 0.00
+    Median_TMP36_degC = 0.00
+    Median_Delta_nT   = 0.00
     Calc_H            = 0.000000
     Calc_D            = 0.0000
     Calc_Z            = 0.000000
@@ -154,9 +152,8 @@ for i in range(1, n+1):
             List_Y_nT.append(float(RawLine['RawY_nT']))
             List_Z_V.append(float(RawLine['RawZ_V']))
             List_Z_nT.append(float(RawLine['RawZ_nT']))
-            List_TMP36Temp.append(float(RawLine['RawTMP36Temp']))
-            List_BMP280Temp.append(float(RawLine['RawBMP280Temp']))
-            List_BMP280Pres.append(float(RawLine['RawBMP280Pres']))
+            List_TMP36_degC.append(float(RawLine['RawTMP36_degC']))
+            List_Delta_nT.append(float(RawLine['RawDelta_nT']))
             
     # close open RawFile
     RawFile.close()
@@ -196,22 +193,16 @@ for i in range(1, n+1):
         Median_Z_nT = math.nan
         
     # check if there is some TMP36 temp data
-    if (len(List_TMP36Temp) != 0):
-        Median_TMP36Temp = statistics.median(List_TMP36Temp)
+    if (len(List_TMP36_degC) != 0):
+        Median_TMP36_degC = statistics.median(List_TMP36_degC)
     else:
-        Median_TMP36Temp = math.nan
+        Median_TMP36_degC = math.nan
         
-    # check if there is some BMP280 temp data
-    if (len(List_BMP280Temp) != 0):
-        Median_BMP280Temp = statistics.median(List_BMP280Temp)
+    # check if there is some Delta_nT data
+    if (len(List_Delta_nT) != 0):
+        Median_Delta_nT = statistics.median(List_Delta_nT)
     else:
-        Median_BMP280Temp = math.nan
-
-    # check if there is some BMP280 pres data
-    if (len(List_BMP280Pres) != 0):
-        Median_BMP280Pres = statistics.median(List_BMP280Pres)
-    else:
-        Median_BMP280Pres = math.nan
+        Median_Delta_nT = math.nan
 
 
     # Process XYZ data to HDZ data
@@ -236,38 +227,36 @@ for i in range(1, n+1):
 
 
     # write processed data to file
-    ProcessedData.write(str(ProcessedTime))          # Data time date
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_X_V))             # 1 minute average X(V)
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_Y_V))             # 1 minute average Y(V)
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_Z_V))             # 1 minute average Z(V)
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_X_nT))            # 1 minute average X(nT)
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_Y_nT))            # 1 minute average Y(nT)
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_Z_nT))            # 1 minute average Z(nT)
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_TMP36Temp))       # 1 minute average TMP36 temperature
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_BMP280Temp))      # 1 minute average BMP280 temperature
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Median_BMP280Pres))      # 1 minute average PMP280 pressure
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Calc_H))                 # Calculated H value
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Calc_D))                 # Calculated D value
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Calc_Z))                 # Calculated Z value
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Calc_B))                 # Calculated B value
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(Calc_I))                 # Calculated I value
-    ProcessedData.write(",")                         # "," separator
-    ProcessedData.write(str(RawLine['RawName']))     # Detector name
-    ProcessedData.write("\n")                        # new line
+    ProcessedData.write(str(ProcessedTime))                  # Data time date
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_X_V))                     # 1 minute average X(V)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_Y_V))                     # 1 minute average Y(V)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_Z_V))                     # 1 minute average Z(V)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_X_nT))                    # 1 minute average X(nT)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_Y_nT))                    # 1 minute average Y(nT)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_Z_nT))                    # 1 minute average Z(nT)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_TMP36_degC))              # 1 minute average TMP36 temperature
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Median_Delta_nT))                # 1 minute average Delta(nT)
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Calc_H))                         # Calculated H value
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Calc_D))                         # Calculated D value
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Calc_Z))                         # Calculated Z value
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Calc_B))                         # Calculated B value
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(Calc_I))                         # Calculated I value
+    ProcessedData.write(",")                                 # "," separator
+    ProcessedData.write(str(RawLine['RawDetectorName']))     # Detector name
+    ProcessedData.write("\n")                                # new line
 
 # close open ProcessedData file
 ProcessedData.close()

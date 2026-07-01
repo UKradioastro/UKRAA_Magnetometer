@@ -13,12 +13,7 @@ su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataXYZACM0.g
                        2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
 
 # entry to plot yesterdays HDZ magnetic data
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataHDZACM0.gp\
-                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
-
-# entry to plot yesterdays BI magnetic data
-su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataBIACM0.gp\
+su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataActivityACM0.gp\
                         >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
                        2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
 
