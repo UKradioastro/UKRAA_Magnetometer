@@ -7,12 +7,17 @@ import os
 import math
 import statistics
 
+# logfile message helper
+def log_msg(message):
+    print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+        ':',
+        'ProcessDataRawACM0.py :',
+        message)
+
 # print message to log file to say started
 
-print('ProcessDataRawACM0.py :', \
-      datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Started processing yesterdays magnetometer data for', \
-      datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
+log_msg('Started processing yesterdays magnetometer data for ' \
+      + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
 
 # Set file headers for data file structure
 RawFieldNames    = ['RawDateTime',\
@@ -50,10 +55,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     os.makedirs(ProcessedPath)
-    print('ProcessDataRawACM0.py :', \
-          datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-          ': New directory created :', \
-          ProcessedPath)
+    log_msg('New directory created : ' + ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = "/home/pi/UKRAA_Magnetometer/data/processed/" \
@@ -265,10 +267,8 @@ ProcessedData.close()
 # Message to log file at end of program
 
 # print message to log file to say completed
-print('ProcessDataRawACM0.py :', \
-      datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), \
-      ': Completed processing yesterdays magnetometer data for', \
-      datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
+log_msg('Completed processing yesterdays magnetometer data for ' \
+    + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
       
 
 # =============================================================================

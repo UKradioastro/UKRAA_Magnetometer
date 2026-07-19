@@ -27,10 +27,9 @@ set terminal pngcairo \
 set print "-"
 
 # print to log file
-print "PlotDataActivity.gp   : "\
-       .system("date +'%Y-%m-%d %H:%M:%S'")\
-       ." : Started Activity plot for "\
-       .system("date -d yesterday +'%Y-%m-%d'")
+print system("date +'%Y-%m-%d %H:%M:%S'")\
+      ." : PlotDataActivityACM0.gp : Started Activity plot for "\
+      .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
 pathData = "/home/pi/UKRAA_Magnetometer/data/processed"
@@ -49,13 +48,11 @@ FileData = pathData\
 is_missing = system("sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/isMissing.sh ".FileData)
 if (is_missing == 1) \
            {
-           print "PlotDataActivity.gp   : "\
-                  .system("date +'%Y/%M/%d %H:%M:%S'")\
-                  ." : data file missing, so..."; 
-           print "PlotDataActivity.gp   : "\
-                  .system("date +'%Y/%M/%d %H:%M:%S'")\
-                  ." : **FAILED** to complete Activity plot for "\
-                  .system("date -d yesterday +'%Y-%m-%d'")
+           print system("date +'%Y-%m-%d %H:%M:%S'")\
+                 ." : PlotDataActivityACM0.gp : FAILED - data file missing, so..."; 
+           print system("date +'%Y-%m-%d %H:%M:%S'")\
+                 ." : PlotDataActivityACM0.gp : **FAILED** to complete Activity plot for "\
+                 .system("date -d yesterday +'%Y-%m-%d'")
            exit
            }
 
@@ -159,9 +156,8 @@ replot
 set output
 
 # print to log file
-print "PlotDataActivity.gp   : "\
-       .system("date +'%Y-%m-%d %H:%M:%S'")\
-       ." : Completed Activity plot for "\
-       .system("date -d yesterday +'%Y-%m-%d'")
+print system("date +'%Y-%m-%d %H:%M:%S'")\
+      ." : PlotDataActivityACM0.gp : Completed Activity plot for "\
+      .system("date -d yesterday +'%Y-%m-%d'")
 
 # EOF
