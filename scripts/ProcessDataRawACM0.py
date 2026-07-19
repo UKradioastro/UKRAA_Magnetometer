@@ -14,6 +14,14 @@ def log_msg(message):
         'ProcessDataRawACM0.py   :',
         message)
 
+
+# format helper for CSV output
+def format_fixed(value, decimal_places):
+    if math.isnan(value):
+        return 'nan'
+
+    return format(value, f'.{decimal_places}f')
+
 # print message to log file to say started
 
 log_msg('Started processing yesterdays magnetometer data for ' \
@@ -231,31 +239,31 @@ for i in range(1, n+1):
     # write processed data to file
     ProcessedData.write(str(ProcessedTime))                  # Data time date
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_X_V))                     # 1 minute average X(V)
+    ProcessedData.write(format_fixed(Median_X_V, 6))         # 1 minute average X(V)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_Y_V))                     # 1 minute average Y(V)
+    ProcessedData.write(format_fixed(Median_Y_V, 6))         # 1 minute average Y(V)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_Z_V))                     # 1 minute average Z(V)
+    ProcessedData.write(format_fixed(Median_Z_V, 6))         # 1 minute average Z(V)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_X_nT))                    # 1 minute average X(nT)
+    ProcessedData.write(format_fixed(Median_X_nT, 0))         # 1 minute average X(nT)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_Y_nT))                    # 1 minute average Y(nT)
+    ProcessedData.write(format_fixed(Median_Y_nT, 0))         # 1 minute average Y(nT)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_Z_nT))                    # 1 minute average Z(nT)
+    ProcessedData.write(format_fixed(Median_Z_nT, 0))         # 1 minute average Z(nT)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_TMP36_degC))              # 1 minute average TMP36 temperature
+    ProcessedData.write(format_fixed(Median_TMP36_degC, 1))   # 1 minute average TMP36 temperature
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Median_Delta_nT))                # 1 minute average Delta(nT)
+    ProcessedData.write(format_fixed(Median_Delta_nT, 1))     # 1 minute average Delta(nT)
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Calc_H))                         # Calculated H value
+    ProcessedData.write(format_fixed(Calc_H, 2))              # Calculated H value
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Calc_D))                         # Calculated D value
+    ProcessedData.write(format_fixed(Calc_D, 1))              # Calculated D value
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Calc_Z))                         # Calculated Z value
+    ProcessedData.write(format_fixed(Calc_Z, 2))              # Calculated Z value
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Calc_B))                         # Calculated B value
+    ProcessedData.write(format_fixed(Calc_B, 2))              # Calculated B value
     ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(Calc_I))                         # Calculated I value
+    ProcessedData.write(format_fixed(Calc_I, 1))              # Calculated I value
     ProcessedData.write(",")                                 # "," separator
     ProcessedData.write(str(RawLine['RawDetectorName']))     # Detector name
     ProcessedData.write("\n")                                # new line
