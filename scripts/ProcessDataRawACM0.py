@@ -11,7 +11,7 @@ import statistics
 def log_msg(message):
     print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
         ':',
-        'ProcessDataRawACM0.py :',
+        'ProcessDataRawACM0.py   :',
         message)
 
 # print message to log file to say started
