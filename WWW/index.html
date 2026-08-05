@@ -6,88 +6,12 @@
 <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  background:
-    radial-gradient(circle at top, rgba(255, 213, 128, 0.25), transparent 28%),
-    linear-gradient(180deg, #f7f3eb 0%, #efeadf 100%);
-  color: #161616;
-}
-a { color: inherit; }
-img { max-width: 100%; height: auto; display: block; }
-.mySlides { display: none; }
-.w3-top { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
-.w3-bar { display: flex; align-items: center; flex-wrap: wrap; }
-.w3-bar-item { display: block; }
-.w3-black { background: #111; color: #f4efe4; }
-.w3-grey { background: #ddd6c8; color: #111; }
-.w3-white { background: rgba(255, 255, 255, 0.82); color: #111; }
-.w3-card, .w3-card-4 { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18); }
-.w3-button {
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  text-decoration: none;
-}
-.w3-padding-large { padding: 14px 18px; }
-.w3-padding-32 { padding-top: 32px; padding-bottom: 32px; }
-.w3-padding-64 { padding-top: 64px; padding-bottom: 64px; }
-.w3-content { max-width: 2000px; margin: 46px auto 0; }
-.w3-container { padding: 16px; }
-.w3-center { text-align: center; }
-.w3-left-align { text-align: left; }
-.w3-justify { text-align: justify; }
-.w3-wide { letter-spacing: 0.14em; text-transform: uppercase; }
-.w3-opacity { opacity: 0.8; }
-.w3-round { border-radius: 14px; }
-.w3-margin-bottom { margin-bottom: 16px; }
-.w3-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
-.w3-col { flex: 1 1 280px; }
-.w3-third { flex: 1 1 30%; }
-.w3-auto { flex: 0 1 auto; }
-.w3-display-container { position: relative; }
-.w3-display-bottommiddle {
-  position: absolute;
-  left: 50%;
-  bottom: 1rem;
-  transform: translateX(-50%);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
-}
-.w3-dropdown-hover { position: relative; }
-.w3-dropdown-content {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 100%;
-  min-width: 240px;
-  background: #111;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.28);
-}
-.w3-dropdown-hover:hover .w3-dropdown-content { display: block; }
-.w3-bar-block { display: block; }
-.w3-hide { display: none !important; }
-.w3-show { display: block !important; }
-.w3-hide-small { display: block; }
-.w3-hide-medium, .w3-hide-large { display: block; }
-.w3-right { margin-left: auto; }
-@media (max-width: 768px) {
-  .w3-hide-small { display: none !important; }
-  .w3-hide-medium { display: none !important; }
-  .w3-bar { gap: 0; }
-  .w3-content { margin-top: 62px; }
-  .w3-dropdown-content { position: static; width: 100%; }
-  .w3-row { flex-direction: column; }
-}
-@media (min-width: 769px) {
-  .w3-hide-large { display: none !important; }
-}
+body {font-family: "Lato", sans-serif}
+.mySlides {display: none}
 </style>
 </head>
 
@@ -97,16 +21,15 @@ img { max-width: 100%; height: auto; display: block; }
 <!-- Navbar -->
 <div class="w3-top">
   <div class="w3-bar w3-black w3-card">
-    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu">Menu</a>
+    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
     <a href="#home" class="w3-bar-item w3-button w3-padding-large">HOME</a>
     <a href="#who" class="w3-bar-item w3-button w3-padding-large w3-hide-small">ABOUT US</a>
     <a href="#detector" class="w3-bar-item w3-button w3-padding-large w3-hide-small">MAGNETOMETER</a>
     <div class="w3-dropdown-hover w3-hide-small">
-      <button class="w3-padding-large w3-button" title="More">GRAPHS</button>     
+      <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
+        <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
-        <a href="#daily_HDZ" class="w3-bar-item w3-button">DAY HDZ GRAPHS</a>
-        <a href="#daily_BI" class="w3-bar-item w3-button">DAY BI GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -117,9 +40,8 @@ img { max-width: 100%; height: auto; display: block; }
 <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
+  <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XYZ GRAPHS</a>
-  <a href="#daily_HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY HDZ GRAPHS</a>
-  <a href="#daily_BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY BI GRAPHS</a>
 </div>
 
 
@@ -170,8 +92,22 @@ img { max-width: 100%; height: auto; display: block; }
 
 
   <!-- Graphs Section -->
+  <!-- daily Activity plots -->
+  <div class="w3-white" id="daily_Act">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+    <h2 class="w3-wide">MY DAILY ACTIVITY RESULTS</h2>
+    <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
+    <p class="w3-center">No accuracy is claimed for any published data</p>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-auto">
+        <p>H magnetic field variation for last day</p>
+        <img src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+      </div>
+    </div>
+  </div>
+
   <!-- Daily XYZ plot -->
-  <div class="w3-white" id="daily_XYZ">
+  <div class="w3-black" id="daily_XYZ">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
       <h2 class="w3-wide">MY DAILY XYZ RESULTS</h2>
       <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
@@ -196,52 +132,6 @@ img { max-width: 100%; height: auto; display: block; }
     </div>
   </div>
 
-  <!-- daily HDZ plots -->
-  <div class="w3-black" id="daily_HDZ">
-    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
-    <h2 class="w3-wide">MY DAILY HDZ RESULTS</h2>
-    <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
-    <p class="w3-center">No accuracy is claimed for any published data</p>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>H magnetic field variation for last day</p>
-        <img src="./temp/H.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
-      </div>
-    </div>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>D magnetic field angle variation for last day</p>
-        <img src="./temp/D.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
-      </div>
-    </div>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>Z magnetic field variation for last day</p>
-        <img src="./temp/Z.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
-      </div>
-    </div>
-  </div>
-
-    <!-- daily BI plots -->
-  <div class="w3-white" id="daily_BI">
-    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
-    <h2 class="w3-wide">MY DAILY BI RESULTS</h2>
-    <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
-    <p class="w3-center">No accuracy is claimed for any published data</p>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>B magnetic field variation for last day</p>
-        <img src="./temp/B.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
-      </div>
-    </div>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>I magnetic field angle variation for last day</p>
-        <img src="./temp/I.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
-      </div>
-    </div>
-  </div>
-
 
   <!-- The Contact Section -->
   <div class="w3-grey" id="contact">
@@ -250,9 +140,9 @@ img { max-width: 100%; height: auto; display: block; }
       <p class="w3-opacity w3-center"><i>Want more info? Contact us!</i></p>
       <div class="w3-row w3-padding-32">
         <div class="w3-col m6 w3-large w3-margin-bottom">
-            Location:  UK<br>
-            WWW:  <a href="https://ukraa.com/" target="blank">ukraa.com</a><br>
-            Email:  <a href="mailto:magnetometer@ukraa.com">magnetometer@ukraa.com</a><br>
+          <i class="fa fa-map-marker" style="width:30px"></i>Location:  UK<br>
+          <i class="fa fa-search" style="width:30px"></i> WWW:  <a href="https://ukraa.com/" target="_blank">ukraa.com</a><br>
+          <i class="fa fa-envelope" style="width:30px"> </i> Email:  <a href="mailto:magnetometer@ukraa.com">magnetometer@ukraa.com</a><br>
         </div>
         <div class="w3-col m6">
           <div class="w3-third">
