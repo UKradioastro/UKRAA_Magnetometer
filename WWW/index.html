@@ -28,8 +28,8 @@ body {font-family: "Lato", sans-serif}
     <div class="w3-dropdown-hover w3-hide-small">
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
-        <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
+        <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -40,8 +40,8 @@ body {font-family: "Lato", sans-serif}
 <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
-  <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XZY GRAPHS</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
+  <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XYZ GRAPHS</a>
 </div>
 
 
@@ -92,8 +92,22 @@ body {font-family: "Lato", sans-serif}
 
 
   <!-- Graphs Section -->
+  <!-- daily Activity plots -->
+  <div class="w3-white" id="daily_Act">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+    <h2 class="w3-wide">MY DAILY ACTIVITY RESULTS</h2>
+    <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
+    <p class="w3-center">No accuracy is claimed for any published data</p>
+    <div class="w3-row w3-padding-32">
+      <div class="w3-auto">
+        <p>H magnetic field variation for last day</p>
+        <img src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+      </div>
+    </div>
+  </div>
+
   <!-- Daily XYZ plot -->
-  <div class="w3-white" id="daily_XYZ">
+  <div class="w3-black" id="daily_XYZ">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
       <h2 class="w3-wide">MY DAILY XYZ RESULTS</h2>
       <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
@@ -118,19 +132,6 @@ body {font-family: "Lato", sans-serif}
     </div>
   </div>
 
-  <!-- daily Activity plots -->
-  <div class="w3-black" id="daily_Act">
-    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
-    <h2 class="w3-wide">MY DAILY ACTIVITY RESULTS</h2>
-    <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
-    <p class="w3-center">No accuracy is claimed for any published data</p>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>H magnetic field variation for last day</p>
-        <img src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
-      </div>
-    </div>
-  </div>
 
   <!-- The Contact Section -->
   <div class="w3-grey" id="contact">

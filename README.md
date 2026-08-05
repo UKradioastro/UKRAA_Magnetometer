@@ -3,14 +3,13 @@
 </div>
 
 
-# Python code for the UKRAA Magnetometer
+# Python code for the UKRAA PicoMagnetometer
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](/LICENSE)
 
 
-Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA Magnetometer
+Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMagnetometer
 
 This software was written to suit a specific set-up, feel free to use as you see fit.
-
 
 Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folder
 
@@ -21,7 +20,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 ## Contents
 
 - [Using the code](#using-the-code) 
-- [Where is my detector](#where-is-my-detector)
+- [Where is my magnetometer](#where-is-my-magnetometer)
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
@@ -38,17 +37,17 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that your UKRAA Magnetometer is connected to a RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/ttyAC*** in a terminal window on the RPi4/5 and reviewing the response.
+The code assumes that your UKRAA PicoMagnetometer is connected to a RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/ttyAC*** in a terminal window on the RPi4/5 and reviewing the response.
 
 The code assumes username is **pi**. 
 
 If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in all the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
 
-The code assumes one detector connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
+The code assumes one magnetometer connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
 
-If there are other devices connected to the RPi and your detector is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRawACM0.py** python script, where *ttyACMx* is the tty address of you connected detector.
+If there are other devices connected to the RPi and your magnetometer is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRaw.py** python script, where *ttyACMx* is the tty address of you connected magnetometer.
 
-**GetDataRawACM0.py** is run as a service.
+**GetDataRaw.py** is run as a service.
 
 Other scripts (Python, gnuplot and shell) are run from **cron**
 
@@ -59,9 +58,9 @@ Other scripts (Python, gnuplot and shell) are run from **cron**
 ---
 
 &nbsp;<!-- =============================================================================== --> 
-### Where is my detector
+### Where is my PicoMagnetometer
 
-Plug your detector into any of the RPi USB ports - I normally use one of the blue ports (USB3).
+Plug your PicoMagnetometer into any of the RPi USB ports - I normally use one of the blue ports (USB3).
 
 1. Open a terminal window and type the following command and press enter
 ```
@@ -76,11 +75,11 @@ ls /dev/tty*
 
 &nbsp;
 
-3. This is the USB address for your attached detector - if you have more than one detector attached you may see **/dev/ttyACM1** etc.
+3. This is the USB address for your attached PicoMagnetometer - if you have more than one magnetometer attached you may see **/dev/ttyACM1** etc.
 
 &nbsp;
 
-4. If you do not see **/dev/ttyACM0**, then unplug and plug the detector back in and try again.
+4. If you do not see **/dev/ttyACM0**, then unplug and plug the PicoMagnetometer back in and try again.
 
 &nbsp;
 
@@ -156,7 +155,7 @@ When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **
 
 That's it!
 
-The code is now set up to run automatically; it will get the data from the detector, process yesterdays data, plot yesterdays data and post yesterdays plots to your intranet web page once per day, at 9.30am in the morning.
+The code is now set up to run automatically; it will get the data from the magnetometer, process the data, plot the data and post the plots to your intranet web page.
 
 [Back to Contents...](#contents)
 
@@ -168,7 +167,7 @@ The code is now set up to run automatically; it will get the data from the detec
 <!-- =============================================================================== --> 
 ## What does the code do
 
-The code receives the event data from the UKRAA Magnetometer detector via serial over the supplied USB cable and stores the event data to the raw data folder.
+The code receives the event data from the UKRAA Magnetometer magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
 
 The raw data will be processed overnight, via CRON, to get magnetic field values per minute, in the x, y and z directions, from your previous day's data.
 
@@ -192,7 +191,7 @@ To access the webpage on your desktop PC or your smart phone…
 http://rpi4-UKRAA-MAG.local
 ```
 
-This will take you to the web page for your detector, displaying yesterday’s events graphs.
+This will take you to the web page for your magnetometer, displaying yesterday’s events graphs.
 
 NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
 
@@ -208,7 +207,7 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check GetDataRawACM0 service is running
+## Check GetDataRaw.py service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
@@ -219,28 +218,28 @@ sudo systemctl status MagnetometerACM0.service
 
 2. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start MagnetometerACM0.service
+sudo systemctl start Magnetometer.service
 ```
 
 &nbsp;
 
 3. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop MagnetometerACM0.service
+sudo systemctl stop Magnetometer.service
 ```
 
 &nbsp;
 
 4. To **enable** your service, type the following command and press enter.
 ```
-sudo systemctl enable MagnetometerACM0.service
+sudo systemctl enable Magnetometer.service
 ```
 
 &nbsp;
 
 5. To **disable** your service, type the following command and press enter.
 ```
-sudo systemctl disable MagnetometerACM0.service
+sudo systemctl disable Magnetometer.service
 ```
 
 [Back to Contents...](#contents)
