@@ -28,7 +28,7 @@ set print "-"
 
 # print to log file
 print system("date +'%Y-%m-%d %H:%M:%S'")\
-      ." : PlotDataActivityACM0.gp : Started Activity plot for "\
+      ." : PlotDataActivityACM0.gp  : Started Activity plot for "\
       .system("date -d yesterday +'%Y-%m-%d'")
 
 # Set up data paths
@@ -49,9 +49,9 @@ is_missing = system("sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/isMissin
 if (is_missing == 1) \
            {
            print system("date +'%Y-%m-%d %H:%M:%S'")\
-                 ." : PlotDataActivityACM0.gp : FAILED - data file missing, so..."; 
+                 ." : PlotDataActivityACM0.gp  : FAILED - data file missing, so..."; 
            print system("date +'%Y-%m-%d %H:%M:%S'")\
-                 ." : PlotDataActivityACM0.gp : **FAILED** to complete Activity plot for "\
+                 ." : PlotDataActivityACM0.gp  : **FAILED** to complete Activity plot for "\
                  .system("date -d yesterday +'%Y-%m-%d'")
            exit
            }
@@ -157,7 +157,7 @@ set output
 
 # print to log file
 print system("date +'%Y-%m-%d %H:%M:%S'")\
-      ." : PlotDataActivityACM0.gp : Completed Activity plot for "\
+      ." : PlotDataActivityACM0.gp  : Completed Activity plot for "\
       .system("date -d yesterday +'%Y-%m-%d'")
 
 # EOF

@@ -20,7 +20,7 @@ from magnetometer_common import utc_now
 def log_msg(message):
     print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
         ':',
-        'ProcessRollingACM0.py   :',
+        'ProcessRollingACM0.py    :',
         message)
 
 

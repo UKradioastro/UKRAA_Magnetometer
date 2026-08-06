@@ -21,7 +21,7 @@ from magnetometer_common import parse_raw_datetime
 def log_msg(message):
     print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
         ':',
-        'ProcessDataHourACM0.py  :',
+        'ProcessDataHourACM0.py   :',
         message)
 
 def create_empty_hour_bins(total_hours):
