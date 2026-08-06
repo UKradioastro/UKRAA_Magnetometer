@@ -3,14 +3,14 @@
 enabled = false
 
 # Hostinger FTP settings
-site = ftp.n15weather.co.uk
+site = your-upload-ftp
 user = your-upload-user
 password = your-upload-password
-port = 21
+port = your-upload-port
 
 # Base target folder on the remote site.
 # Daily images upload here; rolling uploads go into <directory>/rolling.
-directory = /magnetometer_N15/temp
+directory = /your-upload-directory
 
 # Connection options
 timeout_seconds = 30
