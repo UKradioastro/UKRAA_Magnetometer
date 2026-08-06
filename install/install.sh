@@ -38,11 +38,22 @@ else
 fi
 echo ""
 
+echo "Set up default remote upload configuration..."
+if [ ! -f /home/pi/UKRAA_Magnetometer/config/remote-upload.ini ]; then
+	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/remote-upload.ini.example /home/pi/UKRAA_Magnetometer/config/remote-upload.ini
+	echo "Created /home/pi/UKRAA_Magnetometer/config/remote-upload.ini"
+else
+	echo "Existing /home/pi/UKRAA_Magnetometer/config/remote-upload.ini retained"
+fi
+echo ""
+
 echo "Sort out UKRAA Magnetometer file permissions..."
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.py
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.sh
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testAlertEmailACM0.sh
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmailACM0.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testRemoteUploadACM0.sh
 echo "UKRAA Magnetometer file permissions sorted out"
 echo ""
 

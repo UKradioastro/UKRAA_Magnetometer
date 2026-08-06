@@ -276,42 +276,58 @@ function formatAlertSummary(level, isStale, latestActivity) {
   return "Latest activity is " + latestActivity.toFixed(1) + " nT, below the yellow threshold.";
 }
 
-function updateAlertBanner(status) {
+function updateAlertBanner(status, statusSourcePath) {
   var banner = document.getElementById("alertBanner");
   var title = document.getElementById("alertTitle");
   var summary = document.getElementById("alertSummary");
   var meta = document.getElementById("alertMeta");
   var level = status.alert_level || "unknown";
   var bannerClass = status.is_stale ? "stale" : level;
+  var sourcePath = statusSourcePath || "unknown";
 
   banner.className = "status-banner " + bannerClass;
   title.textContent = formatAlertTitle(level, status.is_stale);
   summary.textContent = formatAlertSummary(level, status.is_stale, status.latest_activity_nt);
   meta.textContent = "Last sample: " + (status.latest_sample_time_utc || "unknown")
     + " | Latest processed minute: " + (status.latest_processed_minute_utc || "unknown")
-    + " | Activity: " + (status.latest_activity_nt === null ? "unknown" : status.latest_activity_nt.toFixed(1) + " nT");
+    + " | Activity: " + (status.latest_activity_nt === null ? "unknown" : status.latest_activity_nt.toFixed(1) + " nT")
+    + " | Status source: " + sourcePath;
 }
 
 function setAlertUnavailable(message) {
-  updateAlertBanner({alert_level: "unknown", is_stale: false, latest_activity_nt: null, latest_sample_time_utc: "unknown", latest_processed_minute_utc: "unknown"});
+  updateAlertBanner({alert_level: "unknown", is_stale: false, latest_activity_nt: null, latest_sample_time_utc: "unknown", latest_processed_minute_utc: "unknown"}, "unavailable");
   document.getElementById("alertSummary").textContent = message;
   document.getElementById("alertMeta").textContent = "Status JSON: unavailable";
 }
 
 function refreshRollingStatus() {
-  fetch("./status/current.json", { cache: "no-store" })
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error("status fetch failed");
-      }
-      return response.json();
-    })
-    .then(function(status) {
-      updateAlertBanner(status);
-    })
-    .catch(function() {
+  var statusCandidates = [
+    "./status/current.json",
+    "./temp/status/current.json"
+  ];
+
+  function fetchNextStatus(index) {
+    if (index >= statusCandidates.length) {
       setAlertUnavailable("Waiting for the latest rolling status file.");
-    });
+      return;
+    }
+
+    fetch(statusCandidates[index], { cache: "no-store" })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error("status fetch failed");
+        }
+        return response.json();
+      })
+      .then(function(status) {
+        updateAlertBanner(status, statusCandidates[index]);
+      })
+      .catch(function() {
+        fetchNextStatus(index + 1);
+      });
+  }
+
+  fetchNextStatus(0);
 }
 
 refreshRollingStatus();

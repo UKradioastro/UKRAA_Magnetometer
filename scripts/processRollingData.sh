@@ -41,6 +41,12 @@ fi
 
 if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/publishWebACM0.sh"; then
     log_msg "processRollingData.sh    : Completed rolling publish" >> "$MAIN_LOG"
+
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/uploadRemoteACM0.sh" rolling; then
+        log_msg "processRollingData.sh    : Completed remote rolling upload" >> "$MAIN_LOG"
+    else
+        log_msg "processRollingData.sh    : FAILED remote rolling upload (local publish kept)" >> "$ERROR_LOG"
+    fi
 else
     log_msg "processRollingData.sh    : FAILED rolling publish" >> "$ERROR_LOG"
     exit 1

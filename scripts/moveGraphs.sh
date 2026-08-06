@@ -58,6 +58,12 @@ then
   done < "$COPY_OUTPUT_FILE"
 
   log_msg "moveGraphs.sh           : Completed moving graphs" >> "$MAIN_LOG"
+
+  if /bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh daily; then
+    log_msg "moveGraphs.sh           : Completed remote daily upload" >> "$MAIN_LOG"
+  else
+    log_msg "moveGraphs.sh           : FAILED remote daily upload (local publish kept)" >> "$ERROR_LOG"
+  fi
 else
   log_msg "moveGraphs.sh           : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
   log_msg "moveGraphs.sh           : FAILED to move graphs" >> "$ERROR_LOG"
