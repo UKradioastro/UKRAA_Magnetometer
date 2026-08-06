@@ -149,6 +149,14 @@ sudo bash install.sh
 
 This will run the install script.
 
+Optional: run an install-time heartbeat smoke check (disabled by default):
+
+```
+sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh
+```
+
+This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_SMOKE_CHECK: PASS` or `HEARTBEAT_SMOKE_CHECK: FAIL` summary.
+
 There may be occasions during the running of the install script that require you to make a keyboard entry.
 
 When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
@@ -324,6 +332,49 @@ Or run the Python script directly:
 ```
 
 The test email does not update transition state, so normal alert logic is unaffected.
+
+### Optional daily heartbeat email
+
+You can enable a once-per-day summary email so you know the system is alive even when no threshold transition occurs.
+
+In `alerts.ini`:
+
+```
+[heartbeat]
+enabled = true
+hour_utc = 9
+to =
+attach_plot = false
+```
+
+Notes:
+
+* `hour_utc` is the first UTC hour of the day when the heartbeat can send.
+* Only one heartbeat attempt is made per UTC day (success or failure), to avoid retry spam every 5 minutes.
+* If `heartbeat.to` is blank, it uses `[email] to`.
+
+Environment variable overrides are also available:
+
+* `MAGNETOMETER_HEARTBEAT_ENABLED`
+* `MAGNETOMETER_HEARTBEAT_HOUR_UTC`
+* `MAGNETOMETER_HEARTBEAT_TO`
+* `MAGNETOMETER_HEARTBEAT_ATTACH_PLOT`
+
+### Send a one-off heartbeat test email immediately
+
+To verify heartbeat email delivery without waiting for `heartbeat.hour_utc`, run:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmailACM0.sh
+```
+
+Or run the Python script directly:
+
+```
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-heartbeat
+```
+
+This immediate heartbeat test does not update daily heartbeat schedule/state tracking.
 
 [Back to Contents...](#contents)
 

@@ -120,6 +120,21 @@ def parse_bool(value, default_value):
     return value.strip().lower() in ('1', 'true', 'yes', 'y', 'on')
 
 
+def parse_int(value, default_value, minimum_value=None, maximum_value=None):
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default_value
+
+    if minimum_value is not None and parsed < minimum_value:
+        return minimum_value
+
+    if maximum_value is not None and parsed > maximum_value:
+        return maximum_value
+
+    return parsed
+
+
 def build_settings(base_path):
     config_path = os.environ.get('MAGNETOMETER_ALERTS_INI_PATH', '').strip()
     if not config_path:
@@ -157,6 +172,18 @@ def build_settings(base_path):
             get_config_value(parser, 'MAGNETOMETER_EMAIL_ATTACH_PLOT', 'email', 'attach_plot', 'true'),
             True),
         'web_url': get_config_value(parser, 'MAGNETOMETER_WEB_URL', 'web', 'url', ''),
+        'heartbeat_enabled': parse_bool(
+            get_config_value(parser, 'MAGNETOMETER_HEARTBEAT_ENABLED', 'heartbeat', 'enabled', 'false'),
+            False),
+        'heartbeat_hour_utc': parse_int(
+            get_config_value(parser, 'MAGNETOMETER_HEARTBEAT_HOUR_UTC', 'heartbeat', 'hour_utc', '9'),
+            9,
+            minimum_value=0,
+            maximum_value=23),
+        'heartbeat_attach_plot': parse_bool(
+            get_config_value(parser, 'MAGNETOMETER_HEARTBEAT_ATTACH_PLOT', 'heartbeat', 'attach_plot', 'false'),
+            False),
+        'heartbeat_to': get_config_value(parser, 'MAGNETOMETER_HEARTBEAT_TO', 'heartbeat', 'to', ''),
     }
 
     return settings
@@ -264,6 +291,116 @@ def build_test_email_message(settings, status):
     return subject, '\n'.join(lines)
 
 
+def build_heartbeat_email_message(status, settings, now_utc):
+    latest_activity = status.get('latest_activity_nt')
+    activity_text = 'unknown'
+    if latest_activity is not None:
+        activity_text = f'{latest_activity:.1f} nT'
+
+    level_text = (status.get('alert_level') or 'unknown').upper()
+    subject = f'[UKRAA Magnetometer] Daily heartbeat - {level_text} - {activity_text}'
+
+    lines = [
+        'UKRAA Magnetometer daily heartbeat',
+        '',
+        f'Sent at (UTC): {now_utc.isoformat()}',
+        f'Current alert level: {level_text}',
+        f'Latest activity: {activity_text}',
+        f'Latest sample time (UTC): {status.get("latest_sample_time_utc", "unknown")}',
+        f'Latest processed minute (UTC): {status.get("latest_processed_minute_utc", "unknown")}',
+        f'Stale status: {status.get("is_stale", True)}',
+        f'Detector: {status.get("detector_name", "unknown")}',
+        '',
+        'Thresholds in use:',
+        f'  Yellow: {status.get("yellow_threshold_nt", "unknown")} nT',
+        f'  Amber: {status.get("amber_threshold_nt", "unknown")} nT',
+        f'  Red: {status.get("red_threshold_nt", "unknown")} nT',
+    ]
+
+    web_url = settings.get('web_url', '')
+    if web_url:
+        lines.extend(['', f'Web page: {web_url}'])
+
+    lines.extend([
+        '',
+        'This is a daily health-check email to confirm the magnetometer alert pipeline is running.',
+    ])
+
+    return subject, '\n'.join(lines)
+
+
+def build_heartbeat_mail_settings(settings):
+    heartbeat_settings = dict(settings)
+    heartbeat_settings['email_attach_plot'] = settings['heartbeat_attach_plot']
+
+    heartbeat_to = settings['heartbeat_to'].strip()
+    if heartbeat_to:
+        heartbeat_settings['email_to'] = heartbeat_to
+
+    return heartbeat_settings
+
+
+def maybe_send_daily_heartbeat(status, previous_state, settings, activity_plot_path):
+    if not settings['heartbeat_enabled']:
+        return {
+            'attempted': False,
+            'sent': False,
+            'error': '',
+            'attempt_date_utc': previous_state.get('last_heartbeat_attempt_date_utc'),
+            'attempt_utc': previous_state.get('last_heartbeat_attempt_utc'),
+            'sent_date_utc': previous_state.get('last_heartbeat_sent_date_utc'),
+            'sent_utc': previous_state.get('last_heartbeat_sent_utc'),
+        }
+
+    now_utc = utc_now().replace(microsecond=0)
+    today_utc = now_utc.date().isoformat()
+
+    if now_utc.hour < settings['heartbeat_hour_utc']:
+        return {
+            'attempted': False,
+            'sent': False,
+            'error': '',
+            'attempt_date_utc': previous_state.get('last_heartbeat_attempt_date_utc'),
+            'attempt_utc': previous_state.get('last_heartbeat_attempt_utc'),
+            'sent_date_utc': previous_state.get('last_heartbeat_sent_date_utc'),
+            'sent_utc': previous_state.get('last_heartbeat_sent_utc'),
+        }
+
+    last_attempt_date = previous_state.get('last_heartbeat_attempt_date_utc')
+    if last_attempt_date == today_utc:
+        return {
+            'attempted': False,
+            'sent': False,
+            'error': previous_state.get('last_heartbeat_error', ''),
+            'attempt_date_utc': previous_state.get('last_heartbeat_attempt_date_utc'),
+            'attempt_utc': previous_state.get('last_heartbeat_attempt_utc'),
+            'sent_date_utc': previous_state.get('last_heartbeat_sent_date_utc'),
+            'sent_utc': previous_state.get('last_heartbeat_sent_utc'),
+        }
+
+    subject, body = build_heartbeat_email_message(status, settings, now_utc)
+    success, error_text = send_email(
+        build_heartbeat_mail_settings(settings),
+        subject,
+        body,
+        activity_plot_path)
+
+    if success:
+        log_msg('Daily heartbeat email sent successfully')
+    else:
+        log_msg('Daily heartbeat email failed: ' + error_text)
+
+    return {
+        'attempted': True,
+        'sent': success,
+        'error': '' if success else error_text,
+        'attempt_date_utc': today_utc,
+        'attempt_utc': now_utc.isoformat(),
+        'sent_date_utc': today_utc if success else previous_state.get('last_heartbeat_sent_date_utc'),
+        'sent_utc': now_utc.isoformat() if success else previous_state.get('last_heartbeat_sent_utc'),
+    }
+
+
 def send_email(settings, subject, body, attachment_path):
     smtp_host = settings['smtp_host']
     smtp_port = settings['smtp_port']
@@ -329,6 +466,10 @@ def parse_args():
         '--test-email',
         action='store_true',
         help='Send a one-off SMTP test email and exit. Does not modify alert-state tracking.')
+    parser.add_argument(
+        '--test-heartbeat',
+        action='store_true',
+        help='Send a one-off heartbeat email immediately and exit. Ignores schedule/state gating.')
 
     return parser.parse_args()
 
@@ -360,6 +501,21 @@ def main():
         log_msg('SMTP test email failed: ' + error_text)
         return 2
 
+    if args.test_heartbeat:
+        if status is None:
+            status = build_default_status()
+            log_msg('No rolling status JSON found; sending heartbeat test email with default status values')
+
+        heartbeat_settings = build_heartbeat_mail_settings(settings)
+        subject, body = build_heartbeat_email_message(status, settings, utc_now().replace(microsecond=0))
+        success, error_text = send_email(heartbeat_settings, subject, body, activity_plot_path)
+        if success:
+            log_msg('Heartbeat test email sent successfully')
+            return 0
+
+        log_msg('Heartbeat test email failed: ' + error_text)
+        return 2
+
     if status is None:
         log_msg('No rolling status JSON found; skipping alert evaluation')
         return 0
@@ -378,7 +534,19 @@ def main():
         'last_email_error': previous_state.get('last_email_error', ''),
         'configured_levels': configured_levels,
         'config_path': settings['config_path'],
+        'last_heartbeat_attempt_date_utc': previous_state.get('last_heartbeat_attempt_date_utc'),
+        'last_heartbeat_attempt_utc': previous_state.get('last_heartbeat_attempt_utc'),
+        'last_heartbeat_sent_date_utc': previous_state.get('last_heartbeat_sent_date_utc'),
+        'last_heartbeat_sent_utc': previous_state.get('last_heartbeat_sent_utc'),
+        'last_heartbeat_error': previous_state.get('last_heartbeat_error', ''),
     }
+
+    heartbeat_result = maybe_send_daily_heartbeat(status, previous_state, settings, activity_plot_path)
+    next_state['last_heartbeat_attempt_date_utc'] = heartbeat_result['attempt_date_utc']
+    next_state['last_heartbeat_attempt_utc'] = heartbeat_result['attempt_utc']
+    next_state['last_heartbeat_sent_date_utc'] = heartbeat_result['sent_date_utc']
+    next_state['last_heartbeat_sent_utc'] = heartbeat_result['sent_utc']
+    next_state['last_heartbeat_error'] = heartbeat_result['error']
 
     should_send = should_send_alert(status, previous_state, configured_levels)
 

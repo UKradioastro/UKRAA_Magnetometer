@@ -24,3 +24,14 @@ attach_plot = true
 
 [web]
 url = http://rpi4-UKRAA-MAG.local
+
+[heartbeat]
+# Send one daily summary email after this UTC hour (0-23).
+enabled = false
+hour_utc = 9
+
+# If blank, heartbeat uses the [email] to list.
+to =
+
+# Attach RollingActivity.png to heartbeat emails.
+attach_plot = false
