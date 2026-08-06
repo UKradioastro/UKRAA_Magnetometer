@@ -309,6 +309,22 @@ Available environment variables are:
 * If `RollingActivity.png` exists, it is attached to the alert email
 * Alert evaluator config precedence is: environment variable -> `.ini` file -> built-in default
 
+### Send a one-off SMTP test email
+
+To verify SMTP settings without waiting for a threshold transition, run:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testAlertEmailACM0.sh
+```
+
+Or run the Python script directly:
+
+```
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-email
+```
+
+The test email does not update transition state, so normal alert logic is unaffected.
+
 [Back to Contents...](#contents)
 
 &nbsp;

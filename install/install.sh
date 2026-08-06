@@ -35,6 +35,7 @@ echo ""
 echo "Sort out UKRAA Magnetometer file permissions..."
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.py
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testAlertEmailACM0.sh
 echo "UKRAA Magnetometer file permissions sorted out"
 echo ""
 

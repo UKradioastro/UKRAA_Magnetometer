@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import configparser
 import datetime
 import json
@@ -71,6 +72,21 @@ def load_json_or_default(path, default_value):
 
     with open(path, mode='r', encoding='utf-8-sig') as json_file:
         return json.load(json_file)
+
+
+def build_default_status():
+    return {
+        'generated_at_utc': utc_now().replace(microsecond=0).isoformat(),
+        'latest_processed_minute_utc': 'unknown',
+        'latest_sample_time_utc': 'unknown',
+        'latest_activity_nt': None,
+        'alert_level': 'unknown',
+        'is_stale': True,
+        'yellow_threshold_nt': 50,
+        'amber_threshold_nt': 100,
+        'red_threshold_nt': 200,
+        'detector_name': 'unknown',
+    }
 
 
 def parse_level_list(levels_text):
@@ -209,6 +225,45 @@ def build_email_message(status, previous_state, configured_levels, web_url):
     return subject, '\n'.join(lines)
 
 
+def build_test_email_message(settings, status):
+    configured_levels = settings['configured_levels']
+    web_url = settings['web_url']
+
+    latest_activity = status.get('latest_activity_nt')
+    activity_text = 'unknown'
+    if latest_activity is not None:
+        activity_text = f'{latest_activity:.1f} nT'
+
+    subject = f'[UKRAA Magnetometer] TEST email - {activity_text}'
+
+    lines = [
+        'This is a UKRAA Magnetometer SMTP test email.',
+        '',
+        'If you received this message, your SMTP settings are working.',
+        '',
+        f'Configured levels: {", ".join(level.upper() for level in configured_levels)}',
+        f'Latest alert level in status file: {(status.get("alert_level") or "unknown").upper()}',
+        f'Latest activity: {activity_text}',
+        f'Latest sample time (UTC): {status.get("latest_sample_time_utc", "unknown")}',
+        f'Detector: {status.get("detector_name", "unknown")}',
+        '',
+        'Thresholds in use:',
+        f'  Yellow: {status.get("yellow_threshold_nt", "unknown")} nT',
+        f'  Amber: {status.get("amber_threshold_nt", "unknown")} nT',
+        f'  Red: {status.get("red_threshold_nt", "unknown")} nT',
+    ]
+
+    if web_url:
+        lines.extend(['', f'Web page: {web_url}'])
+
+    lines.extend([
+        '',
+        'Rolling activity plot is attached when available and enabled.',
+    ])
+
+    return subject, '\n'.join(lines)
+
+
 def send_email(settings, subject, body, attachment_path):
     smtp_host = settings['smtp_host']
     smtp_port = settings['smtp_port']
@@ -267,7 +322,20 @@ def save_state(path, state):
         state_file.write('\n')
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Evaluate rolling geomagnetic alerts and send SMTP notifications.')
+    parser.add_argument(
+        '--test-email',
+        action='store_true',
+        help='Send a one-off SMTP test email and exit. Does not modify alert-state tracking.')
+
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
+
     base_path = get_base_path()
     status_path = build_status_json_path(base_path)
     state_path = build_alert_state_path(base_path)
@@ -277,9 +345,24 @@ def main():
     web_url = settings['web_url']
 
     status = load_json_or_default(status_path, None)
+
+    if args.test_email:
+        if status is None:
+            status = build_default_status()
+            log_msg('No rolling status JSON found; sending test email with default status values')
+
+        subject, body = build_test_email_message(settings, status)
+        success, error_text = send_email(settings, subject, body, activity_plot_path)
+        if success:
+            log_msg('SMTP test email sent successfully')
+            return 0
+
+        log_msg('SMTP test email failed: ' + error_text)
+        return 2
+
     if status is None:
         log_msg('No rolling status JSON found; skipping alert evaluation')
-        return
+        return 0
 
     previous_state = load_json_or_default(state_path, {})
     current_level = (status.get('alert_level') or 'unknown').lower()
@@ -304,7 +387,7 @@ def main():
             next_state['last_email_level'] = current_level
         save_state(state_path, next_state)
         log_msg(f'No email alert required (level {previous_level.upper()} -> {current_level.upper()})')
-        return
+        return 0
 
     subject, body = build_email_message(status, previous_state, configured_levels, web_url)
     success, error_text = send_email(settings, subject, body, activity_plot_path)
@@ -315,11 +398,13 @@ def main():
         next_state['last_email_error'] = ''
         save_state(state_path, next_state)
         log_msg(f'Alert email sent for transition {previous_level.upper()} -> {current_level.upper()}')
-    else:
-        next_state['last_email_error'] = error_text
-        save_state(state_path, next_state)
-        log_msg(f'Alert email failed for level {current_level.upper()} : {error_text}')
+        return 0
+
+    next_state['last_email_error'] = error_text
+    save_state(state_path, next_state)
+    log_msg(f'Alert email failed for level {current_level.upper()} : {error_text}')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
