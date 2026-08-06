@@ -32,6 +32,13 @@ else
     exit 1
 fi
 
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlertsACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    log_msg "processRollingData.sh   : Completed rolling alert evaluation" >> "$MAIN_LOG"
+else
+    log_msg "processRollingData.sh   : FAILED rolling alert evaluation" >> "$ERROR_LOG"
+    exit 1
+fi
+
 if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/publishWebACM0.sh"; then
     log_msg "processRollingData.sh   : Completed rolling publish" >> "$MAIN_LOG"
 else

@@ -73,15 +73,18 @@ def median_or_nan(values):
     return math.nan
 
 
-def determine_alert_level(latest_activity_nt, watch_threshold, active_threshold):
+def determine_aurorawatch_level(latest_activity_nt, yellow_threshold, amber_threshold, red_threshold):
     if math.isnan(latest_activity_nt):
         return 'unknown'
 
-    if latest_activity_nt >= active_threshold:
-        return 'active'
+    if latest_activity_nt >= red_threshold:
+        return 'red'
 
-    if latest_activity_nt >= watch_threshold:
-        return 'watch'
+    if latest_activity_nt >= amber_threshold:
+        return 'amber'
+
+    if latest_activity_nt >= yellow_threshold:
+        return 'yellow'
 
     return 'quiet'
 
@@ -199,8 +202,9 @@ def write_status_json(
     samples_seen):
     ensure_directory(os.path.dirname(output_path))
 
-    watch_threshold = get_alert_threshold('MAGNETOMETER_ALERT_WATCH_NT', '5')
-    active_threshold = get_alert_threshold('MAGNETOMETER_ALERT_ACTIVE_NT', '15')
+    yellow_threshold = get_alert_threshold('MAGNETOMETER_ALERT_YELLOW_NT', '50')
+    amber_threshold = get_alert_threshold('MAGNETOMETER_ALERT_AMBER_NT', '100')
+    red_threshold = get_alert_threshold('MAGNETOMETER_ALERT_RED_NT', '200')
     stale_seconds = get_stale_seconds()
 
     latest_processed_minute = window_end_exclusive - datetime.timedelta(minutes=1)
@@ -220,9 +224,10 @@ def write_status_json(
         'latest_sample_age_seconds': latest_sample_age_seconds,
         'is_stale': is_stale,
         'latest_activity_nt': None if math.isnan(latest_activity_nt) else float(format_fixed(latest_activity_nt, 1)),
-        'alert_level': determine_alert_level(latest_activity_nt, watch_threshold, active_threshold),
-        'watch_threshold_nt': watch_threshold,
-        'active_threshold_nt': active_threshold,
+        'alert_level': determine_aurorawatch_level(latest_activity_nt, yellow_threshold, amber_threshold, red_threshold),
+        'yellow_threshold_nt': yellow_threshold,
+        'amber_threshold_nt': amber_threshold,
+        'red_threshold_nt': red_threshold,
         'stale_threshold_seconds': stale_seconds,
         'detector_name': detector_name,
         'samples_seen': samples_seen,

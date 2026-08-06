@@ -1,0 +1,14 @@
+{
+  "last_run_utc": "2026-08-06T10:19:06+00:00",
+  "last_level": "quiet",
+  "last_activity_nt": 8.0,
+  "last_sample_time_utc": "2026-08-05 23:59:56",
+  "last_email_level": "quiet",
+  "last_email_sent_utc": null,
+  "last_email_error": "",
+  "configured_levels": [
+    "red",
+    "amber",
+    "yellow"
+  ]
+}

@@ -15,8 +15,9 @@ body {font-family: "Lato", sans-serif}
 .mySlides {display: none}
 .status-banner {border-radius: 12px; color: #fff; margin: 0 auto 24px; max-width: 800px; padding: 18px 20px; text-align: left}
 .status-banner.quiet {background: #2f6f44}
-.status-banner.watch {background: #9c6a00}
-.status-banner.active {background: #9f2d2d}
+.status-banner.yellow {background: #b8860b}
+.status-banner.amber {background: #cc7000}
+.status-banner.red {background: #9f2d2d}
 .status-banner.unknown {background: #4a5568}
 .status-banner.stale {background: #5d4037}
 .status-meta {font-size: 0.95rem; margin: 8px 0 0}
@@ -232,12 +233,16 @@ function formatAlertTitle(level, isStale) {
     return "Rolling data stale";
   }
 
-  if (level === "active") {
-    return "Aurora watch likely worthwhile";
+  if (level === "red") {
+    return "RED alert: high geomagnetic activity";
   }
 
-  if (level === "watch") {
-    return "Geomagnetic activity elevated";
+  if (level === "amber") {
+    return "AMBER alert: significant geomagnetic activity";
+  }
+
+  if (level === "yellow") {
+    return "YELLOW alert: geomagnetic activity elevated";
   }
 
   if (level === "quiet") {
@@ -256,15 +261,19 @@ function formatAlertSummary(level, isStale, latestActivity) {
     return "No recent activity value is available yet.";
   }
 
-  if (level === "active") {
-    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the active threshold.";
+  if (level === "red") {
+    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the red threshold.";
   }
 
-  if (level === "watch") {
-    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the watch threshold.";
+  if (level === "amber") {
+    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the amber threshold.";
   }
 
-  return "Latest activity is " + latestActivity.toFixed(1) + " nT, below the watch threshold.";
+  if (level === "yellow") {
+    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the yellow threshold.";
+  }
+
+  return "Latest activity is " + latestActivity.toFixed(1) + " nT, below the yellow threshold.";
 }
 
 function updateAlertBanner(status) {

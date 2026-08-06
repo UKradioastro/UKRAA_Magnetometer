@@ -7,6 +7,8 @@ rollingData = basePath."/data/rolling/latest-24h.csv"
 archivePlot = basePath."/plots/rolling/RollingXYZ.png"
 tempPlot = basePath."/temp/rolling/RollingXYZ.png"
 
+system("sh -lc 'mkdir -p \"".basePath."/plots/rolling\" \"".basePath."/temp/rolling\"'")
+
 set terminal pngcairo \
              background "#ffffff" \
              enhanced \
@@ -15,6 +17,11 @@ set terminal pngcairo \
              rounded
 
 set datafile separator ","
+
+stats rollingData using 5 output prefix "XSTAT" nooutput
+stats rollingData using 6 output prefix "YSTAT" nooutput
+stats rollingData using 7 output prefix "ZSTAT" nooutput
+
 set xdata time
 set timefmt "%Y-%m-%d %H:%M:%S"
 set format x "%H:%M"
@@ -23,17 +30,12 @@ set key outside above center
 set lmargin 10
 set rmargin 4
 
-stats rollingData using 5 output prefix "XSTAT" nooutput
-stats rollingData using 6 output prefix "YSTAT" nooutput
-stats rollingData using 7 output prefix "ZSTAT" nooutput
-
 startX = system("sh -lc 'head -n 1 \"".rollingData."\" | cut -d, -f1'")
 endX = system("sh -lc 'tail -n 1 \"".rollingData."\" | cut -d, -f1'")
 
 set xrange [startX:endX]
-set multiplot layout 3,1 title "Rolling magnetic field for the last 24 hours\nUpdated every 5 minutes" font ",12"
-
 set output archivePlot
+set multiplot layout 3,1 title "Rolling magnetic field for the last 24 hours\nUpdated every 5 minutes" font ",12"
 
 set ylabel "X (nT)"
 set yrange [XSTAT_min - 200:XSTAT_max + 200]

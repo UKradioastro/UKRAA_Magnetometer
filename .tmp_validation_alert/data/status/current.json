@@ -1,0 +1,18 @@
+{
+  "generated_at_utc": "2026-08-06T10:19:06+00:00",
+  "window_start_utc": "2026-08-05 00:00:00",
+  "window_end_exclusive_utc": "2026-08-06 00:00:00",
+  "latest_processed_minute_utc": "2026-08-05 23:59:00",
+  "latest_sample_time_utc": "2026-08-05 23:59:56",
+  "latest_sample_age_seconds": 4,
+  "is_stale": false,
+  "latest_activity_nt": 8.0,
+  "alert_level": "quiet",
+  "yellow_threshold_nt": 50.0,
+  "amber_threshold_nt": 100.0,
+  "red_threshold_nt": 200.0,
+  "stale_threshold_seconds": 600,
+  "detector_name": "CPicoNanoTesla",
+  "samples_seen": 4320,
+  "rolling_csv_path": "C:\\Users\\Owner\\Desktop\\UKRAA magnetometer\\GitHub\\UKRAA_PicoMagnetometer\\.tmp_validation_alert\\data\\rolling\\latest-24h.csv"
+}

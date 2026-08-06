@@ -249,6 +249,53 @@ sudo systemctl disable Magnetometer.service
 ---
 
 &nbsp;
+<!-- =============================================================================== -->
+## Rolling alert emails (AuroraWatch thresholds)
+
+Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
+
+* **Yellow** at **50 nT**
+* **Amber** at **100 nT**
+* **Red** at **200 nT**
+
+The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
+
+### Configure which levels trigger email
+
+Set `MAGNETOMETER_EMAIL_ALERT_LEVELS` as a comma-separated list:
+
+* `RED`
+* `RED,AMBER`
+* `RED,AMBER,YELLOW`
+
+### Configure SMTP and recipients
+
+Set these environment variables in the context where `processRollingData.sh` runs:
+
+* `MAGNETOMETER_SMTP_HOST` (required)
+* `MAGNETOMETER_SMTP_PORT` (default `587`)
+* `MAGNETOMETER_SMTP_USERNAME` (optional)
+* `MAGNETOMETER_SMTP_PASSWORD` (optional)
+* `MAGNETOMETER_SMTP_STARTTLS` (`true` by default)
+* `MAGNETOMETER_SMTP_SSL` (`false` by default)
+* `MAGNETOMETER_EMAIL_FROM` (required)
+* `MAGNETOMETER_EMAIL_TO` (required, comma-separated for multiple recipients)
+* `MAGNETOMETER_EMAIL_ATTACH_PLOT` (`true` by default)
+* `MAGNETOMETER_WEB_URL` (optional, included in email body)
+
+### Notes
+
+* Alert state is stored in `data/alerts/alert-state.json`
+* Rolling status is read from `data/status/current.json`
+* If `RollingActivity.png` exists, it is attached to the alert email
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
 
 <!-- =============================================================================== --> 
 ### License
