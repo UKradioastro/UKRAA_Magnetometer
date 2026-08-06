@@ -27,7 +27,25 @@ fi
 
 mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR"
 
-cp -av "$SOURCE_DIR/RollingXYZ.png" "$SOURCE_DIR/RollingActivity.png" "$DEST_ROLLING_DIR/" >> "$MAIN_LOG" 2>> "$ERROR_LOG" || exit 1
-cp -av "$SOURCE_STATUS" "$DEST_STATUS_DIR/current.json" >> "$MAIN_LOG" 2>> "$ERROR_LOG" || exit 1
+if cp -a "$SOURCE_DIR/RollingXYZ.png" "$DEST_ROLLING_DIR/" >> "$ERROR_LOG" 2>&1; then
+  log_msg "publishWebACM0.sh       : Copied RollingXYZ.png to $DEST_ROLLING_DIR" >> "$MAIN_LOG"
+else
+  log_msg "publishWebACM0.sh       : FAILED - could not copy RollingXYZ.png" >> "$ERROR_LOG"
+  exit 1
+fi
+
+if cp -a "$SOURCE_DIR/RollingActivity.png" "$DEST_ROLLING_DIR/" >> "$ERROR_LOG" 2>&1; then
+  log_msg "publishWebACM0.sh       : Copied RollingActivity.png to $DEST_ROLLING_DIR" >> "$MAIN_LOG"
+else
+  log_msg "publishWebACM0.sh       : FAILED - could not copy RollingActivity.png" >> "$ERROR_LOG"
+  exit 1
+fi
+
+if cp -a "$SOURCE_STATUS" "$DEST_STATUS_DIR/current.json" >> "$ERROR_LOG" 2>&1; then
+  log_msg "publishWebACM0.sh       : Copied current.json to $DEST_STATUS_DIR" >> "$MAIN_LOG"
+else
+  log_msg "publishWebACM0.sh       : FAILED - could not copy current.json" >> "$ERROR_LOG"
+  exit 1
+fi
 
 log_msg "publishWebACM0.sh       : Completed publishing rolling web assets" >> "$MAIN_LOG"

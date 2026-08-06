@@ -24,7 +24,7 @@ LEVEL_RANK = {
 def log_msg(message):
     print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
           ':',
-          'EvaluateAlertsACM0.py :',
+          'EvaluateAlertsACM0.py  :',
           message)
 
 
