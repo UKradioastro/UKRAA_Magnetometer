@@ -4,6 +4,9 @@
 # cron entry to process yesterdays raw magnetometer data (run as user pi)
 00 04 * * * su - pi -c "sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/processData.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>>/home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"
 
+# cron entry to refresh rolling data, rolling plots and rolling web assets every 5 minutes
+*/5 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/processRollingData.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
+
 # cron entry to manage logfiles - on a Sunday 00:00 each week
 00 00 * * 00 /bin/bash /home/pi/UKRAA_Magnetometer/scripts/manageLogfiles.sh
 

@@ -6,12 +6,20 @@
 <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="300">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 body {font-family: "Lato", sans-serif}
 .mySlides {display: none}
+.status-banner {border-radius: 12px; color: #fff; margin: 0 auto 24px; max-width: 800px; padding: 18px 20px; text-align: left}
+.status-banner.quiet {background: #2f6f44}
+.status-banner.watch {background: #9c6a00}
+.status-banner.active {background: #9f2d2d}
+.status-banner.unknown {background: #4a5568}
+.status-banner.stale {background: #5d4037}
+.status-meta {font-size: 0.95rem; margin: 8px 0 0}
 </style>
 </head>
 
@@ -28,6 +36,7 @@ body {font-family: "Lato", sans-serif}
     <div class="w3-dropdown-hover w3-hide-small">
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
+        <a href="#rolling" class="w3-bar-item w3-button">ROLLING PLOTS</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
       </div>
@@ -40,6 +49,7 @@ body {font-family: "Lato", sans-serif}
 <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
+  <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING PLOTS</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XYZ GRAPHS</a>
 </div>
@@ -92,6 +102,30 @@ body {font-family: "Lato", sans-serif}
 
 
   <!-- Graphs Section -->
+  <div class="w3-grey" id="rolling">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:960px">
+      <h2 class="w3-wide">ROLLING MAGNETOMETER STATUS</h2>
+      <p class="w3-center">24-hour rolling plots refreshed every 5 minutes</p>
+      <div id="alertBanner" class="status-banner unknown">
+        <h3 id="alertTitle" style="margin:0 0 8px">Rolling status unavailable</h3>
+        <p id="alertSummary" style="margin:0">Waiting for the latest rolling status file.</p>
+        <p id="alertMeta" class="status-meta">Status JSON: unavailable</p>
+      </div>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <p>Rolling activity for the last 24 hours</p>
+          <img src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling activity plot" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <p>Rolling X, Y and Z magnetic field for the last 24 hours</p>
+          <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- daily Activity plots -->
   <div class="w3-white" id="daily_Act">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
@@ -192,6 +226,86 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
+
+function formatAlertTitle(level, isStale) {
+  if (isStale) {
+    return "Rolling data stale";
+  }
+
+  if (level === "active") {
+    return "Aurora watch likely worthwhile";
+  }
+
+  if (level === "watch") {
+    return "Geomagnetic activity elevated";
+  }
+
+  if (level === "quiet") {
+    return "Geomagnetic conditions quiet";
+  }
+
+  return "Rolling status unavailable";
+}
+
+function formatAlertSummary(level, isStale, latestActivity) {
+  if (isStale) {
+    return "The latest magnetometer samples are older than the rolling freshness threshold.";
+  }
+
+  if (latestActivity === null || latestActivity === undefined) {
+    return "No recent activity value is available yet.";
+  }
+
+  if (level === "active") {
+    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the active threshold.";
+  }
+
+  if (level === "watch") {
+    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the watch threshold.";
+  }
+
+  return "Latest activity is " + latestActivity.toFixed(1) + " nT, below the watch threshold.";
+}
+
+function updateAlertBanner(status) {
+  var banner = document.getElementById("alertBanner");
+  var title = document.getElementById("alertTitle");
+  var summary = document.getElementById("alertSummary");
+  var meta = document.getElementById("alertMeta");
+  var level = status.alert_level || "unknown";
+  var bannerClass = status.is_stale ? "stale" : level;
+
+  banner.className = "status-banner " + bannerClass;
+  title.textContent = formatAlertTitle(level, status.is_stale);
+  summary.textContent = formatAlertSummary(level, status.is_stale, status.latest_activity_nt);
+  meta.textContent = "Last sample: " + (status.latest_sample_time_utc || "unknown")
+    + " | Latest processed minute: " + (status.latest_processed_minute_utc || "unknown")
+    + " | Activity: " + (status.latest_activity_nt === null ? "unknown" : status.latest_activity_nt.toFixed(1) + " nT");
+}
+
+function setAlertUnavailable(message) {
+  updateAlertBanner({alert_level: "unknown", is_stale: false, latest_activity_nt: null, latest_sample_time_utc: "unknown", latest_processed_minute_utc: "unknown"});
+  document.getElementById("alertSummary").textContent = message;
+  document.getElementById("alertMeta").textContent = "Status JSON: unavailable";
+}
+
+function refreshRollingStatus() {
+  fetch("./status/current.json", { cache: "no-store" })
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error("status fetch failed");
+      }
+      return response.json();
+    })
+    .then(function(status) {
+      updateAlertBanner(status);
+    })
+    .catch(function() {
+      setAlertUnavailable("Waiting for the latest rolling status file.");
+    });
+}
+
+refreshRollingStatus();
 </script>
 
 </body>
