@@ -260,6 +260,22 @@ Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
 
 The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
 
+### Configure via `.ini` file (recommended)
+
+1. Copy the example file:
+	`install/alerts.ini.example`
+
+2. Place it on the Pi as:
+	`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
+
+3. Edit the values for your SMTP service and recipients.
+
+By default, `EvaluateAlertsACM0.py` reads:
+`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
+
+You can override the config path with:
+`MAGNETOMETER_ALERTS_INI_PATH=/path/to/alerts.ini`
+
 ### Configure which levels trigger email
 
 Set `MAGNETOMETER_EMAIL_ALERT_LEVELS` as a comma-separated list:
@@ -270,7 +286,10 @@ Set `MAGNETOMETER_EMAIL_ALERT_LEVELS` as a comma-separated list:
 
 ### Configure SMTP and recipients
 
-Set these environment variables in the context where `processRollingData.sh` runs:
+You can set SMTP/email values in the `.ini` file, or by environment variables.
+Environment variables take precedence if both are set.
+
+Available environment variables are:
 
 * `MAGNETOMETER_SMTP_HOST` (required)
 * `MAGNETOMETER_SMTP_PORT` (default `587`)
@@ -288,6 +307,7 @@ Set these environment variables in the context where `processRollingData.sh` run
 * Alert state is stored in `data/alerts/alert-state.json`
 * Rolling status is read from `data/status/current.json`
 * If `RollingActivity.png` exists, it is attached to the alert email
+* Alert evaluator config precedence is: environment variable -> `.ini` file -> built-in default
 
 [Back to Contents...](#contents)
 

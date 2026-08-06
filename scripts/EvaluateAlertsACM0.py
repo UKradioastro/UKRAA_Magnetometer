@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import configparser
 import datetime
 import json
 import os
@@ -38,11 +39,37 @@ def build_activity_plot_path(base_path):
     return os.path.join(base_path, 'temp', 'rolling', 'RollingActivity.png')
 
 
+def build_default_config_path(base_path):
+    return os.path.join(base_path, 'config', 'alerts.ini')
+
+
+def load_config_parser(config_path):
+    parser = configparser.ConfigParser()
+    if os.path.exists(config_path):
+        with open(config_path, mode='r', encoding='UTF-8') as config_file:
+            # Strip optional BOM so configparser can parse files saved by different editors.
+            config_text = config_file.read().lstrip('\ufeff')
+            parser.read_string(config_text)
+
+    return parser
+
+
+def get_config_value(parser, env_name, section, option, default_value):
+    env_value = os.environ.get(env_name)
+    if env_value is not None:
+        return env_value.strip()
+
+    if parser.has_section(section) and parser.has_option(section, option):
+        return parser.get(section, option).strip()
+
+    return default_value
+
+
 def load_json_or_default(path, default_value):
     if not os.path.exists(path):
         return default_value
 
-    with open(path, mode='r', encoding='UTF-8') as json_file:
+    with open(path, mode='r', encoding='utf-8-sig') as json_file:
         return json.load(json_file)
 
 
@@ -56,8 +83,13 @@ def parse_level_list(levels_text):
     return result
 
 
-def get_configured_levels():
-    levels_text = os.environ.get('MAGNETOMETER_EMAIL_ALERT_LEVELS', 'RED,AMBER,YELLOW')
+def get_configured_levels(parser):
+    levels_text = get_config_value(
+        parser,
+        'MAGNETOMETER_EMAIL_ALERT_LEVELS',
+        'alerts',
+        'email_alert_levels',
+        'RED,AMBER,YELLOW')
     configured = parse_level_list(levels_text)
     if configured:
         return configured
@@ -65,12 +97,53 @@ def get_configured_levels():
     return ['red']
 
 
-def bool_from_env(name, default_value):
-    raw = os.environ.get(name)
-    if raw is None:
+def parse_bool(value, default_value):
+    if value is None:
         return default_value
 
-    return raw.strip().lower() in ('1', 'true', 'yes', 'y', 'on')
+    return value.strip().lower() in ('1', 'true', 'yes', 'y', 'on')
+
+
+def build_settings(base_path):
+    config_path = os.environ.get('MAGNETOMETER_ALERTS_INI_PATH', '').strip()
+    if not config_path:
+        config_path = build_default_config_path(base_path)
+
+    parser = load_config_parser(config_path)
+
+    smtp_port_text = get_config_value(
+        parser,
+        'MAGNETOMETER_SMTP_PORT',
+        'smtp',
+        'port',
+        '587')
+    try:
+        smtp_port = int(smtp_port_text)
+    except ValueError:
+        smtp_port = 587
+
+    settings = {
+        'config_path': config_path,
+        'configured_levels': get_configured_levels(parser),
+        'smtp_host': get_config_value(parser, 'MAGNETOMETER_SMTP_HOST', 'smtp', 'host', ''),
+        'smtp_port': smtp_port,
+        'smtp_user': get_config_value(parser, 'MAGNETOMETER_SMTP_USERNAME', 'smtp', 'username', ''),
+        'smtp_password': get_config_value(parser, 'MAGNETOMETER_SMTP_PASSWORD', 'smtp', 'password', ''),
+        'smtp_ssl': parse_bool(
+            get_config_value(parser, 'MAGNETOMETER_SMTP_SSL', 'smtp', 'ssl', 'false'),
+            False),
+        'smtp_starttls': parse_bool(
+            get_config_value(parser, 'MAGNETOMETER_SMTP_STARTTLS', 'smtp', 'starttls', 'true'),
+            True),
+        'email_from': get_config_value(parser, 'MAGNETOMETER_EMAIL_FROM', 'email', 'from', ''),
+        'email_to': get_config_value(parser, 'MAGNETOMETER_EMAIL_TO', 'email', 'to', ''),
+        'email_attach_plot': parse_bool(
+            get_config_value(parser, 'MAGNETOMETER_EMAIL_ATTACH_PLOT', 'email', 'attach_plot', 'true'),
+            True),
+        'web_url': get_config_value(parser, 'MAGNETOMETER_WEB_URL', 'web', 'url', ''),
+    }
+
+    return settings
 
 
 def should_send_alert(status, previous_state, configured_levels):
@@ -136,16 +209,16 @@ def build_email_message(status, previous_state, configured_levels, web_url):
     return subject, '\n'.join(lines)
 
 
-def send_email(subject, body, attachment_path):
-    smtp_host = os.environ.get('MAGNETOMETER_SMTP_HOST', '').strip()
-    smtp_port = int(os.environ.get('MAGNETOMETER_SMTP_PORT', '587'))
-    smtp_user = os.environ.get('MAGNETOMETER_SMTP_USERNAME', '').strip()
-    smtp_password = os.environ.get('MAGNETOMETER_SMTP_PASSWORD', '')
-    smtp_from = os.environ.get('MAGNETOMETER_EMAIL_FROM', '').strip()
-    smtp_to = os.environ.get('MAGNETOMETER_EMAIL_TO', '').strip()
-    smtp_ssl = bool_from_env('MAGNETOMETER_SMTP_SSL', False)
-    smtp_starttls = bool_from_env('MAGNETOMETER_SMTP_STARTTLS', True)
-    attach_plot = bool_from_env('MAGNETOMETER_EMAIL_ATTACH_PLOT', True)
+def send_email(settings, subject, body, attachment_path):
+    smtp_host = settings['smtp_host']
+    smtp_port = settings['smtp_port']
+    smtp_user = settings['smtp_user']
+    smtp_password = settings['smtp_password']
+    smtp_from = settings['email_from']
+    smtp_to = settings['email_to']
+    smtp_ssl = settings['smtp_ssl']
+    smtp_starttls = settings['smtp_starttls']
+    attach_plot = settings['email_attach_plot']
 
     if not (smtp_host and smtp_from and smtp_to):
         return False, 'SMTP configuration incomplete (need host, from, to)'
@@ -199,8 +272,9 @@ def main():
     status_path = build_status_json_path(base_path)
     state_path = build_alert_state_path(base_path)
     activity_plot_path = build_activity_plot_path(base_path)
-    configured_levels = get_configured_levels()
-    web_url = os.environ.get('MAGNETOMETER_WEB_URL', '').strip()
+    settings = build_settings(base_path)
+    configured_levels = settings['configured_levels']
+    web_url = settings['web_url']
 
     status = load_json_or_default(status_path, None)
     if status is None:
@@ -220,6 +294,7 @@ def main():
         'last_email_sent_utc': previous_state.get('last_email_sent_utc'),
         'last_email_error': previous_state.get('last_email_error', ''),
         'configured_levels': configured_levels,
+        'config_path': settings['config_path'],
     }
 
     should_send = should_send_alert(status, previous_state, configured_levels)
@@ -232,7 +307,7 @@ def main():
         return
 
     subject, body = build_email_message(status, previous_state, configured_levels, web_url)
-    success, error_text = send_email(subject, body, activity_plot_path)
+    success, error_text = send_email(settings, subject, body, activity_plot_path)
 
     if success:
         next_state['last_email_level'] = current_level

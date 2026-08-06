@@ -1,0 +1,26 @@
+# Copy this file to:
+#   /home/pi/UKRAA_Magnetometer/config/alerts.ini
+# and edit the values for your environment.
+#
+# Environment variables still override these values when set.
+
+[alerts]
+# Comma-separated levels that should trigger email on upward transitions.
+# Valid values: RED, AMBER, YELLOW
+email_alert_levels = RED,AMBER,YELLOW
+
+[smtp]
+host = smtp.example.com
+port = 587
+username = your-smtp-username
+password = your-smtp-password
+starttls = true
+ssl = false
+
+[email]
+from = magnetometer@example.com
+to = you@example.com
+attach_plot = true
+
+[web]
+url = http://rpi4-UKRAA-MAG.local

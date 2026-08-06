@@ -17,9 +17,19 @@ sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/logfiles
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/BI
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/HDZ
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/XYZ
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
 sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/temp
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
 echo "UKRAA Magnetometer directory structure created"
+echo ""
+
+echo "Set up default rolling alert configuration..."
+if [ ! -f /home/pi/UKRAA_Magnetometer/config/alerts.ini ]; then
+	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/alerts.ini.example /home/pi/UKRAA_Magnetometer/config/alerts.ini
+	echo "Created /home/pi/UKRAA_Magnetometer/config/alerts.ini"
+else
+	echo "Existing /home/pi/UKRAA_Magnetometer/config/alerts.ini retained"
+fi
 echo ""
 
 echo "Sort out UKRAA Magnetometer file permissions..."

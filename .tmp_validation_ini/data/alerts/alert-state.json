@@ -1,0 +1,14 @@
+{
+  "last_run_utc": "2026-08-06T10:29:07+00:00",
+  "last_level": "amber",
+  "last_activity_nt": 120.0,
+  "last_sample_time_utc": "2026-08-06 11:29:56",
+  "last_email_level": "unknown",
+  "last_email_sent_utc": null,
+  "last_email_error": "SMTP configuration incomplete (need host, from, to)",
+  "configured_levels": [
+    "red",
+    "amber"
+  ],
+  "config_path": "C:\\Users\\Owner\\Desktop\\UKRAA magnetometer\\GitHub\\UKRAA_PicoMagnetometer\\.tmp_validation_ini\\config\\alerts.ini"
+}
