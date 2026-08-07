@@ -5,7 +5,11 @@
 
 # Python code for the UKRAA PicoMagnetometer
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](/LICENSE)
-
+[![Python 3](https://img.shields.io/badge/Python-3-blue.svg?logo=python)](https://www.python.org/)
+[![Shell Script](https://img.shields.io/badge/Shell-Script-4EAA25.svg?logo=gnu-bash)](https://www.gnu.org/software/bash/)
+[![GNUplot](https://img.shields.io/badge/GNUplot-5.4-4F4F4F.svg)](https://www.gnuplot.info/)
+[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-4%2F5-red.svg?logo=raspberrypi)](https://www.raspberrypi.org/)
+[![Made for Raspberry Pi](https://img.shields.io/badge/Made%20for-Raspberry%20Pi-A22846.svg?logo=raspberrypi)](https://www.raspberrypi.com/)
 
 Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMagnetometer
 
@@ -47,9 +51,9 @@ The code assumes one magnetometer connected to the RPi4/5 USB and that it will b
 
 If there are other devices connected to the RPi and your magnetometer is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRaw.py** python script, where *ttyACMx* is the tty address of you connected magnetometer.
 
-**GetDataRaw.py** is run as a service.
+**GetDataRawACM0.py** is run as a service.
 
-Other scripts (Python, gnuplot and shell) are run from **cron**
+Other scripts (Python, gnuplot) are run from **cron** using shell scripts.
 
 [Back to Contents...](#contents)
 
@@ -175,7 +179,7 @@ The code is now set up to run automatically; it will get the data from the magne
 <!-- =============================================================================== --> 
 ## What does the code do
 
-The code receives the event data from the UKRAA Magnetometer magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
+The code receives the event data from the UKRAA Magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
 
 The raw data will be processed overnight, via CRON, to get magnetic field values per minute, in the x, y and z directions, from your previous day's data.
 
@@ -184,9 +188,9 @@ A number of plots will be created:
 * H, D and Z (Local horizontal plane, declination angle and up/down)
 * B and I (Total strength Earths magnetic field and angle of Earths magnetic field)
 
-The raw data will also be processed and graphed overnight, via CRON, to produce a weekly summary of absolute change in magnetic field and % change of magnetic field and plot .
+Note: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration files... (needs to be written...)
 
-These will appear as the required amount of data is recorded by the magnetometer.
+The raw data will also be processed on a continuous 5 minute basis, again via CRON, to produce a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user will receive an email alert of such - see [Rolling alert emails](#rolling-alert-emails) for more details.
 
 A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.
 
@@ -199,7 +203,7 @@ To access the webpage on your desktop PC or your smart phone…
 http://rpi4-UKRAA-MAG.local
 ```
 
-This will take you to the web page for your magnetometer, displaying yesterday’s events graphs.
+This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s events plots.
 
 NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
 
@@ -215,7 +219,7 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check GetDataRaw.py service is running
+## Check GetDataRawACM0.py service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
@@ -226,28 +230,28 @@ sudo systemctl status MagnetometerACM0.service
 
 2. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start Magnetometer.service
+sudo systemctl start MagnetometerACM0.service
 ```
 
 &nbsp;
 
 3. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop Magnetometer.service
+sudo systemctl stop MagnetometerACM0.service
 ```
 
 &nbsp;
 
 4. To **enable** your service, type the following command and press enter.
 ```
-sudo systemctl enable Magnetometer.service
+sudo systemctl enable MagnetometerACM0.service
 ```
 
 &nbsp;
 
 5. To **disable** your service, type the following command and press enter.
 ```
-sudo systemctl disable Magnetometer.service
+sudo systemctl disable MagnetometerACM0.service
 ```
 
 [Back to Contents...](#contents)
@@ -258,7 +262,7 @@ sudo systemctl disable Magnetometer.service
 
 &nbsp;
 <!-- =============================================================================== -->
-## Rolling alert emails (AuroraWatch thresholds)
+## Rolling alert emails
 
 Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
 
@@ -393,7 +397,7 @@ Example settings:
 ```
 [ftp]
 enabled = true
-site = ftp.n15weather.co.uk
+site = your-uploader-fp
 user = your-upload-user
 password = your-upload-password
 port = 21
