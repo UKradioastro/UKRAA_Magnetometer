@@ -1,0 +1,23 @@
+[ftp]
+# Set true to enable remote FTP uploads.
+enabled = false
+
+# Hostinger FTP settings
+site = your-upload-ftp
+user = your-upload-user
+password = your-upload-password
+port = your-upload-port
+
+# Base target folder on the remote site.
+# Daily images upload here; rolling uploads go into <directory>/rolling.
+directory = /your-upload-directory
+
+# Connection options
+timeout_seconds = 30
+passive = true
+create_dirs = true
+
+# Optional: when true, rolling uploads also send
+# /home/pi/UKRAA_Magnetometer/data/status/current.json
+# to <directory>/status/current.json
+upload_status_json = false

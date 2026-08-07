@@ -1,10 +1,17 @@
 # imports
-from datetime import datetime, timezone
 import serial
 import os
 
+from magnetometer_common import build_raw_day_path
+from magnetometer_common import build_raw_month_path
+from magnetometer_common import ensure_directory
+from magnetometer_common import get_base_path
+from magnetometer_common import utc_now
+
 # main
 def main():
+    base_path = get_base_path()
+
     # set up usb serial variables
     ser = serial.Serial(port = '/dev/ttyACM0',
                         baudrate = 115200,
@@ -21,29 +28,20 @@ def main():
 
     try:
         for line in ser:
+            current_time = utc_now()
+
             # path for data storage
-            path = '/home/pi/UKRAA_Magnetometer/data/raw/'\
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y')\
-                    + '/'\
-                    + datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
+            path = build_raw_month_path(base_path, current_time)
             # check if the specific path exists
             pathExists = os.path.exists(path)
             if not pathExists:
                 # create directory structure
-                os.makedirs(path, exist_ok=True)
+                ensure_directory(path)
             # if data write to file
             if line:
-                timetowrite = (datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
-                            + " "
-                            + datetime.strftime(datetime.now(timezone.utc), '%H:%M:%S'))
+                timetowrite = current_time.strftime('%Y-%m-%d %H:%M:%S')
                 texttowrite = (line.decode('utf-8', 'ignore').strip())
-                outfilePath = '/home/pi/UKRAA_Magnetometer/data/raw/'
-                outfilePath += datetime.strftime(datetime.now(timezone.utc), '%Y')
-                outfilePath += '/'
-                outfilePath += datetime.strftime(datetime.now(timezone.utc), '%Y-%m')
-                outfilePath += '/'
-                outfilePath += datetime.strftime(datetime.now(timezone.utc), '%Y-%m-%d')
-                outfilePath += '.csv'
+                outfilePath = build_raw_day_path(base_path, current_time)
 
                 with open(outfilePath, mode='a', encoding='UTF-8') as outfile:
                     print(timetowrite

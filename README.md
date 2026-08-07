@@ -5,7 +5,11 @@
 
 # Python code for the UKRAA PicoMagnetometer
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](/LICENSE)
-
+[![Python 3](https://img.shields.io/badge/Python-3-blue.svg?logo=python)](https://www.python.org/)
+[![Shell Script](https://img.shields.io/badge/Shell-Script-4EAA25.svg?logo=gnu-bash)](https://www.gnu.org/software/bash/)
+[![GNUplot](https://img.shields.io/badge/GNUplot-5.4-4F4F4F.svg)](https://www.gnuplot.info/)
+[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-4%2F5-red.svg?logo=raspberrypi)](https://www.raspberrypi.org/)
+[![Made for Raspberry Pi](https://img.shields.io/badge/Made%20for-Raspberry%20Pi-A22846.svg?logo=raspberrypi)](https://www.raspberrypi.com/)
 
 Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMagnetometer
 
@@ -20,18 +24,18 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 ## Contents
 
 - [Using the code](#using-the-code) 
-- [Where is my magnetometer](#where-is-my-magnetometer)
+- [Where is my magnetometer](#where-is-my-Picomagnetometer)
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
-- [Check GetDataRawACM0 service is running](#check-GetDataRawACM0-service-is-running)
+- [Check MagnetometerACM0 service is running](#check-MagnetometerACM0-service-is-running)
+- [Rolling alert emails](#rolling-alert-emails)
 - [License](#license)
 - [Contact us](#contact-us)
 
 &nbsp;
 
 ---
-
 
 &nbsp;
 <!-- =============================================================================== --> 
@@ -47,9 +51,9 @@ The code assumes one magnetometer connected to the RPi4/5 USB and that it will b
 
 If there are other devices connected to the RPi and your magnetometer is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRaw.py** python script, where *ttyACMx* is the tty address of you connected magnetometer.
 
-**GetDataRaw.py** is run as a service.
+**GetDataRawACM0.py** is run as a service.
 
-Other scripts (Python, gnuplot and shell) are run from **cron**
+Other scripts (Python, gnuplot) are run from **cron** using shell scripts.
 
 [Back to Contents...](#contents)
 
@@ -149,6 +153,14 @@ sudo bash install.sh
 
 This will run the install script.
 
+Optional: run an install-time heartbeat smoke check (disabled by default):
+
+```
+sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh
+```
+
+This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_SMOKE_CHECK: PASS` or `HEARTBEAT_SMOKE_CHECK: FAIL` summary.
+
 There may be occasions during the running of the install script that require you to make a keyboard entry.
 
 When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
@@ -167,7 +179,7 @@ The code is now set up to run automatically; it will get the data from the magne
 <!-- =============================================================================== --> 
 ## What does the code do
 
-The code receives the event data from the UKRAA Magnetometer magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
+The code receives the event data from the UKRAA Magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
 
 The raw data will be processed overnight, via CRON, to get magnetic field values per minute, in the x, y and z directions, from your previous day's data.
 
@@ -176,9 +188,9 @@ A number of plots will be created:
 * H, D and Z (Local horizontal plane, declination angle and up/down)
 * B and I (Total strength Earths magnetic field and angle of Earths magnetic field)
 
-The raw data will also be processed and graphed overnight, via CRON, to produce a weekly summary of absolute change in magnetic field and % change of magnetic field and plot .
+Note: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration files... (needs to be written...)
 
-These will appear as the required amount of data is recorded by the magnetometer.
+The raw data will also be processed on a continuous 5 minute basis, again via CRON, to produce a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user will receive an email alert of such - see [Rolling alert emails](#rolling-alert-emails) for more details.
 
 A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.
 
@@ -191,7 +203,7 @@ To access the webpage on your desktop PC or your smart phone…
 http://rpi4-UKRAA-MAG.local
 ```
 
-This will take you to the web page for your magnetometer, displaying yesterday’s events graphs.
+This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s events plots.
 
 NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
 
@@ -207,7 +219,7 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check GetDataRaw.py service is running
+## Check MagnetometerACM0 service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
@@ -218,28 +230,207 @@ sudo systemctl status MagnetometerACM0.service
 
 2. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start Magnetometer.service
+sudo systemctl start MagnetometerACM0.service
 ```
 
 &nbsp;
 
 3. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop Magnetometer.service
+sudo systemctl stop MagnetometerACM0.service
 ```
 
 &nbsp;
 
 4. To **enable** your service, type the following command and press enter.
 ```
-sudo systemctl enable Magnetometer.service
+sudo systemctl enable MagnetometerACM0.service
 ```
 
 &nbsp;
 
 5. To **disable** your service, type the following command and press enter.
 ```
-sudo systemctl disable Magnetometer.service
+sudo systemctl disable MagnetometerACM0.service
+```
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Rolling alert emails
+
+Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
+
+* **Yellow** at **50 nT**
+* **Amber** at **100 nT**
+* **Red** at **200 nT**
+
+The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
+
+### Configure via `.ini` file (recommended)
+
+1. Copy the example file:
+	`install/alerts.ini.example`
+
+2. Place it on the Pi as:
+	`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
+
+3. Edit the values for your SMTP service and recipients.
+
+By default, `EvaluateAlertsACM0.py` reads:
+`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
+
+You can override the config path with:
+`MAGNETOMETER_ALERTS_INI_PATH=/path/to/alerts.ini`
+
+### Configure which levels trigger email
+
+Set `MAGNETOMETER_EMAIL_ALERT_LEVELS` as a comma-separated list:
+
+* `RED`
+* `RED,AMBER`
+* `RED,AMBER,YELLOW`
+
+### Configure SMTP and recipients
+
+You can set SMTP/email values in the `.ini` file, or by environment variables.
+Environment variables take precedence if both are set.
+
+Available environment variables are:
+
+* `MAGNETOMETER_SMTP_HOST` (required)
+* `MAGNETOMETER_SMTP_PORT` (default `587`)
+* `MAGNETOMETER_SMTP_USERNAME` (optional)
+* `MAGNETOMETER_SMTP_PASSWORD` (optional)
+* `MAGNETOMETER_SMTP_STARTTLS` (`true` by default)
+* `MAGNETOMETER_SMTP_SSL` (`false` by default)
+* `MAGNETOMETER_EMAIL_FROM` (required)
+* `MAGNETOMETER_EMAIL_TO` (required, comma-separated for multiple recipients)
+* `MAGNETOMETER_EMAIL_ATTACH_PLOT` (`true` by default)
+* `MAGNETOMETER_WEB_URL` (optional, included in email body)
+
+### Notes
+
+* Alert state is stored in `data/alerts/alert-state.json`
+* Rolling status is read from `data/status/current.json`
+* If `RollingActivity.png` exists, it is attached to the alert email
+* Alert evaluator config precedence is: environment variable -> `.ini` file -> built-in default
+
+### Send a one-off SMTP test email
+
+To verify SMTP settings without waiting for a threshold transition, run:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testAlertEmailACM0.sh
+```
+
+Or run the Python script directly:
+
+```
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-email
+```
+
+The test email does not update transition state, so normal alert logic is unaffected.
+
+### Optional daily heartbeat email
+
+You can enable a once-per-day summary email so you know the system is alive even when no threshold transition occurs.
+
+In `alerts.ini`:
+
+```
+[heartbeat]
+enabled = true
+hour_utc = 9
+to =
+attach_plot = false
+```
+
+Notes:
+
+* `hour_utc` is the first UTC hour of the day when the heartbeat can send.
+* Only one heartbeat attempt is made per UTC day (success or failure), to avoid retry spam every 5 minutes.
+* If `heartbeat.to` is blank, it uses `[email] to`.
+
+Environment variable overrides are also available:
+
+* `MAGNETOMETER_HEARTBEAT_ENABLED`
+* `MAGNETOMETER_HEARTBEAT_HOUR_UTC`
+* `MAGNETOMETER_HEARTBEAT_TO`
+* `MAGNETOMETER_HEARTBEAT_ATTACH_PLOT`
+
+### Send a one-off heartbeat test email immediately
+
+To verify heartbeat email delivery without waiting for `heartbeat.hour_utc`, run:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmailACM0.sh
+```
+
+Or run the Python script directly:
+
+```
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-heartbeat
+```
+
+This immediate heartbeat test does not update daily heartbeat schedule/state tracking.
+
+### Optional remote FTP upload to external website
+
+You can upload plot PNG files to an external Hostinger site while keeping local web publishing as the primary path.
+
+Remote upload config file:
+
+* `/home/pi/UKRAA_Magnetometer/config/remote-upload.ini`
+
+Template created by installer:
+
+* `install/remote-upload.ini.example`
+
+Example settings:
+
+```
+[ftp]
+enabled = true
+site = your-uploader-fp
+user = your-upload-user
+password = your-upload-password
+port = 21
+directory = /data
+timeout_seconds = 30
+passive = true
+create_dirs = true
+upload_status_json = false
+```
+
+Behavior:
+
+* Daily run (09:30 via `moveGraphs.sh`) uploads:
+	* `Activity.png`, `X.png`, `Y.png`, `Z.png` to `/data`
+* Rolling run (every 5 minutes via `processRollingData.sh`) uploads:
+	* `RollingActivity.png`, `RollingXYZ.png` to `/data/rolling`
+* Optional rolling status JSON upload:
+	* set `upload_status_json = true`
+	* uploads `data/status/current.json` to `/data/status/current.json`
+	* external webpage status fallback (`status/current.json`) requires this to be true.
+* Remote upload failures are non-blocking and do not stop local publishing.
+
+Manual test commands:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh daily
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh rolling
+```
+
+Combined test helper:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testRemoteUploadACM0.sh
 ```
 
 [Back to Contents...](#contents)

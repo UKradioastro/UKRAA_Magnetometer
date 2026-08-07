@@ -7,85 +7,113 @@ import os
 import math
 import statistics
 
+from magnetometer_common import RAW_FIELD_NAMES
+from magnetometer_common import build_day_path
+from magnetometer_common import build_month_path
+from magnetometer_common import calculate_hdzbi
+from magnetometer_common import ensure_directory
+from magnetometer_common import format_fixed
+from magnetometer_common import get_base_path
+from magnetometer_common import get_target_date
+from magnetometer_common import parse_raw_datetime
+
 # logfile message helper
 def log_msg(message):
     print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
         ':',
-        'ProcessDataRawACM0.py   :',
+        'ProcessDataRawACM0.py    :',
         message)
 
+def create_empty_minute_bins(total_minutes):
+    return [
+        {
+            'x_v': [],
+            'x_nt': [],
+            'y_v': [],
+            'y_nt': [],
+            'z_v': [],
+            'z_nt': [],
+            'tmp36_degc': [],
+            'delta_nt': [],
+        }
+        for _ in range(total_minutes)
+    ]
 
-# format helper for CSV output
-def format_fixed(value, decimal_places):
-    if math.isnan(value):
-        return 'nan'
 
-    return format(value, f'.{decimal_places}f')
+def median_or_nan(values):
+    if values:
+        return statistics.median(values)
+
+    return math.nan
+def load_minute_bins(raw_data_file, raw_field_names, target_date):
+    minute_bins = create_empty_minute_bins(1440)
+    detector_name = ''
+
+    with open(file=raw_data_file, mode='r', encoding='UTF-8') as raw_file:
+        raw_csv_reader = csv.DictReader(raw_file, raw_field_names)
+
+        for raw_line in raw_csv_reader:
+            raw_datetime = parse_raw_datetime(raw_line['RawDateTime'])
+
+            if raw_datetime.date() != target_date:
+                continue
+
+            minute_index = (raw_datetime.hour * 60) + raw_datetime.minute
+            minute_bin = minute_bins[minute_index]
+
+            minute_bin['x_v'].append(float(raw_line['RawX_V']))
+            minute_bin['x_nt'].append(float(raw_line['RawX_nT']))
+            minute_bin['y_v'].append(float(raw_line['RawY_V']))
+            minute_bin['y_nt'].append(float(raw_line['RawY_nT']))
+            minute_bin['z_v'].append(float(raw_line['RawZ_V']))
+            minute_bin['z_nt'].append(float(raw_line['RawZ_nT']))
+            minute_bin['tmp36_degc'].append(float(raw_line['RawTMP36_degC']))
+            minute_bin['delta_nt'].append(float(raw_line['RawDelta_nT']))
+
+            detector_name = str(raw_line['RawDetectorName'])
+
+    return minute_bins, detector_name
 
 # print message to log file to say started
 
+TargetDate = get_target_date()
+BasePath = get_base_path()
+
 log_msg('Started processing yesterdays magnetometer data for ' \
-      + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
+      + TargetDate.strftime('%Y-%m-%d'))
 
 # Set file headers for data file structure
-RawFieldNames    = ['RawDateTime',\
-                    'RawX_V', \
-                    'RawX_nT', \
-                    'RawY_V', \
-                    'RawY_nT', \
-                    'RawZ_V', \
-                    'RawZ_nT', \
-                    'RawTMP36_degC', \
-                    'RawDelta_nT', \
-                    'RawColour', \
-                    'RawDetectorName']
+RawFieldNames = RAW_FIELD_NAMES
 
 # Set path for data file structure
 
 # raw data file source
-RawDataFile   = "/home/pi/UKRAA_Magnetometer/data/raw/" \
-                 + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y') \
-                 + "/" \
-                 + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m') \
-                 + "/" \
-                 + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d') \
-                 + ".csv"
+RawDataFile = build_day_path(BasePath, 'raw', TargetDate)
 
 
 # Processed data path
-ProcessedPath = '/home/pi/UKRAA_Magnetometer/data/processed/'\
-                + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y') \
-                + "/" \
-                + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m')
+ProcessedPath = build_month_path(BasePath, 'processed', TargetDate)
 
 # check if the specific path exists
 pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
-    os.makedirs(ProcessedPath)
+    ensure_directory(ProcessedPath)
     log_msg('New directory created : ' + ProcessedPath)
 
 # Processed data file name
-ProcessedDataFile = "/home/pi/UKRAA_Magnetometer/data/processed/" \
-                     + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y') \
-                     + "/" \
-                     + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m') \
-                     + "/" \
-                     + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d') \
-                     + ".csv"
+ProcessedDataFile = build_day_path(BasePath, 'processed', TargetDate)
 
 # =============================================================================
 # Main program
 
-StartTime_str = datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d') \
-                + ' 00:00:00'
+StartTime_str = TargetDate.strftime('%Y-%m-%d') + ' 00:00:00'
 
 StartTime_datetime = datetime.datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S')
 # uncomment next lines to print the response
 #print('ProcessDataRawACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
-EndTime_str = datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d') \
-              + ' 23:59:59'
+EndTime_str = TargetDate.strftime('%Y-%m-%d') + ' 23:59:59'
 
 EndTime_datetime = datetime.datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S')
 # uncomment next lines to print the response
@@ -109,174 +137,68 @@ ProcessedTime = StartTime_datetime - minute
 # number of 1 minutes in a day
 n = 1440
 
-# open file to store data in and append to end
-ProcessedData = open(file=ProcessedDataFile, mode='a', encoding='UTF-8')
+MinuteBins, DetectorName = load_minute_bins(RawDataFile, RawFieldNames, TargetDate)
 
-for i in range(1, n+1):
-    # add a minute to each time value from 00:00:00 to 23:59:00
-    ProcessedTime = ProcessedTime + minute
-    
-    StartBinTime = ProcessedTime
+# open file to store data in and replace existing content
+with open(file=ProcessedDataFile, mode='w', encoding='UTF-8') as ProcessedData:
+    for i in range(1, n+1):
+        # add a minute to each time value from 00:00:00 to 23:59:00
+        ProcessedTime = ProcessedTime + minute
 
-    EndBinTime = StartBinTime + minute
+        minute_bin = MinuteBins[i - 1]
 
-    # using csv.DictReader
-    RawFile = open(file=RawDataFile, mode='r', encoding='UTF-8')
-    RawCSV_reader = csv.DictReader(RawFile,RawFieldNames)
+        Median_X_V = median_or_nan(minute_bin['x_v'])
+        Median_X_nT = median_or_nan(minute_bin['x_nt'])
+        Median_Y_V = median_or_nan(minute_bin['y_v'])
+        Median_Y_nT = median_or_nan(minute_bin['y_nt'])
+        Median_Z_V = median_or_nan(minute_bin['z_v'])
+        Median_Z_nT = median_or_nan(minute_bin['z_nt'])
+        Median_TMP36_degC = median_or_nan(minute_bin['tmp36_degc'])
+        Median_Delta_nT = median_or_nan(minute_bin['delta_nt'])
 
-    # set counters to zero
-    List_X_V          = list()
-    List_Y_V          = list()
-    List_Z_V          = list()
-    List_X_nT         = list()
-    List_Y_nT         = list()
-    List_Z_nT         = list()
-    List_TMP36_degC   = list()
-    List_Delta_nT     = list()
-    Median_X_V        = 0.000000
-    Median_Y_V        = 0.000000
-    Median_Z_V        = 0.000000
-    Median_X_nT       = 0.0
-    Median_Y_nT       = 0.0
-    Median_Z_nT       = 0.0
-    Median_TMP36_degC = 0.00
-    Median_Delta_nT   = 0.00
-    Calc_H            = 0.000000
-    Calc_D            = 0.0000
-    Calc_Z            = 0.000000
-    Calc_B            = 0.000000
-    Calc_I            = 0.0000
-    
+        Calc_H, Calc_D, Calc_Z, Calc_B, Calc_I = calculate_hdzbi(
+            Median_X_nT,
+            Median_Y_nT,
+            Median_Z_nT)
 
-    for RawLine in RawCSV_reader:
-        # try to get raw data after start StartBinTime
-        # convert string to datetime.datetime format
-        RawDatetime = datetime.datetime.strptime(RawLine['RawDateTime'], 
-                                                 '%Y-%m-%d %H:%M:%S')
-        
-        # search file for data between two time points
-        if (RawDatetime >= StartBinTime) and (RawDatetime < EndBinTime):
-            List_X_V.append(float(RawLine['RawX_V']))
-            List_X_nT.append(float(RawLine['RawX_nT']))
-            List_Y_V.append(float(RawLine['RawY_V']))
-            List_Y_nT.append(float(RawLine['RawY_nT']))
-            List_Z_V.append(float(RawLine['RawZ_V']))
-            List_Z_nT.append(float(RawLine['RawZ_nT']))
-            List_TMP36_degC.append(float(RawLine['RawTMP36_degC']))
-            List_Delta_nT.append(float(RawLine['RawDelta_nT']))
-            
-    # close open RawFile
-    RawFile.close()
-
-    
-    # check if there is some x-axis data
-    if (len(List_X_V) != 0):
-        Median_X_V = statistics.median(List_X_V)
-    else:
-        Median_X_V = math.nan
-        
-    if (len(List_X_nT) != 0):
-        Median_X_nT = statistics.median(List_X_nT)
-    else:
-        Median_X_nT = math.nan
-        
-    # check if there is some y-axis data
-    if (len(List_Y_V) != 0):
-        Median_Y_V = statistics.median(List_Y_V)
-    else:
-        Median_Y_V = math.nan
-    
-    if (len(List_Y_nT) != 0):
-        Median_Y_nT = statistics.median(List_Y_nT)
-    else:
-        Median_Y_nT = math.nan
-        
-    # check if there is some z-axis data
-    if (len(List_Z_V) != 0):
-        Median_Z_V = statistics.median(List_Z_V)
-    else:
-        Median_Z_V = math.nan
-        
-    if (len(List_Z_nT) != 0):
-        Median_Z_nT = statistics.median(List_Z_nT)
-    else:
-        Median_Z_nT = math.nan
-        
-    # check if there is some TMP36 temp data
-    if (len(List_TMP36_degC) != 0):
-        Median_TMP36_degC = statistics.median(List_TMP36_degC)
-    else:
-        Median_TMP36_degC = math.nan
-        
-    # check if there is some Delta_nT data
-    if (len(List_Delta_nT) != 0):
-        Median_Delta_nT = statistics.median(List_Delta_nT)
-    else:
-        Median_Delta_nT = math.nan
-
-
-    # Process XYZ data to HDZ data
-    Calc_H = math.nan
-    Calc_D = math.nan
-    Calc_Z = math.nan
-
-    if not (math.isnan(Median_X_nT) or math.isnan(Median_Y_nT)):
-        Calc_H = math.sqrt((Median_X_nT * Median_X_nT) + (Median_Y_nT * Median_Y_nT))
-        if (Calc_H != 0):
-            Calc_D = math.degrees(math.atan2(Median_Y_nT, Median_X_nT))
-        if not math.isnan(Median_Z_nT):
-            Calc_Z = Median_Z_nT
-
-    # Process XYZ & HZ data to BI data
-    Calc_B = math.nan
-    Calc_I = math.nan
-    if not (math.isnan(Median_X_nT) or math.isnan(Median_Y_nT) or math.isnan(Median_Z_nT)):
-        Calc_B = math.sqrt((Median_X_nT * Median_X_nT) + (Median_Y_nT * Median_Y_nT) + (Median_Z_nT * Median_Z_nT))
-        if (Calc_B != 0) and (not math.isnan(Calc_H)) and (Calc_H != 0):
-            Calc_I = math.degrees(math.atan2(Calc_Z, Calc_H))
-
-
-    # write processed data to file
-    ProcessedData.write(str(ProcessedTime))                  # Data time date
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_X_V, 6))         # 1 minute average X(V)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_Y_V, 6))         # 1 minute average Y(V)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_Z_V, 6))         # 1 minute average Z(V)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_X_nT, 0))         # 1 minute average X(nT)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_Y_nT, 0))         # 1 minute average Y(nT)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_Z_nT, 0))         # 1 minute average Z(nT)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_TMP36_degC, 1))   # 1 minute average TMP36 temperature
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Median_Delta_nT, 1))     # 1 minute average Delta(nT)
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Calc_H, 2))              # Calculated H value
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Calc_D, 1))              # Calculated D value
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Calc_Z, 2))              # Calculated Z value
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Calc_B, 2))              # Calculated B value
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(format_fixed(Calc_I, 1))              # Calculated I value
-    ProcessedData.write(",")                                 # "," separator
-    ProcessedData.write(str(RawLine['RawDetectorName']))     # Detector name
-    ProcessedData.write("\n")                                # new line
-
-# close open ProcessedData file
-ProcessedData.close()
+        # write processed data to file
+        ProcessedData.write(str(ProcessedTime))                  # Data time date
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_X_V, 6))         # 1 minute average X(V)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_Y_V, 6))         # 1 minute average Y(V)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_Z_V, 6))         # 1 minute average Z(V)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_X_nT, 0))        # 1 minute average X(nT)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_Y_nT, 0))        # 1 minute average Y(nT)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_Z_nT, 0))        # 1 minute average Z(nT)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_TMP36_degC, 1))  # 1 minute average TMP36 temperature
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Median_Delta_nT, 1))    # 1 minute average Delta(nT)
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Calc_H, 0))             # Calculated H value
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Calc_D, 1))             # Calculated D value
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Calc_Z, 0))             # Calculated Z value
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Calc_B, 0))             # Calculated B value
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(format_fixed(Calc_I, 1))             # Calculated I value
+        ProcessedData.write(",")                                 # "," separator
+        ProcessedData.write(DetectorName)                        # Detector name
+        ProcessedData.write("\n")                                # new line
 
 # =============================================================================
 # Message to log file at end of program
 
 # print message to log file to say completed
 log_msg('Completed processing yesterdays magnetometer data for ' \
-    + datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(1), '%Y-%m-%d'))
+    + TargetDate.strftime('%Y-%m-%d'))
       
 
 # =============================================================================

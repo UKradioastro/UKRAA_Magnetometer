@@ -1,5 +1,11 @@
 #!/bin/bash
 
+RUN_HEARTBEAT_SMOKE_CHECK=0
+
+if [ "${MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT:-}" = "1" ]; then
+	RUN_HEARTBEAT_SMOKE_CHECK=1
+fi
+
 
 echo "Start installing UKRAA Magnetometer software..."
 echo ""
@@ -17,14 +23,37 @@ sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/logfiles
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/BI
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/HDZ
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/XYZ
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
 sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/temp
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
 echo "UKRAA Magnetometer directory structure created"
 echo ""
 
+echo "Set up default rolling alert configuration..."
+if [ ! -f /home/pi/UKRAA_Magnetometer/config/alerts.ini ]; then
+	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/alerts.ini.example /home/pi/UKRAA_Magnetometer/config/alerts.ini
+	echo "Created /home/pi/UKRAA_Magnetometer/config/alerts.ini"
+else
+	echo "Existing /home/pi/UKRAA_Magnetometer/config/alerts.ini retained"
+fi
+echo ""
+
+echo "Set up default remote upload configuration..."
+if [ ! -f /home/pi/UKRAA_Magnetometer/config/remote-upload.ini ]; then
+	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/remote-upload.ini.example /home/pi/UKRAA_Magnetometer/config/remote-upload.ini
+	echo "Created /home/pi/UKRAA_Magnetometer/config/remote-upload.ini"
+else
+	echo "Existing /home/pi/UKRAA_Magnetometer/config/remote-upload.ini retained"
+fi
+echo ""
+
 echo "Sort out UKRAA Magnetometer file permissions..."
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.py
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testAlertEmailACM0.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmailACM0.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh
+sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testRemoteUploadACM0.sh
 echo "UKRAA Magnetometer file permissions sorted out"
 echo ""
 
@@ -46,6 +75,23 @@ cat /home/pi/UKRAA_Magnetometer/install/crontabMagnetometerACM0.cron >> "$tmpCro
 sudo crontab -u root "$tmpCronFile"
 rm -f "$tmpCronFile"
 echo "UKRAA Magnetometer crontab entry installed"
+echo ""
+
+
+if [ "$RUN_HEARTBEAT_SMOKE_CHECK" -eq 1 ]; then
+	echo "Running optional heartbeat smoke check..."
+	if MAGNETOMETER_BASE_PATH=/home/pi/UKRAA_Magnetometer su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-heartbeat"; then
+		echo "HEARTBEAT_SMOKE_CHECK: PASS"
+	else
+		smoke_exit_code=$?
+		echo "HEARTBEAT_SMOKE_CHECK: FAIL (exit code $smoke_exit_code)"
+		echo "Check SMTP settings in /home/pi/UKRAA_Magnetometer/config/alerts.ini"
+		echo "Retry command: /bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmailACM0.sh"
+	fi
+else
+	echo "Skipping optional heartbeat smoke check (default)."
+	echo "Enable it with: sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh"
+fi
 echo ""
 
 

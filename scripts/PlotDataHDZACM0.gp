@@ -27,7 +27,7 @@ set terminal pngcairo \
 set print "-"
 
 # print to log file
-print "PlotDataHDZACM0.gp    : "\
+print "PlotDataHDZACM0.gp       : "\
        .system("date +'%Y-%m-%d %H:%M:%S'")\
        ." : Started HDZ plot for "\
        .system("date -d yesterday +'%Y-%m-%d'")
@@ -49,10 +49,10 @@ FileData = pathData\
 is_missing = system("sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/isMissing.sh ".FileData)
 if (is_missing == 1) \
            {
-           print "PlotDataHDZACM0.gp    : "\
+           print "PlotDataHDZACM0.gp       : "\
                   .system("date +'%Y/%M/%d %H:%M:%S'")\
                   ." : data file missing, so..."; 
-           print "PlotDataHDZACM0.gp    : "\
+           print "PlotDataHDZACM0.gp       : "\
                   .system("date +'%Y/%M/%d %H:%M:%S'")\
                   ." : **FAILED** to complete HDZ plot for "\
                   .system("date -d yesterday +'%Y-%m-%d'")
@@ -243,7 +243,7 @@ replot
 set output
 
 # print to log file
-print "PlotDataHDZACM0.gp    : "\
+print "PlotDataHDZACM0.gp       : "\
        .system("date +'%Y-%m-%d %H:%M:%S'")\
        ." : Completed HDZ plot for "\
        .system("date -d yesterday +'%Y-%m-%d'")
