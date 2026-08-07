@@ -29,6 +29,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
 - [Check GetDataRawACM0 service is running](#check-GetDataRawACM0-service-is-running)
+- [Rolling alert emails](#rolling-alert-emails)
 - [License](#license)
 - [Contact us](#contact-us)
 
