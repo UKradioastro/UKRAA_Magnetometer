@@ -24,11 +24,11 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 ## Contents
 
 - [Using the code](#using-the-code) 
-- [Where is my magnetometer](#where-is-my-magnetometer)
+- [Where is my magnetometer](#where-is-my-Picomagnetometer)
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
-- [Check GetDataRawACM0 service is running](#check-GetDataRawACM0-service-is-running)
+- [Check GetDataRawACM0 service is running](#check-GetDataRawACM0.py-service-is-running)
 - [Rolling alert emails](#rolling-alert-emails)
 - [License](#license)
 - [Contact us](#contact-us)
@@ -36,7 +36,6 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 &nbsp;
 
 ---
-
 
 &nbsp;
 <!-- =============================================================================== --> 
