@@ -28,7 +28,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
-- [Check GetDataRawACM0 service is running](#check-getdatarawacm0py-service-is-running)
+- [Check MagnetometerACM0 service is running](#check-MagnetometerACM0-service-is-running)
 - [Rolling alert emails](#rolling-alert-emails)
 - [License](#license)
 - [Contact us](#contact-us)
@@ -219,7 +219,7 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check GetDataRawACM0.py service is running
+## Check MagnetometerACM0 service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
