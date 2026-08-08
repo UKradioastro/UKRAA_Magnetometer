@@ -9,6 +9,12 @@
 # Valid values: RED, AMBER, YELLOW
 email_alert_levels = RED,AMBER,YELLOW
 
+# AuroraWatch-aligned threshold values in nT.
+# These are used by alert evaluation and activity plot colour bands.
+yellow_threshold_nt = 50
+amber_threshold_nt = 100
+red_threshold_nt = 200
+
 [smtp]
 host = smtp.example.com
 port = 587

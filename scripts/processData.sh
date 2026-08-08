@@ -25,6 +25,17 @@ else
     exit 1
 fi
 
+# entry to process yesterdays hourly data
+if su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataHourACM0.py \
+                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
+                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+    log_msg "processData.sh          : Completed processing yesterdays hourly data" >> "$MAIN_LOG"
+else
+    log_msg "processData.sh          : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
+    log_msg "processData.sh          : FAILED to process yesterdays hourly data" >> "$ERROR_LOG"
+    exit 1
+fi
+
 # entry to plot yesterdays XYZ magnetic data
 if su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataXYZACM0.gp\
                         >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
