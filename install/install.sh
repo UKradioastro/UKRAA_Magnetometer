@@ -58,13 +58,13 @@ echo "UKRAA Magnetometer file permissions sorted out"
 echo ""
 
 
-echo "Start installing MagnetometerACM0.service..."
-cp -vf /home/pi/UKRAA_Magnetometer/install/MagnetometerACM0.service /etc/systemd/system
-chmod -v 644 /etc/systemd/system/MagnetometerACM0.service
+echo "Start installing PicoMagnetometerACM0.service..."
+cp -vf /home/pi/UKRAA_Magnetometer/install/PicoMagnetometerACM0.service /etc/systemd/system
+chmod -v 644 /etc/systemd/system/PicoMagnetometerACM0.service
 systemctl daemon-reload
-systemctl enable MagnetometerACM0.service
-systemctl start MagnetometerACM0.service
-echo "MagnetometerACM0.service installed and started"
+systemctl enable PicoMagnetometerACM0.service
+systemctl start PicoMagnetometerACM0.service
+echo "PicoMagnetometerACM0.service installed and started"
 echo ""
 
 echo "Start installing UKRAA Magnetometer crontab entry..."
