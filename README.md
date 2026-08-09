@@ -153,7 +153,17 @@ sudo bash install.sh
 
 This will run the install script.
 
-Optional: run an install-time heartbeat smoke check (disabled by default):
+There may be occasions during the running of the install script that require you to make a keyboard entry.
+
+When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
+
+That's it!
+
+The code is now set up to run automatically; it will get the data from the PicoMagnetometer, process the data, plot the data and post the plots to your intranet web page.
+
+There are other functions that are customisable by the user, such as **email alerts** and **FTP service** to users’ external website, that are covered in the **User Manual**.
+
+**Optional**: run an install-time heartbeat smoke check (disabled by default):
 
 ```
 sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh
@@ -161,13 +171,6 @@ sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh
 
 This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_SMOKE_CHECK: PASS` or `HEARTBEAT_SMOKE_CHECK: FAIL` summary.
 
-There may be occasions during the running of the install script that require you to make a keyboard entry.
-
-When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
-
-That's it!
-
-The code is now set up to run automatically; it will get the data from the magnetometer, process the data, plot the data and post the plots to your intranet web page.
 
 [Back to Contents...](#contents)
 
@@ -188,7 +191,7 @@ A number of plots will be created:
 * H, D and Z (Local horizontal plane, declination angle and up/down)
 * B and I (Total strength Earths magnetic field and angle of Earths magnetic field)
 
-Note: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration files... (needs to be written...)
+Note: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration filesfiles - see **User Manual: Additional graphs** for more details.
 
 The raw data will also be processed on a continuous 5 minute basis, again via CRON, to produce a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user will receive an email alert of such - see [Rolling alert emails](#rolling-alert-emails) for more details.
 
@@ -211,6 +214,9 @@ NOTE: if you have a different **hostname** for your RPi, change the search bar e
 
 Where *hostname* is the hostname for your RPi setup.
 
+Code is also supplied that will enable the user to upload, via FTP, to their host website, should they have one - see **User Manual: FTP service** for more details.
+
+
 [Back to Contents...](#contents)
 
 &nbsp;
@@ -219,39 +225,39 @@ Where *hostname* is the hostname for your RPi setup.
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check MagnetometerACM0 service is running
+## Check PicoMagnetometerACM0 service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
-sudo systemctl status MagnetometerACM0.service
+sudo systemctl status PicoMagnetometerACM0.service
 ```
 
 &nbsp;
 
 2. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start MagnetometerACM0.service
+sudo systemctl start PicoMagnetometerACM0.service
 ```
 
 &nbsp;
 
 3. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop MagnetometerACM0.service
+sudo systemctl stop PicoMagnetometerACM0.service
 ```
 
 &nbsp;
 
 4. To **enable** your service, type the following command and press enter.
 ```
-sudo systemctl enable MagnetometerACM0.service
+sudo systemctl enable PicoMagnetometerACM0.service
 ```
 
 &nbsp;
 
 5. To **disable** your service, type the following command and press enter.
 ```
-sudo systemctl disable MagnetometerACM0.service
+sudo systemctl disable PicoMagnetometerACM0.service
 ```
 
 [Back to Contents...](#contents)
