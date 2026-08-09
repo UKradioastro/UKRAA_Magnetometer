@@ -12,6 +12,7 @@ from magnetometer_common import build_day_path
 from magnetometer_common import calculate_hdzbi
 from magnetometer_common import ensure_directory
 from magnetometer_common import format_fixed
+from magnetometer_common import get_alert_thresholds
 from magnetometer_common import get_base_path
 from magnetometer_common import parse_raw_datetime
 from magnetometer_common import utc_now
@@ -32,10 +33,6 @@ def get_window_end_exclusive():
 
     current_time = utc_now().replace(tzinfo=None)
     return current_time.replace(second=0, microsecond=0)
-
-
-def get_alert_threshold(name, default_value):
-    return float(os.environ.get(name, default_value))
 
 
 def get_stale_seconds():
@@ -192,6 +189,7 @@ def write_rolling_csv(output_path, window_start, minute_bins, detector_name):
 
 
 def write_status_json(
+    base_path,
     output_path,
     csv_path,
     window_start,
@@ -202,9 +200,7 @@ def write_status_json(
     samples_seen):
     ensure_directory(os.path.dirname(output_path))
 
-    yellow_threshold = get_alert_threshold('MAGNETOMETER_ALERT_YELLOW_NT', '50')
-    amber_threshold = get_alert_threshold('MAGNETOMETER_ALERT_AMBER_NT', '100')
-    red_threshold = get_alert_threshold('MAGNETOMETER_ALERT_RED_NT', '200')
+    yellow_threshold, amber_threshold, red_threshold = get_alert_thresholds(base_path)
     stale_seconds = get_stale_seconds()
 
     latest_processed_minute = window_end_exclusive - datetime.timedelta(minutes=1)
@@ -261,6 +257,7 @@ def main():
 
     latest_activity_nt = median_or_nan(minute_bins[-1]['delta_nt'])
     write_status_json(
+        base_path,
         status_json_path,
         rolling_csv_path,
         window_start,

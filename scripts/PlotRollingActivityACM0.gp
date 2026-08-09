@@ -6,9 +6,10 @@ basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_
 rollingData = basePath."/data/rolling/latest-24h.csv"
 archivePlot = basePath."/plots/rolling/RollingActivity.png"
 tempPlot = basePath."/temp/rolling/RollingActivity.png"
-yellowThreshold = real(system("sh -lc 'printf %s \"${MAGNETOMETER_ALERT_YELLOW_NT:-50}\"'"))
-amberThreshold = real(system("sh -lc 'printf %s \"${MAGNETOMETER_ALERT_AMBER_NT:-100}\"'"))
-redThreshold = real(system("sh -lc 'printf %s \"${MAGNETOMETER_ALERT_RED_NT:-200}\"'"))
+thresholdValues = system("sh -lc 'MAGNETOMETER_BASE_PATH=\"".basePath."\" /usr/bin/python3 \"".basePath."/scripts/GetAlertThresholdsACM0.py\"'")
+yellowThreshold = real(word(thresholdValues, 1))
+amberThreshold = real(word(thresholdValues, 2))
+redThreshold = real(word(thresholdValues, 3))
 
 system("sh -lc 'mkdir -p \"".basePath."/plots/rolling\" \"".basePath."/temp/rolling\"'")
 
@@ -31,8 +32,7 @@ set timefmt "%Y-%m-%d %H:%M:%S"
 set format x "%H:%M"
 set grid xtics ytics
 set key outside above center
-set style fill solid 0.35 noborder
-set boxwidth 40
+set boxwidth 60 absolute
 
 set xrange [startX:endX]
 set yrange [0:topRange]
@@ -46,9 +46,11 @@ set arrow 1 from graph 0, first yellowThreshold to graph 1, first yellowThreshol
 set arrow 2 from graph 0, first amberThreshold to graph 1, first amberThreshold nohead dt 2 lc rgb "#b36b00"
 set arrow 3 from graph 0, first redThreshold to graph 1, first redThreshold nohead dt 2 lc rgb "#b94a48"
 
+my_colour(val) = (val < yellowThreshold) ? 0x00FF00 : (val <= amberThreshold) ? 0xFFFF00 : (val <= redThreshold) ? 0xFF8503 : 0xFF0000
+
 set output archivePlot
-plot rollingData using 1:9 with lines linewidth 1.5 linecolor rgb "#1f4e79" title "1-minute activity", \
-     rollingData using 1:9 with filledcurves x1 linecolor rgb "#8ecae6" title "Activity area"
+plot rollingData using 1:9:(my_colour($9)) with boxes fillstyle solid 1.0 noborder notitle linecolor rgb variable, \
+     rollingData using 1:9 with boxes fillstyle empty border rgb "black" notitle linecolor rgb "black"
 set output
 
 set output tempPlot

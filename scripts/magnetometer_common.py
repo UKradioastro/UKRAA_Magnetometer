@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import configparser
 import datetime
 import math
 import os
@@ -109,3 +110,55 @@ def build_raw_month_path(base_path, current_time):
         'raw',
         current_time.strftime('%Y'),
         current_time.strftime('%Y-%m'))
+
+
+def build_alerts_ini_path(base_path):
+    configured_path = os.environ.get('MAGNETOMETER_ALERTS_INI_PATH', '').strip()
+    if configured_path:
+        return configured_path
+
+    return os.path.join(base_path, 'config', 'alerts.ini')
+
+
+def _load_ini_parser(config_path):
+    parser = configparser.ConfigParser()
+    if not os.path.exists(config_path):
+        return parser
+
+    with open(config_path, mode='r', encoding='UTF-8') as config_file:
+        config_text = config_file.read().lstrip('\ufeff')
+        parser.read_string(config_text)
+
+    return parser
+
+
+def _parse_threshold(value_text, default_value):
+    try:
+        return float(value_text)
+    except (TypeError, ValueError):
+        return float(default_value)
+
+
+def get_alert_thresholds(base_path):
+    alerts_ini_path = build_alerts_ini_path(base_path)
+    parser = _load_ini_parser(alerts_ini_path)
+
+    yellow_default = '50'
+    amber_default = '100'
+    red_default = '200'
+
+    yellow_text = os.environ.get(
+        'MAGNETOMETER_ALERT_YELLOW_NT',
+        parser.get('alerts', 'yellow_threshold_nt', fallback=yellow_default))
+    amber_text = os.environ.get(
+        'MAGNETOMETER_ALERT_AMBER_NT',
+        parser.get('alerts', 'amber_threshold_nt', fallback=amber_default))
+    red_text = os.environ.get(
+        'MAGNETOMETER_ALERT_RED_NT',
+        parser.get('alerts', 'red_threshold_nt', fallback=red_default))
+
+    return (
+        _parse_threshold(yellow_text, yellow_default),
+        _parse_threshold(amber_text, amber_default),
+        _parse_threshold(red_text, red_default),
+    )

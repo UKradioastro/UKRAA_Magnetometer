@@ -272,6 +272,11 @@ Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
 
 The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
 
+The same threshold values are also used by:
+
+* Daily hourly Activity plot (`PlotDataActivityACM0.gp`)
+* Rolling Activity plot (`PlotRollingActivityACM0.gp`)
+
 ### Configure via `.ini` file (recommended)
 
 1. Copy the example file:
@@ -281,6 +286,15 @@ The alert evaluator runs as part of `processRollingData.sh` and only sends email
 	`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
 
 3. Edit the values for your SMTP service and recipients.
+
+4. Set activity thresholds in the same file under `[alerts]`:
+
+```
+[alerts]
+yellow_threshold_nt = 50
+amber_threshold_nt = 100
+red_threshold_nt = 200
+```
 
 By default, `EvaluateAlertsACM0.py` reads:
 `/home/pi/UKRAA_Magnetometer/config/alerts.ini`
@@ -320,6 +334,24 @@ Available environment variables are:
 * Rolling status is read from `data/status/current.json`
 * If `RollingActivity.png` exists, it is attached to the alert email
 * Alert evaluator config precedence is: environment variable -> `.ini` file -> built-in default
+
+### Regenerate a chosen Activity date (quick local test mode)
+
+You can regenerate the hourly Activity plot for any date without storing an archive copy by default:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlotACM0.sh YYYY-MM-DD
+```
+
+This updates only:
+
+* `/home/pi/UKRAA_Magnetometer/temp/Activity.png`
+
+To also write the dated archive file in `plots/Activity/`, add `--archive`:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlotACM0.sh YYYY-MM-DD --archive
+```
 
 ### Send a one-off SMTP test email
 
