@@ -24,12 +24,11 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 ## Contents
 
 - [Using the code](#using-the-code) 
-- [Where is my magnetometer](#where-is-my-Picomagnetometer)
+- [Where is my PicoMagnetometer](#where-is-my-Picomagnetometer)
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
-- [Check MagnetometerACM0 service is running](#check-MagnetometerACM0-service-is-running)
-- [Rolling alert emails](#rolling-alert-emails)
+- [Check PicoMagnetometerACM0 service is running](#check-MagnetometerACM0-service-is-running)
 - [License](#license)
 - [Contact us](#contact-us)
 
