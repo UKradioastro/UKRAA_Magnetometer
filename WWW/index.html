@@ -120,13 +120,11 @@ body {font-family: "Lato", sans-serif}
       </div>
       <div class="w3-row w3-padding-16">
         <div class="w3-auto">
-          <p>Rolling activity for the last 24 hours</p>
           <img src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling activity plot" style="width:100%">
         </div>
       </div>
       <div class="w3-row w3-padding-16">
         <div class="w3-auto">
-          <p>Rolling X, Y and Z magnetic field for the last 24 hours</p>
           <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
         </div>
       </div>
@@ -141,7 +139,6 @@ body {font-family: "Lato", sans-serif}
     <p class="w3-center">No accuracy is claimed for any published data</p>
     <div class="w3-row w3-padding-32">
       <div class="w3-auto">
-        <p>H magnetic field variation for last day</p>
         <img src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
       </div>
     </div>
@@ -155,7 +152,6 @@ body {font-family: "Lato", sans-serif}
       <p class="w3-center">No accuracy is claimed for any published data</p>
     <div class="w3-row w3-padding-32">
       <div class="w3-auto">
-          <p>X, Y and Z magnetic field variation for last day</p>
           <img src="./temp/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
       </div>
     </div>
@@ -170,7 +166,6 @@ body {font-family: "Lato", sans-serif}
 
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardHDZ">
         <div class="w3-auto">
-          <p>H, D and Z magnetic field variation for last day</p>
           <img src="./temp/HDZ.png" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
         </div>
       </div>
@@ -186,7 +181,6 @@ body {font-family: "Lato", sans-serif}
 
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardBI">
         <div class="w3-auto">
-          <p>H, D and Z magnetic field variation for last day</p>
           <img src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
         </div>
       </div>
@@ -385,18 +379,27 @@ function refreshOptionalDailyGraphs() {
       }
     }
 
-    var section = document.getElementById("daily_HDZBI");
-    var navMain = document.getElementById("navDailyHdzbi");
-    var navMobile = document.getElementById("navDemoDailyHdzbi");
+    var sectionHDZ = document.getElementById("daily_HDZ");
+    var navMainHDZ = document.getElementById("navDailyHdz");
+    var navMobileHDZ = document.getElementById("navDemoDailyHdz");
+    var sectionBI = document.getElementById("daily_BI");
+    var navMainBI = document.getElementById("navDailyBi");
+    var navMobileBI = document.getElementById("navDemoDailyBi");
 
     if (hasAnyGraph) {
-      section.style.display = "block";
-      navMain.style.display = "block";
-      navMobile.style.display = "block";
+      sectionHDZ.style.display = "block";
+      navMainHDZ.style.display = "block";
+      navMobileHDZ.style.display = "block";
+      sectionBI.style.display = "block";
+      navMainBI.style.display = "block";
+      navMobileBI.style.display = "block";
     } else {
-      section.style.display = "none";
-      navMain.style.display = "none";
-      navMobile.style.display = "none";
+      sectionHDZ.style.display = "none";
+      navMainHDZ.style.display = "none";
+      navMobileHDZ.style.display = "none";
+      sectionBI.style.display = "none";
+      navMainBI.style.display = "none";
+      navMobileBI.style.display = "none";
     }
   });
 }
