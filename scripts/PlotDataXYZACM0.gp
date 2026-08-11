@@ -64,7 +64,7 @@ set y2tics
 
 startX = system("sh -lc 'head -n 1 \"".fileData."\" | cut -d, -f1'")
 endX = system("sh -lc 'tail -n 1 \"".fileData."\" | cut -d, -f1'")
-plotTitle = sprintf("XYZ magnetic field for %s\\nGraph is updated every day at 9.30am\\n%s UTC to %s UTC", dateTag, startX, endX)
+plotTitle = sprintf("XYZ magnetic field for %s\nGraph is updated every day at 9.30am\n%s UTC to %s UTC", dateTag, startX, endX)
 
 set xrange [startX:endX]
 
