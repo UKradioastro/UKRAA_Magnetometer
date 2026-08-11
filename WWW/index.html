@@ -21,6 +21,8 @@ body {font-family: "Lato", sans-serif}
 .status-banner.unknown {background: #4a5568}
 .status-banner.stale {background: #5d4037}
 .status-meta {font-size: 0.95rem; margin: 8px 0 0}
+.optional-graph-section {display: none}
+.optional-graph-card {display: none}
 </style>
 </head>
 
@@ -40,6 +42,7 @@ body {font-family: "Lato", sans-serif}
         <a href="#rolling" class="w3-bar-item w3-button">ROLLING PLOTS</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
+        <a href="#daily_HDZBI" class="w3-bar-item w3-button" id="navDailyHdzbi">DAY HDZ/BI GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -53,6 +56,7 @@ body {font-family: "Lato", sans-serif}
   <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING PLOTS</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XYZ GRAPHS</a>
+  <a href="#daily_HDZBI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoDailyHdzbi">DAY HDZ/BI GRAPHS</a>
 </div>
 
 
@@ -149,20 +153,31 @@ body {font-family: "Lato", sans-serif}
       <p class="w3-center">No accuracy is claimed for any published data</p>
     <div class="w3-row w3-padding-32">
       <div class="w3-auto">
-        <p>X magnetic field variation for last day</p>
-        <img src="./temp/X.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+          <p>X, Y and Z magnetic field variation for last day</p>
+          <img src="./temp/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
       </div>
     </div>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>Y magnetic field variation for last day</p>
-        <img src="./temp/Y.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+  </div>
+
+  <!-- Daily HDZ / BI plots (optional) -->
+  <div class="w3-grey optional-graph-section" id="daily_HDZBI">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">MY DAILY HDZ / BI RESULTS</h2>
+      <p class="w3-center">These graphs are displayed when HDZ and/or BI plotting is enabled.</p>
+      <p class="w3-center">No accuracy is claimed for any published data.</p>
+
+      <div class="w3-row w3-padding-16 optional-graph-card" id="cardHDZ">
+        <div class="w3-auto">
+          <p>H, D and Z magnetic field variation for last day</p>
+          <img src="./temp/HDZ.png" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
+        </div>
       </div>
-    </div>
-    <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <p>Z magnetic field variation for last day</p>
-        <img src="./temp/Z.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+
+      <div class="w3-row w3-padding-16 optional-graph-card" id="cardBI">
+        <div class="w3-auto">
+          <p>B and I magnetic field variation for last day</p>
+          <img src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
+        </div>
       </div>
     </div>
   </div>
@@ -330,7 +345,54 @@ function refreshRollingStatus() {
   fetchNextStatus(0);
 }
 
+function probeImage(url) {
+  return new Promise(function(resolve) {
+    var probe = new Image();
+    probe.onload = function() { resolve(true); };
+    probe.onerror = function() { resolve(false); };
+    probe.src = url + "?t=" + Date.now();
+  });
+}
+
+function refreshOptionalDailyGraphs() {
+  var optionalGraphs = [
+    { image: "./temp/HDZ.png", cardId: "cardHDZ" },
+    { image: "./temp/BI.png", cardId: "cardBI" }
+  ];
+
+  Promise.all(optionalGraphs.map(function(entry) {
+    return probeImage(entry.image);
+  })).then(function(results) {
+    var hasAnyGraph = false;
+
+    for (var i = 0; i < optionalGraphs.length; i++) {
+      var card = document.getElementById(optionalGraphs[i].cardId);
+      if (results[i]) {
+        card.style.display = "block";
+        hasAnyGraph = true;
+      } else {
+        card.style.display = "none";
+      }
+    }
+
+    var section = document.getElementById("daily_HDZBI");
+    var navMain = document.getElementById("navDailyHdzbi");
+    var navMobile = document.getElementById("navDemoDailyHdzbi");
+
+    if (hasAnyGraph) {
+      section.style.display = "block";
+      navMain.style.display = "block";
+      navMobile.style.display = "block";
+    } else {
+      section.style.display = "none";
+      navMain.style.display = "none";
+      navMobile.style.display = "none";
+    }
+  });
+}
+
 refreshRollingStatus();
+refreshOptionalDailyGraphs();
 </script>
 
 </body>

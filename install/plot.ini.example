@@ -1,0 +1,19 @@
+# Copy this file to:
+#   /home/pi/UKRAA_Magnetometer/config/plot.ini
+# and edit the values for your environment.
+#
+# Environment variables MAGNETOMETER_PLOT_HDZ and MAGNETOMETER_PLOT_BI
+# still override these values when set.
+
+[plots]
+# Set to true to generate a daily H, D, Z plot (horizontal intensity,
+# declination, and vertical component in nT).
+# Useful for comparing against reference observatories such as the
+# British Geological Survey (BGS).
+plot_hdz = true
+
+# Set to true to generate a daily B, I plot (total field intensity
+# and inclination in nT / degrees).
+# Useful for comparing against reference observatories such as the
+# British Geological Survey (BGS).
+plot_bi = true

@@ -215,6 +215,49 @@ Where *hostname* is the hostname for your RPi setup.
 
 Code is also supplied that will enable the user to upload, via FTP, to their host website, should they have one - see **User Manual: FTP service** for more details.
 
+### Operational checks
+
+After updating scripts on your RPi, run:
+
+```
+sudo bash /home/pi/UKRAA_Magnetometer/scripts/runPostUpdateChecksACM0.sh
+```
+
+This executes:
+- optional daily publish logic checks
+- optional HDZ/BI web visibility checks
+
+For daily runtime monitoring, a health marker is written by:
+
+```
+sudo bash /home/pi/UKRAA_Magnetometer/scripts/checkDailyPublishHealthACM0.sh
+```
+
+Marker output file:
+
+```
+/home/pi/UKRAA_Magnetometer/data/status/daily-health.txt
+```
+
+One-line dashboard summary on demand:
+
+```
+sudo bash /home/pi/UKRAA_Magnetometer/scripts/showDashboardSummaryACM0.sh
+```
+
+If scheduled in cron, summary snapshots can be collected in:
+
+```
+/home/pi/UKRAA_Magnetometer/logfiles/dashboard-summary.log
+```
+
+Migration note (daily plot image names):
+
+- Previous daily web/temp files: `X.png`, `Y.png`, `Z.png`, `H.png`, `D.png`, `B.png`, `I.png`
+- Current daily web/temp files: `XYZ.png`, `HDZ.png`, `BI.png` (plus `Activity.png` unchanged)
+
+The daily gnuplot scripts now generate composite multiplot images with temperature overlay on the y2 axis.
+
 
 [Back to Contents...](#contents)
 

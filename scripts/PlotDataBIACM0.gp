@@ -1,211 +1,200 @@
 #!/usr/bin/gnuplot -persist
-#
-#    
-#    	G N U P L O T
-#    	Version 5.2 patchlevel 6    last modified 2019-01-01 
-#    
-#    	Copyright (C) 1986-1993, 1998, 2004, 2007-2018
-#    	Thomas Williams, Colin Kelley and many others
-#    
-#    	gnuplot home:     http://www.gnuplot.info
-#    	faq, bugs, etc:   type "help FAQ"
-#    	immediate help:   type "help"  (plot window: hit 'h')
 
-# Reset gnuplot variables
 reset
 
-# Set terminal 
-set terminal pngcairo \
-             background "#ffffff"\
-             enhanced \
-             font "DejaVuSansCondensed, 10"\
-             fontscale 1.0\
-             size 640,540\
-             rounded
+basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
+pathData = basePath."/data/processed"
 
-# Set print to <stdout>
-set print "-"
-
-# print to log file
-print "PlotDataBIACM0.gp        : "\
-       .system("date +'%Y-%m-%d %H:%M:%S'")\
-       ." : Started BI plot for "\
-       .system("date -d yesterday +'%Y-%m-%d'")
-
-# Set up data paths
-pathData = "/home/pi/UKRAA_Magnetometer/data/processed"
-
-# Path to each data file for graphing
-FileData = pathData\
-           ."/"\
-           .system("date -d yesterday +'%Y'")\
-           ."/"\
-           .system("date -d yesterday +'%Y-%m'")\
-           ."/"\
-           .system("date -d yesterday +'%Y-%m-%d'")\
+fileData = pathData."/" \
+           .system("date -d yesterday +'%Y'") \
+           ."/" \
+           .system("date -d yesterday +'%Y-%m'") \
+           ."/" \
+           .system("date -d yesterday +'%Y-%m-%d'") \
            .".csv"
 
-# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/isMissing.sh ".FileData)
-if (is_missing == 1) \
-           {
-           print "PlotDataBIACM0.gp        : "\
-                  .system("date +'%Y/%M/%d %H:%M:%S'")\
-                  ." : data file missing, so..."; 
-           print "PlotDataBIACM0.gp        : "\
-                  .system("date +'%Y/%M/%d %H:%M:%S'")\
-                  ." : **FAILED** to complete BI plot for "\
-                  .system("date -d yesterday +'%Y-%m-%d'")
-           exit
-           }
+is_missing = system("sudo /bin/bash ".basePath."/scripts/isMissing.sh ".fileData)
+if (is_missing == 1) {
+    print system("date +'%Y-%m-%d %H:%M:%S'") \
+          ." : PlotDataBIACM0.gp        : FAILED - data file missing"
+    exit
+}
 
-# FileData exists - good to continue...
+dateTag = system("date -d yesterday +'%Y-%m-%d'")
+archivePlot = basePath."/plots/BI/".dateTag."_BI_plot.png"
+tempPlot = basePath."/temp/BI.png"
 
-# Set separator to ","
+system("sh -lc 'mkdir -p \"".basePath."/plots/BI\" \"".basePath."/temp\"'")
+
+set terminal pngcairo \
+             background "#ffffff" \
+             enhanced \
+             font "DejaVuSansCondensed,10" \
+             size 960,760 \
+             rounded
+
 set datafile separator ","
 
-# undertake stats before setting timeformat and xdata
-stats FileData using 14 output prefix "BTdata" nooutput
-stats FileData using 15 output prefix "ITdata" nooutput
+stats fileData using 13 output prefix "BSTAT" nooutput
+stats fileData using 14 output prefix "ISTAT" nooutput
+stats fileData using 8 output prefix "TSTAT" nooutput
 
-# date to be processed
-date = system("date -d yesterday +'%Y-%m-%d'")
+tempPadding = 1.0
+tempRangeMin = TSTAT_min - tempPadding
+tempRangeMax = TSTAT_max + tempPadding
+magneticColor = "#0000ff"
+tempColor = "#a0a0a0"
+fieldStatX = 0.02
+tempStatX = 0.80
+statTitleY = 0.95
+statMeanY = 0.90
+statMaxY = 0.85
+statMinY = 0.80
 
-# Start of X axis time
-StartXaxis = system("date -d '-1 day' +'%Y-%m-%d'")." 00:00:00"
-
-# End of X axis time
-EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
-
-# setting output path to include data stamp
-# Path to directory to store file
-# B plot (nT)
-pathPlot1 = "/home/pi/UKRAA_Magnetometer/plots/BI/"\
-             .date\
-             ."_B_plot.png"
-pathTemp1 = "/home/pi/UKRAA_Magnetometer/temp/B.png"
-# I plot (deg)
-pathPlot2 = "/home/pi/UKRAA_Magnetometer/plots/BI/"\
-             .date\
-             ."_I_plot.png"
-pathTemp2 = "/home/pi/UKRAA_Magnetometer/temp/I.png"
-
-# Title for graph
-# B plot (nT)
-GraphTitle1 = "B magnetic field data for "\
-               .system("date -d yesterday +'%A %d %B %Y'")\
-               ."\n Graph is updated every day at 9.30am \n"
-# I plot (deg)
-GraphTitle2 = "I magnetic angle data for "\
-               .system("date -d yesterday +'%A %d %B %Y'")\
-               ."\n Graph is updated every day at 9.30am \n"
-
-# Set data types
 set xdata time
-
-# Set format types
-set format x "%H:%M" timedate
-set format y "%.1f" 
-set format y2 "%.1f" 
 set timefmt "%Y-%m-%d %H:%M:%S"
+set format x "%H:%M"
+set format y2 "%.1f"
+set grid xtics ytics
+unset key
+set lmargin 10
+set rmargin 10
+set y2tics
 
-# Set grid format
-set grid xtics nomxtics ytics nomytics noztics nomztics nortics nomrtics \
-         nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
-set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,\
-         linetype 0 linecolor 0 linewidth 0.500 dashtype solid
+startX = system("sh -lc 'head -n 1 \"".fileData."\" | cut -d, -f1'")
+endX = system("sh -lc 'tail -n 1 \"".fileData."\" | cut -d, -f1'")
+plotTitle = sprintf("BI magnetic field for %s\\nGraph is updated every day at 9.30am\\n%s UTC to %s UTC", dateTag, startX, endX)
 
-# Set Legend (Key) above plot
-set key outside above center
-set key samplen 10
-#set key title GraphTitle
-set key nobox
+set xrange [startX:endX]
 
-# X-axis tics
-set mxtics 2.0
-set xtics border out scale 1,0.5 nomirror norotate  autojustify
-set xtics norangelimit 7200
-set xtics textcolor rgb "black"
-set xtics font ",8"
+print system("date +'%Y-%m-%d %H:%M:%S'") \
+      ." : PlotDataBIACM0.gp        : Started BI plot for " \
+      .dateTag
 
-# Y-axis tics
-set mytics 2.0
-set ytics border out scale 1,0.5 nomirror norotate  autojustify
-set ytics norangelimit autofreq
-set ytics textcolor rgb "dark-violet"
+set output archivePlot
+set multiplot layout 2,1 title plotTitle font ",12"
 
-# X-axis label and ranges
-set xlabel "Time (UTC)" 
-set xlabel textcolor rgb "black" norotate
-set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
+set ylabel "B (nT)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+unset xlabel
+set yrange [BSTAT_min - 100:BSTAT_max + 100]
+set y2label "Temperature (C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "B field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean B(nT) : %0.1f nT", BSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max B(nT) : %0.1f nT", BSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min B(nT) : %0.1f nT", BSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:13 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
 
-##### Plot command # B(nT)
+set ylabel "I (deg)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+set xlabel "Time (UTC)"
+set yrange [ISTAT_min - 5:ISTAT_max + 5]
+set y2label "Temperature (C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "I field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean I(deg) : %0.1f deg", ISTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max I(deg) : %0.1f deg", ISTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min I(deg) : %0.1f deg", ISTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:14 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
 
-# Y-axis labels and ranges
-set ylabel "B (nT)" 
-set ylabel textcolor rgb "dark-violet" rotate
-set yrange [ (BTdata_min - 500) : (BTdata_max + 500) ] noreverse nowriteback
-
-# set STATS labels on graph
-set label 1 sprintf("Mean B(nT) : %0.1f nT", BTdata_mean)
-set label 1 at graph 0.02, 0.95 tc default
-set label 2 sprintf("Max B(nT) : %0.1f nT", BTdata_max)
-set label 2 at graph 0.02, 0.90 tc default
-set label 3 sprintf("Min B(nT) : %0.1f nT", BTdata_min)
-set label 3 at graph 0.02, 0.85 tc default
-
-GraphTitle = GraphTitle1
-set key title GraphTitle
-set output pathPlot1
-plot FileData using 1:14 \
-                    linetype 1 \
-                    linewidth 1 \
-                    linecolor rgb "#0000FF" \
-                    title "B magnetic field variation" \
-                    with lines
-
-# Replot to terminal and create .png image with data tag for future upload to web page
-set output pathTemp1
-replot
-# end replot
-
-###### Plot command # I(deg)
-
-# Y-axis labels and ranges
-set ylabel "I (deg)" 
-set ylabel textcolor rgb "dark-violet" rotate
-set yrange [ (ITdata_min - 5) : (ITdata_max + 5) ] noreverse nowriteback
-
-# set STATS labels on graph
-set label 1 sprintf("Mean I(deg) : %0.1f deg", ITdata_mean)
-set label 1 at graph 0.02, 0.95 tc default
-set label 2 sprintf("Max I(deg) : %0.1f deg", ITdata_max)
-set label 2 at graph 0.02, 0.90 tc default
-set label 3 sprintf("Min I(deg) : %0.1f deg", ITdata_min)
-set label 3 at graph 0.02, 0.85 tc default
-
-GraphTitle = GraphTitle2
-set key title GraphTitle
-set output pathPlot2
-plot FileData using 1:15 \
-                    linetype 1 \
-                    linewidth 1 \
-                    linecolor rgb "#FF0000" \
-                    title "I magnetic angle variation" \
-                    with lines
-
-# Replot to terminal and create .png image with data tag for future upload to web page
-set output pathTemp2
-replot
-# end replot
-
-# This is important because it closes our output file.
+unset multiplot
 set output
 
-# print to log file
-print "PlotDataBIACM0.gp        : "\
-       .system("date +'%Y-%m-%d %H:%M:%S'")\
-       ." : Completed BI plot for "\
-       .system("date -d yesterday +'%Y-%m-%d'")
+set output tempPlot
+set multiplot layout 2,1 title plotTitle font ",12"
 
-# EOF
+set ylabel "B (nT)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+unset xlabel
+set yrange [BSTAT_min - 100:BSTAT_max + 100]
+set y2label "Temperature (C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "B field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean B(nT) : %0.1f nT", BSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max B(nT) : %0.1f nT", BSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min B(nT) : %0.1f nT", BSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:13 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
+
+set ylabel "I (deg)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+set xlabel "Time (UTC)"
+set yrange [ISTAT_min - 5:ISTAT_max + 5]
+set y2label "Temperature (C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "I field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean I(deg) : %0.1f deg", ISTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max I(deg) : %0.1f deg", ISTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min I(deg) : %0.1f deg", ISTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:14 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
+
+unset multiplot
+set output
+
+print system("date +'%Y-%m-%d %H:%M:%S'") \
+      ." : PlotDataBIACM0.gp        : Completed BI plot for " \
+      .dateTag
