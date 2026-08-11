@@ -20,7 +20,7 @@ set terminal pngcairo \
              enhanced \
              font "DejaVuSansCondensed, 10"\
              fontscale 1.0\
-             size 640,540\
+             size 960,960\
              rounded
 
 # Set print to <stdout>

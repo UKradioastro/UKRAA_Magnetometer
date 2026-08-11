@@ -58,7 +58,7 @@ set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
 set yrange [XSTAT_min - 200:XSTAT_max + 200]
-set y2label "Temperature (C)"
+set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
 set y2range [tempRangeMin:tempRangeMax]
@@ -72,11 +72,11 @@ set label 4 sprintf("Min X(nT) : %0.1f nT", XSTAT_min)
 set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
 set label 11 "Temperature statistics"
 set label 11 at graph tempStatX, statTitleY tc rgb tempColor
-set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
 set label 12 at graph tempStatX, statMeanY tc rgb tempColor
-set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
 set label 13 at graph tempStatX, statMaxY tc rgb tempColor
-set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
 set label 14 at graph tempStatX, statMinY tc rgb tempColor
 plot rollingData using 1:5 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
     rollingData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
@@ -86,7 +86,7 @@ set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
 set yrange [YSTAT_min - 200:YSTAT_max + 200]
-set y2label "Temperature (C)"
+set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
 set y2range [tempRangeMin:tempRangeMax]
@@ -100,11 +100,11 @@ set label 4 sprintf("Min Y(nT) : %0.1f nT", YSTAT_min)
 set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
 set label 11 "Temperature statistics"
 set label 11 at graph tempStatX, statTitleY tc rgb tempColor
-set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
 set label 12 at graph tempStatX, statMeanY tc rgb tempColor
-set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
 set label 13 at graph tempStatX, statMaxY tc rgb tempColor
-set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
 set label 14 at graph tempStatX, statMinY tc rgb tempColor
 plot rollingData using 1:6 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
     rollingData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
@@ -114,7 +114,7 @@ set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 set xlabel "Time (UTC)"
 set yrange [ZSTAT_min - 200:ZSTAT_max + 200]
-set y2label "Temperature (C)"
+set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
 set y2range [tempRangeMin:tempRangeMax]
@@ -128,11 +128,11 @@ set label 4 sprintf("Min Z(nT) : %0.1f nT", ZSTAT_min)
 set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
 set label 11 "Temperature statistics"
 set label 11 at graph tempStatX, statTitleY tc rgb tempColor
-set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
 set label 12 at graph tempStatX, statMeanY tc rgb tempColor
-set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
 set label 13 at graph tempStatX, statMaxY tc rgb tempColor
-set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
 set label 14 at graph tempStatX, statMinY tc rgb tempColor
 plot rollingData using 1:7 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
     rollingData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
@@ -149,7 +149,7 @@ set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
 set yrange [XSTAT_min - 200:XSTAT_max + 200]
-set y2label "Temperature (C)"
+set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
 set y2range [tempRangeMin:tempRangeMax]
@@ -163,11 +163,11 @@ set label 4 sprintf("Min X(nT) : %0.1f nT", XSTAT_min)
 set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
 set label 11 "Temperature statistics"
 set label 11 at graph tempStatX, statTitleY tc rgb tempColor
-set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
 set label 12 at graph tempStatX, statMeanY tc rgb tempColor
-set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
 set label 13 at graph tempStatX, statMaxY tc rgb tempColor
-set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
 set label 14 at graph tempStatX, statMinY tc rgb tempColor
 plot rollingData using 1:5 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
     rollingData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
@@ -177,7 +177,7 @@ set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
 set yrange [YSTAT_min - 200:YSTAT_max + 200]
-set y2label "Temperature (C)"
+set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
 set y2range [tempRangeMin:tempRangeMax]
@@ -191,11 +191,11 @@ set label 4 sprintf("Min Y(nT) : %0.1f nT", YSTAT_min)
 set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
 set label 11 "Temperature statistics"
 set label 11 at graph tempStatX, statTitleY tc rgb tempColor
-set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
 set label 12 at graph tempStatX, statMeanY tc rgb tempColor
-set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
 set label 13 at graph tempStatX, statMaxY tc rgb tempColor
-set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
 set label 14 at graph tempStatX, statMinY tc rgb tempColor
 plot rollingData using 1:6 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
     rollingData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
@@ -205,7 +205,7 @@ set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 set xlabel "Time (UTC)"
 set yrange [ZSTAT_min - 200:ZSTAT_max + 200]
-set y2label "Temperature (C)"
+set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
 set y2range [tempRangeMin:tempRangeMax]
@@ -219,11 +219,11 @@ set label 4 sprintf("Min Z(nT) : %0.1f nT", ZSTAT_min)
 set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
 set label 11 "Temperature statistics"
 set label 11 at graph tempStatX, statTitleY tc rgb tempColor
-set label 12 sprintf("Mean Temp(C) : %0.1f C", TSTAT_mean)
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
 set label 12 at graph tempStatX, statMeanY tc rgb tempColor
-set label 13 sprintf("Max Temp(C) : %0.1f C", TSTAT_max)
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
 set label 13 at graph tempStatX, statMaxY tc rgb tempColor
-set label 14 sprintf("Min Temp(C) : %0.1f C", TSTAT_min)
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
 set label 14 at graph tempStatX, statMinY tc rgb tempColor
 plot rollingData using 1:7 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
     rollingData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
