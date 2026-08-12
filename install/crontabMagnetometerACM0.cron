@@ -13,3 +13,9 @@
 # cron entry to upload plot files to www
 30 09 * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/moveGraphs.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
 
+# cron entry to write daily health marker after processing + publish should be complete
+15 10 * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/checkDailyPublishHealthACM0.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
+
+# cron entry to append one-line dashboard summary every 15 minutes
+*/15 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/showDashboardSummaryACM0.sh >> /home/pi/UKRAA_Magnetometer/logfiles/dashboard-summary.log 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
+

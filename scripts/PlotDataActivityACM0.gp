@@ -20,7 +20,7 @@ set terminal pngcairo \
              enhanced \
              font "DejaVuSansCondensed, 10"\
              fontscale 1.0\
-             size 640,540\
+             size 960,960\
              rounded
 
 # Set print to <stdout>
@@ -80,17 +80,18 @@ EndXaxis = nextDate." 00:00:00"
 
 # setting output path to include data stamp
 # Path to directory to store file
-# X plot (nT)
+
 pathPlot1 = basePath."/plots/Activity/"\
              .targetDate\
              .".png"
 pathTemp1 = basePath."/temp/Activity.png"
 
 # Title for graph
-# X plot (nT)
-GraphTitle1 = "Hourly geomagnetic activity for "\
-               .targetDatePretty\
-               ."\n Graph is updated every day at 9.30am \n"
+dateTag = system("date -d yesterday +'%Y-%m-%d'")
+startX = system("sh -lc 'head -n 1 \"".FileData."\" | cut -d, -f1'")
+endX = system("sh -lc 'tail -n 1 \"".FileData."\" | cut -d, -f1'")
+GraphTitle1 = sprintf("Hourly geomagnetic activity for %s\nGraph is updated every day at 9.30am\n%s UTC to %s UTC", dateTag, startX, endX)
+
 
 # Set data types
 set xdata time

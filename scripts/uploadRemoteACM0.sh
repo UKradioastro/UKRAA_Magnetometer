@@ -120,10 +120,19 @@ def upload_files(mode, base_path, config_path):
     if mode == 'daily':
         upload_entries = [
             ('Activity.png', os.path.join(base_path, 'temp', 'Activity.png'), base_remote_dir),
-            ('X.png', os.path.join(base_path, 'temp', 'X.png'), base_remote_dir),
-            ('Y.png', os.path.join(base_path, 'temp', 'Y.png'), base_remote_dir),
-            ('Z.png', os.path.join(base_path, 'temp', 'Z.png'), base_remote_dir),
+            ('XYZ.png', os.path.join(base_path, 'temp', 'XYZ.png'), base_remote_dir),
         ]
+
+        optional_daily_entries = [
+            ('HDZ.png', os.path.join(base_path, 'temp', 'HDZ.png'), base_remote_dir),
+            ('BI.png', os.path.join(base_path, 'temp', 'BI.png'), base_remote_dir),
+        ]
+
+        for file_name, local_path, remote_dir in optional_daily_entries:
+            if os.path.exists(local_path):
+                upload_entries.append((file_name, local_path, remote_dir))
+            else:
+                print(f'INFO: Optional daily file not present, skipping: {file_name}')
     else:
         rolling_remote_dir = posixpath.join(base_remote_dir, 'rolling')
         upload_entries = [

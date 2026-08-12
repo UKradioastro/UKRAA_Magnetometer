@@ -17,7 +17,7 @@ set terminal pngcairo \
              background "#ffffff" \
              enhanced \
              font "DejaVuSansCondensed,10" \
-             size 960,420 \
+             size 960,960 \
              rounded
 
 set datafile separator ","
@@ -26,6 +26,7 @@ stats rollingData using 9 output prefix "ASTAT" nooutput
 startX = system("sh -lc 'head -n 1 \"".rollingData."\" | cut -d, -f1'")
 endX = system("sh -lc 'tail -n 1 \"".rollingData."\" | cut -d, -f1'")
 topRange = (ASTAT_max > redThreshold ? ASTAT_max + 10 : redThreshold + 10)
+plotTitle = sprintf("Rolling magnetic field for the last 24 hours\nUpdated every 5 minutes\n%s UTC to %s UTC", startX, endX)
 
 set xdata time
 set timefmt "%Y-%m-%d %H:%M:%S"
@@ -47,6 +48,8 @@ set arrow 2 from graph 0, first amberThreshold to graph 1, first amberThreshold 
 set arrow 3 from graph 0, first redThreshold to graph 1, first redThreshold nohead dt 2 lc rgb "#b94a48"
 
 my_colour(val) = (val < yellowThreshold) ? 0x00FF00 : (val <= amberThreshold) ? 0xFFFF00 : (val <= redThreshold) ? 0xFF8503 : 0xFF0000
+
+set key title plotTitle font ",12"
 
 set output archivePlot
 plot rollingData using 1:9:(my_colour($9)) with boxes fillstyle solid 1.0 noborder notitle linecolor rgb variable, \

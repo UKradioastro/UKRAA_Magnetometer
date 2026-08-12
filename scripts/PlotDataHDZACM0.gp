@@ -1,251 +1,257 @@
 #!/usr/bin/gnuplot -persist
-#
-#    
-#    	G N U P L O T
-#    	Version 5.2 patchlevel 6    last modified 2019-01-01 
-#    
-#    	Copyright (C) 1986-1993, 1998, 2004, 2007-2018
-#    	Thomas Williams, Colin Kelley and many others
-#    
-#    	gnuplot home:     http://www.gnuplot.info
-#    	faq, bugs, etc:   type "help FAQ"
-#    	immediate help:   type "help"  (plot window: hit 'h')
 
-# Reset gnuplot variables
 reset
 
-# Set terminal 
-set terminal pngcairo \
-             background "#ffffff"\
-             enhanced \
-             font "DejaVuSansCondensed, 10"\
-             fontscale 1.0\
-             size 640,540\
-             rounded
+basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
+pathData = basePath."/data/processed"
 
-# Set print to <stdout>
-set print "-"
-
-# print to log file
-print "PlotDataHDZACM0.gp       : "\
-       .system("date +'%Y-%m-%d %H:%M:%S'")\
-       ." : Started HDZ plot for "\
-       .system("date -d yesterday +'%Y-%m-%d'")
-
-# Set up data paths
-pathData = "/home/pi/UKRAA_Magnetometer/data/processed"
-
-# Path to each data file for graphing
-FileData = pathData\
-           ."/"\
-           .system("date -d yesterday +'%Y'")\
-           ."/"\
-           .system("date -d yesterday +'%Y-%m'")\
-           ."/"\
-           .system("date -d yesterday +'%Y-%m-%d'")\
+fileData = pathData."/" \
+           .system("date -d yesterday +'%Y'") \
+           ."/" \
+           .system("date -d yesterday +'%Y-%m'") \
+           ."/" \
+           .system("date -d yesterday +'%Y-%m-%d'") \
            .".csv"
 
-# check if FileData exists - 0=exists, 1=doesn't exist, if doesn't exist then exit, with message
-is_missing = system("sudo /bin/bash /home/pi/UKRAA_Magnetometer/scripts/isMissing.sh ".FileData)
-if (is_missing == 1) \
-           {
-           print "PlotDataHDZACM0.gp       : "\
-                  .system("date +'%Y/%M/%d %H:%M:%S'")\
-                  ." : data file missing, so..."; 
-           print "PlotDataHDZACM0.gp       : "\
-                  .system("date +'%Y/%M/%d %H:%M:%S'")\
-                  ." : **FAILED** to complete HDZ plot for "\
-                  .system("date -d yesterday +'%Y-%m-%d'")
-           exit
-           }
+is_missing = system("sudo /bin/bash ".basePath."/scripts/isMissing.sh ".fileData)
+if (is_missing == 1) {
+    print system("date +'%Y-%m-%d %H:%M:%S'") \
+          ." : PlotDataHDZACM0.gp       : FAILED - data file missing"
+    exit
+}
 
-# FileData exists - good to continue...
+dateTag = system("date -d yesterday +'%Y-%m-%d'")
+archivePlot = basePath."/plots/HDZ/".dateTag."_HDZ_plot.png"
+tempPlot = basePath."/temp/HDZ.png"
 
-# Set separator to ","
+system("sh -lc 'mkdir -p \"".basePath."/plots/HDZ\" \"".basePath."/temp\"'")
+
+set terminal pngcairo \
+             background "#ffffff" \
+             enhanced \
+             font "DejaVuSansCondensed,10" \
+             size 960,960 \
+             rounded
+
 set datafile separator ","
 
-# undertake stats before setting timeformat and xdata
-stats FileData using 11 output prefix "HTdata" nooutput
-stats FileData using 12 output prefix "DTdata" nooutput
-stats FileData using 13 output prefix "ZTdata" nooutput
+stats fileData using 10 output prefix "HSTAT" nooutput
+stats fileData using 11 output prefix "DSTAT" nooutput
+stats fileData using 12 output prefix "ZSTAT" nooutput
+stats fileData using 8 output prefix "TSTAT" nooutput
 
-# date to be processed
-date = system("date -d yesterday +'%Y-%m-%d'")
+tempPadding = 1.0
+tempRangeMin = TSTAT_min - tempPadding
+tempRangeMax = TSTAT_max + tempPadding
+magneticColor = "#0000ff"
+tempColor = "#a0a0a0"
+fieldStatX = 0.02
+tempStatX = 0.80
+statTitleY = 0.95
+statMeanY = 0.90
+statMaxY = 0.85
+statMinY = 0.80
 
-# Start of X axis time
-StartXaxis = system("date -d '-1 day' +'%Y-%m-%d'")." 00:00:00"
-
-# End of X axis time
-EndXaxis = system("date +'%Y-%m-%d'")." 00:00:00"
-
-# setting output path to include data stamp
-# Path to directory to store file
-# X plot (nT)
-pathPlot1 = "/home/pi/UKRAA_Magnetometer/plots/HDZ/"\
-             .date\
-             ."_H_plot.png"
-pathTemp1 = "/home/pi/UKRAA_Magnetometer/temp/H.png"
-# Y plot (nT)
-pathPlot2 = "/home/pi/UKRAA_Magnetometer/plots/HDZ/"\
-             .date\
-             ."_D_plot.png"
-pathTemp2 = "/home/pi/UKRAA_Magnetometer/temp/D.png"
-# Z plot (nT)
-pathPlot3 = "/home/pi/UKRAA_Magnetometer/plots/HDZ/"\
-             .date\
-             ."_Z_plot.png"
-pathTemp3 = "/home/pi/UKRAA_Magnetometer/temp/Z.png"
-
-# Title for graph
-# H plot (nT)
-GraphTitle1 = "H magnetic field data for "\
-               .system("date -d yesterday +'%A %d %B %Y'")\
-               ."\n Graph is updated every day at 9.30am \n"
-# D plot (deg
-GraphTitle2 = "D magnetic angle data for "\
-               .system("date -d yesterday +'%A %d %B %Y'")\
-               ."\n Graph is updated every day at 9.30am \n"
-# Z plot (nT)
-GraphTitle3 = "Z magnetic field data for "\
-               .system("date -d yesterday +'%A %d %B %Y'")\
-               ."\n Graph is updated every day at 9.30am \n"
-
-# Set data types
 set xdata time
-
-# Set format types
-set format x "%H:%M" timedate
-set format y "%.1f" 
-set format y2 "%.1f" 
 set timefmt "%Y-%m-%d %H:%M:%S"
+set format x "%H:%M"
+set format y2 "%.1f"
+set grid xtics ytics
+unset key
+set lmargin 10
+set rmargin 10
+set y2tics
 
-# Set grid format
-set grid xtics nomxtics ytics nomytics noztics nomztics nortics nomrtics \
-         nox2tics nomx2tics noy2tics nomy2tics nocbtics nomcbtics
-set grid layerdefault linetype 0 linecolor 0 linewidth 0.500 dashtype solid,\
-         linetype 0 linecolor 0 linewidth 0.500 dashtype solid
+startX = system("sh -lc 'head -n 1 \"".fileData."\" | cut -d, -f1'")
+endX = system("sh -lc 'tail -n 1 \"".fileData."\" | cut -d, -f1'")
+plotTitle = sprintf("HDZ magnetic field for %s\nGraph is updated every day at 9.30am\n%s UTC to %s UTC", dateTag, startX, endX)
 
-# Set Legend (Key) above plot
-set key outside above center
-set key samplen 10
-#set key title GraphTitle
-set key nobox
+set xrange [startX:endX]
 
-# X-axis tics
-set mxtics 2.0
-set xtics border out scale 1,0.5 nomirror norotate  autojustify
-set xtics norangelimit 7200
-set xtics textcolor rgb "black"
-set xtics font ",8"
+print system("date +'%Y-%m-%d %H:%M:%S'") \
+      ." : PlotDataHDZACM0.gp       : Started HDZ plot for " \
+      .dateTag
 
-# Y-axis tics
-set mytics 2.0
-set ytics border out scale 1,0.5 nomirror norotate  autojustify
-set ytics norangelimit autofreq
-set ytics textcolor rgb "dark-violet"
+set output archivePlot
+set multiplot layout 3,1 title plotTitle font ",12"
 
-# X-axis label and ranges
-set xlabel "Time (UTC)" 
-set xlabel textcolor rgb "black" norotate
-set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
+set ylabel "H (nT)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+unset xlabel
+set yrange [HSTAT_min - 100:HSTAT_max + 100]
+set y2label "Temperature (°C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "H field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean H(nT) : %0.1f nT", HSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max H(nT) : %0.1f nT", HSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min H(nT) : %0.1f nT", HSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:10 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
 
-##### Plot command # H(nT)
+set ylabel "D (deg)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+unset xlabel
+set yrange [DSTAT_min - 5:DSTAT_max + 5]
+set y2label "Temperature (°C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "D angle statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean D(deg) : %0.1f deg", DSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max D(deg) : %0.1f deg", DSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min D(deg) : %0.1f deg", DSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:11 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
 
-# Y-axis labels and ranges
-set ylabel "H (nT)" 
-set ylabel textcolor rgb "dark-violet" rotate
-set yrange [ (HTdata_min - 500) : (HTdata_max + 500) ] noreverse nowriteback
+set ylabel "Z (nT)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+set xlabel "Time (UTC)"
+set yrange [ZSTAT_min - 500:ZSTAT_max + 500]
+set y2label "Temperature (°C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "Z field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean Z(nT) : %0.1f nT", ZSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max Z(nT) : %0.1f nT", ZSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min Z(nT) : %0.1f nT", ZSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:12 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
 
-# set STATS labels on graph
-set label 1 sprintf("Mean H(nT) : %0.1f nT", HTdata_mean)
-set label 1 at graph 0.02, 0.95 tc default
-set label 2 sprintf("Max H(nT) : %0.1f nT", HTdata_max)
-set label 2 at graph 0.02, 0.90 tc default
-set label 3 sprintf("Min H(nT) : %0.1f nT", HTdata_min)
-set label 3 at graph 0.02, 0.85 tc default
-
-GraphTitle = GraphTitle1
-set key title GraphTitle
-set output pathPlot1
-plot FileData using 1:11 \
-                    linetype 1 \
-                    linewidth 1 \
-                    linecolor rgb "#0000FF" \
-                    title "H magnetic field variation" \
-                    with lines
-
-# Replot to terminal and create .png image with data tag for future upload to web page
-set output pathTemp1
-replot
-# end replot
-
-###### Plot command # D(deg)
-
-# Y-axis labels and ranges
-set ylabel "D (deg)" 
-set ylabel textcolor rgb "dark-violet" rotate
-set yrange [ (DTdata_min - 5) : (DTdata_max + 5) ] noreverse nowriteback
-
-# set STATS labels on graph
-set label 1 sprintf("Mean D(deg) : %0.1f deg", DTdata_mean)
-set label 1 at graph 0.02, 0.95 tc default
-set label 2 sprintf("Max D(deg) : %0.1f deg", DTdata_max)
-set label 2 at graph 0.02, 0.90 tc default
-set label 3 sprintf("Min D(deg) : %0.1f deg", DTdata_min)
-set label 3 at graph 0.02, 0.85 tc default
-
-GraphTitle = GraphTitle2
-set key title GraphTitle
-set output pathPlot2
-plot FileData using 1:12 \
-                    linetype 1 \
-                    linewidth 1 \
-                    linecolor rgb "#FF0000" \
-                    title "D magnetic angle variation" \
-                    with lines
-
-# Replot to terminal and create .png image with data tag for future upload to web page
-set output pathTemp2
-replot
-# end replot
-
-##### Plot command # Z(nT)
-
-# Y-axis labels and ranges
-set ylabel "Z (nT)" 
-set ylabel textcolor rgb "dark-violet" rotate
-set yrange [ (ZTdata_min - 500) : (ZTdata_max + 500) ] noreverse nowriteback
-
-# set STATS labels on graph
-set label 1 sprintf("Mean Z(nT) : %0.1f nT", ZTdata_mean)
-set label 1 at graph 0.02, 0.95 tc default
-set label 2 sprintf("Max Z(nT) : %0.1f nT", ZTdata_max)
-set label 2 at graph 0.02, 0.90 tc default
-set label 3 sprintf("Min Z(nT) : %0.1f nT", ZTdata_min)
-set label 3 at graph 0.02, 0.85 tc default
-
-GraphTitle = GraphTitle3
-set key title GraphTitle
-set output pathPlot3
-plot FileData using 1:13 \
-                    linetype 1 \
-                    linewidth 1 \
-                    linecolor rgb "#00FF00" \
-                    title "Z magnetic field variation" \
-                    with lines
-
-# Replot to terminal and create .png image with data tag for future upload to web page
-set output pathTemp3
-replot
-# end replot
-
-# This is important because it closes our output file.
+unset multiplot
 set output
 
-# print to log file
-print "PlotDataHDZACM0.gp       : "\
-       .system("date +'%Y-%m-%d %H:%M:%S'")\
-       ." : Completed HDZ plot for "\
-       .system("date -d yesterday +'%Y-%m-%d'")
+set output tempPlot
+set multiplot layout 3,1 title plotTitle font ",12"
 
-# EOF
+set ylabel "H (nT)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+unset xlabel
+set yrange [HSTAT_min - 100:HSTAT_max + 100]
+set y2label "Temperature (°C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "H field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean H(nT) : %0.1f nT", HSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max H(nT) : %0.1f nT", HSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min H(nT) : %0.1f nT", HSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:10 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
+
+set ylabel "D (deg)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+unset xlabel
+set yrange [DSTAT_min - 5:DSTAT_max + 5]
+set y2label "Temperature (°C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "D angle statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean D(deg) : %0.1f deg", DSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max D(deg) : %0.1f deg", DSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min D(deg) : %0.1f deg", DSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:11 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
+
+set ylabel "Z (nT)"
+set ylabel textcolor rgb magneticColor
+set ytics textcolor rgb magneticColor
+set xlabel "Time (UTC)"
+set yrange [ZSTAT_min - 500:ZSTAT_max + 500]
+set y2label "Temperature (°C)"
+set y2label textcolor rgb tempColor
+set y2tics textcolor rgb tempColor
+set y2range [tempRangeMin:tempRangeMax]
+set label 1 "Z field statistics"
+set label 1 at graph fieldStatX, statTitleY tc rgb magneticColor
+set label 2 sprintf("Mean Z(nT) : %0.1f nT", ZSTAT_mean)
+set label 2 at graph fieldStatX, statMeanY tc rgb magneticColor
+set label 3 sprintf("Max Z(nT) : %0.1f nT", ZSTAT_max)
+set label 3 at graph fieldStatX, statMaxY tc rgb magneticColor
+set label 4 sprintf("Min Z(nT) : %0.1f nT", ZSTAT_min)
+set label 4 at graph fieldStatX, statMinY tc rgb magneticColor
+set label 11 "Temperature statistics"
+set label 11 at graph tempStatX, statTitleY tc rgb tempColor
+set label 12 sprintf("Mean Temp(C) : %0.1f °C", TSTAT_mean)
+set label 12 at graph tempStatX, statMeanY tc rgb tempColor
+set label 13 sprintf("Max Temp(C) : %0.1f °C", TSTAT_max)
+set label 13 at graph tempStatX, statMaxY tc rgb tempColor
+set label 14 sprintf("Min Temp(C) : %0.1f °C", TSTAT_min)
+set label 14 at graph tempStatX, statMinY tc rgb tempColor
+plot fileData using 1:12 with lines linewidth 1.2 linecolor rgb magneticColor notitle, \
+    fileData using 1:8 axes x1y2 with lines linewidth 1.0 linecolor rgb tempColor notitle
+
+unset multiplot
+set output
+
+print system("date +'%Y-%m-%d %H:%M:%S'") \
+      ." : PlotDataHDZACM0.gp       : Completed HDZ plot for " \
+      .dateTag

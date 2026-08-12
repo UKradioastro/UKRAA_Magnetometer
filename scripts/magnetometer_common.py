@@ -120,6 +120,37 @@ def build_alerts_ini_path(base_path):
     return os.path.join(base_path, 'config', 'alerts.ini')
 
 
+def build_plot_ini_path(base_path):
+    configured_path = os.environ.get('MAGNETOMETER_PLOT_INI_PATH', '').strip()
+    if configured_path:
+        return configured_path
+
+    return os.path.join(base_path, 'config', 'plot.ini')
+
+
+def _parse_bool(value_text, default_value):
+    if value_text is None:
+        return default_value
+
+    return value_text.strip().lower() in ('true', '1', 'yes')
+
+
+def get_plot_options(base_path):
+    plot_ini_path = build_plot_ini_path(base_path)
+    parser = _load_ini_parser(plot_ini_path)
+
+    plot_hdz = _parse_bool(
+        os.environ.get('MAGNETOMETER_PLOT_HDZ',
+                       parser.get('plots', 'plot_hdz', fallback='true')),
+        True)
+    plot_bi = _parse_bool(
+        os.environ.get('MAGNETOMETER_PLOT_BI',
+                       parser.get('plots', 'plot_bi', fallback='true')),
+        True)
+
+    return plot_hdz, plot_bi
+
+
 def _load_ini_parser(config_path):
     parser = configparser.ConfigParser()
     if not os.path.exists(config_path):
