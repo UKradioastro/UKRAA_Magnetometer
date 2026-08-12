@@ -19,12 +19,15 @@ echo ""
 echo "Creating UKRAA Magnetometer directory structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/processed
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/raw
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/history
 sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/logfiles
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/BI
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/HDZ
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/XYZ
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/history
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
 sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/temp
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/history
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
 echo "UKRAA Magnetometer directory structure created"
 echo ""

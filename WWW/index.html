@@ -40,6 +40,7 @@ body {font-family: "Lato", sans-serif}
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
         <a href="#rolling" class="w3-bar-item w3-button">ROLLING PLOTS</a>
+        <a href="#history" class="w3-bar-item w3-button">HISTORY PLOTS</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
         <a href="#daily_HDZ" class="w3-bar-item w3-button" id="navDailyHdz">DAY HDZ GRAPHS</a>
@@ -55,6 +56,7 @@ body {font-family: "Lato", sans-serif}
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
   <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING PLOTS</a>
+  <a href="#history" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">HISTORY PLOTS</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XYZ GRAPHS</a>
   <a href="#daily_HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoDailyHdz">DAY HDZ GRAPHS</a>
@@ -126,6 +128,41 @@ body {font-family: "Lato", sans-serif}
       <div class="w3-row w3-padding-16">
         <div class="w3-auto">
           <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historical plots -->
+  <div class="w3-white" id="history">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:1200px">
+      <h2 class="w3-wide">HISTORY PLOTS</h2>
+      <p class="w3-center">Seven-day, monthly, three-month, six-month and annual magnetic histories</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+
+      <div class="w3-row-padding w3-padding-16">
+        <div class="w3-col l4 m6 s12 w3-margin-bottom">
+          <h3>7 Day</h3>
+          <img src="./temp/history/7d/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round" alt="7 day xyz history plot" style="width:100%">
+        </div>
+        <div class="w3-col l4 m6 s12 w3-margin-bottom">
+          <h3>1 Month</h3>
+          <img src="./temp/history/1m/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round" alt="1 month xyz history plot" style="width:100%">
+        </div>
+        <div class="w3-col l4 m6 s12 w3-margin-bottom">
+          <h3>3 Months</h3>
+          <img src="./temp/history/3m/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round" alt="3 month xyz history plot" style="width:100%">
+        </div>
+      </div>
+
+      <div class="w3-row-padding w3-padding-16">
+        <div class="w3-col l4 m6 s12 w3-margin-bottom">
+          <h3>6 Months</h3>
+          <img src="./temp/history/6m/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round" alt="6 month xyz history plot" style="width:100%">
+        </div>
+        <div class="w3-col l4 m6 s12 w3-margin-bottom">
+          <h3>1 Year</h3>
+          <img src="./temp/history/1y/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round" alt="1 year xyz history plot" style="width:100%">
         </div>
       </div>
     </div>

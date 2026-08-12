@@ -39,6 +39,14 @@ for required_file in Activity.png XYZ.png; do
     fi
 done
 
+# History web files check.
+for history_window in 7d 1m 3m 6m 1y; do
+    if [ ! -f "$WEB_TEMP_DIR/history/$history_window/XYZ.png" ]; then
+        status="FAIL"
+        append_issue "missing web history XYZ file: $WEB_TEMP_DIR/history/$history_window/XYZ.png"
+    fi
+done
+
 # Optional daily web files are only required when enabled.
 if [ -x "$BASE_PATH/scripts/GetPlotOptionsACM0.py" ]; then
     read -r plot_hdz plot_bi < <(/usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptionsACM0.py")
@@ -48,6 +56,13 @@ if [ -x "$BASE_PATH/scripts/GetPlotOptionsACM0.py" ]; then
             status="FAIL"
             append_issue "missing web HDZ file while plot_hdz=true: $WEB_TEMP_DIR/HDZ.png"
         fi
+
+        for history_window in 7d 1m 3m 6m 1y; do
+            if [ ! -f "$WEB_TEMP_DIR/history/$history_window/HDZ.png" ]; then
+                status="FAIL"
+                append_issue "missing web history HDZ file while plot_hdz=true: $WEB_TEMP_DIR/history/$history_window/HDZ.png"
+            fi
+done
     fi
 
     if [ "$plot_bi" = "true" ]; then
@@ -55,6 +70,13 @@ if [ -x "$BASE_PATH/scripts/GetPlotOptionsACM0.py" ]; then
             status="FAIL"
             append_issue "missing web BI file while plot_bi=true: $WEB_TEMP_DIR/BI.png"
         fi
+
+        for history_window in 7d 1m 3m 6m 1y; do
+            if [ ! -f "$WEB_TEMP_DIR/history/$history_window/BI.png" ]; then
+                status="FAIL"
+                append_issue "missing web history BI file while plot_bi=true: $WEB_TEMP_DIR/history/$history_window/BI.png"
+            fi
+done
     fi
 fi
 

@@ -27,6 +27,10 @@ fi
 
 failures=0
 
+if ! run_check "Historical CSV generation logic" "$BASE_PATH/scripts/testHistoryProcessingACM0.sh"; then
+    failures=$((failures + 1))
+fi
+
 if ! run_check "Optional daily publish logic" "$BASE_PATH/scripts/testOptionalDailyPlotsACM0.sh"; then
     failures=$((failures + 1))
 fi
