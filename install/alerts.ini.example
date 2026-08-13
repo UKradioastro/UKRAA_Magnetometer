@@ -41,3 +41,9 @@ to =
 
 # Attach RollingActivity.png to heartbeat emails.
 attach_plot = false
+
+# Set false to omit the threshold values from heartbeat emails.
+include_thresholds = true
+
+# Optional closing message. Leave blank to omit it.
+message = This is a daily health-check email to confirm the magnetometer alert pipeline is running.

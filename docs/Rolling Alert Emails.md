@@ -117,6 +117,8 @@ enabled = true
 hour_utc = 9
 to =
 attach_plot = false
+include_thresholds = false
+message = This is a daily health-check email to confirm the magnetometer alert pipeline is running.
 ```
 
 Notes:
@@ -124,6 +126,8 @@ Notes:
 * `hour_utc` is the first UTC hour of the day when the heartbeat can send.
 * Only one heartbeat attempt is made per UTC day (success or failure), to avoid retry spam every 5 minutes.
 * If `heartbeat.to` is blank, it uses `[email] to`.
+* Set `heartbeat.include_thresholds = false` to omit the threshold values from the heartbeat.
+* `heartbeat.message` controls the closing message; leave it blank to omit that line.
 
 Environment variable overrides are also available:
 
@@ -131,6 +135,8 @@ Environment variable overrides are also available:
 * `MAGNETOMETER_HEARTBEAT_HOUR_UTC`
 * `MAGNETOMETER_HEARTBEAT_TO`
 * `MAGNETOMETER_HEARTBEAT_ATTACH_PLOT`
+* `MAGNETOMETER_HEARTBEAT_INCLUDE_THRESHOLDS`
+* `MAGNETOMETER_HEARTBEAT_MESSAGE`
 
 ### Send a one-off heartbeat test email immediately
 

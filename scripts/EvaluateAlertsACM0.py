@@ -184,6 +184,20 @@ def build_settings(base_path):
             get_config_value(parser, 'MAGNETOMETER_HEARTBEAT_ATTACH_PLOT', 'heartbeat', 'attach_plot', 'false'),
             False),
         'heartbeat_to': get_config_value(parser, 'MAGNETOMETER_HEARTBEAT_TO', 'heartbeat', 'to', ''),
+        'heartbeat_include_thresholds': parse_bool(
+            get_config_value(
+                parser,
+                'MAGNETOMETER_HEARTBEAT_INCLUDE_THRESHOLDS',
+                'heartbeat',
+                'include_thresholds',
+                'true'),
+            True),
+        'heartbeat_message': get_config_value(
+            parser,
+            'MAGNETOMETER_HEARTBEAT_MESSAGE',
+            'heartbeat',
+            'message',
+            'This is a daily health-check email to confirm the magnetometer alert pipeline is running.'),
     }
 
     return settings
@@ -310,21 +324,24 @@ def build_heartbeat_email_message(status, settings, now_utc):
         f'Latest processed minute (UTC): {status.get("latest_processed_minute_utc", "unknown")}',
         f'Stale status: {status.get("is_stale", True)}',
         f'Detector: {status.get("detector_name", "unknown")}',
-        '',
-        'Thresholds in use:',
-        f'  Yellow: {status.get("yellow_threshold_nt", "unknown")} nT',
-        f'  Amber: {status.get("amber_threshold_nt", "unknown")} nT',
-        f'  Red: {status.get("red_threshold_nt", "unknown")} nT',
     ]
+
+    if settings.get('heartbeat_include_thresholds', True):
+        lines.extend([
+            '',
+            'Thresholds in use:',
+            f'  Yellow: {status.get("yellow_threshold_nt", "unknown")} nT',
+            f'  Amber: {status.get("amber_threshold_nt", "unknown")} nT',
+            f'  Red: {status.get("red_threshold_nt", "unknown")} nT',
+        ])
 
     web_url = settings.get('web_url', '')
     if web_url:
         lines.extend(['', f'Web page: {web_url}'])
 
-    lines.extend([
-        '',
-        'This is a daily health-check email to confirm the magnetometer alert pipeline is running.',
-    ])
+    message = settings.get('heartbeat_message', '').strip()
+    if message:
+        lines.extend(['', message])
 
     return subject, '\n'.join(lines)
 
