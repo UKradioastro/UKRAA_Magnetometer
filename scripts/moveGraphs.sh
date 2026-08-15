@@ -58,7 +58,16 @@ if [ "$PLOT_HDZ" = "true" ]; then
   fi
   log_msg "moveGraphs.sh           : HDZ file detected (HDZ.png)" >> "$MAIN_LOG"
 else
-  log_msg "moveGraphs.sh           : HDZ files not required (plot_hdz=false)" >> "$MAIN_LOG"
+  if [ -f "$SOURCE_DIR/HDZ.png" ]; then
+    rm -f "$SOURCE_DIR/HDZ.png"
+    log_msg "moveGraphs.sh           : Removed stale HDZ.png from temp source (plot_hdz=false)" >> "$MAIN_LOG"
+  fi
+  if [ -f "$WEB_ROOT/temp/HDZ.png" ]; then
+    rm -f "$WEB_ROOT/temp/HDZ.png"
+    log_msg "moveGraphs.sh           : Removed stale HDZ.png from web root (plot_hdz=false)" >> "$MAIN_LOG"
+  else
+    log_msg "moveGraphs.sh           : HDZ files not required (plot_hdz=false)" >> "$MAIN_LOG"
+  fi
 fi
 
 if [ "$PLOT_BI" = "true" ]; then
@@ -69,7 +78,16 @@ if [ "$PLOT_BI" = "true" ]; then
   fi
   log_msg "moveGraphs.sh           : BI file detected (BI.png)" >> "$MAIN_LOG"
 else
-  log_msg "moveGraphs.sh           : BI files not required (plot_bi=false)" >> "$MAIN_LOG"
+  if [ -f "$SOURCE_DIR/BI.png" ]; then
+    rm -f "$SOURCE_DIR/BI.png"
+    log_msg "moveGraphs.sh           : Removed stale BI.png from temp source (plot_bi=false)" >> "$MAIN_LOG"
+  fi
+  if [ -f "$WEB_ROOT/temp/BI.png" ]; then
+    rm -f "$WEB_ROOT/temp/BI.png"
+    log_msg "moveGraphs.sh           : Removed stale BI.png from web root (plot_bi=false)" >> "$MAIN_LOG"
+  else
+    log_msg "moveGraphs.sh           : BI files not required (plot_bi=false)" >> "$MAIN_LOG"
+  fi
 fi
 
 # entry to move yesterdays graphs from temp to web root

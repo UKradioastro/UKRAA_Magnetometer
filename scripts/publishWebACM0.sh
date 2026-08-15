@@ -61,6 +61,9 @@ if [ "$PLOT_HDZ" = "true" ]; then
     log_msg "publishWebACM0.sh        : FAILED - could not copy RollingHDZ.png" >> "$ERROR_LOG"
     exit 1
   fi
+elif [ -f "$DEST_ROLLING_DIR/RollingHDZ.png" ]; then
+  rm -f "$DEST_ROLLING_DIR/RollingHDZ.png"
+  log_msg "publishWebACM0.sh        : Removed stale RollingHDZ.png (plot_hdz=false)" >> "$MAIN_LOG"
 else
   log_msg "publishWebACM0.sh        : Rolling HDZ not required (plot_hdz=false)" >> "$MAIN_LOG"
 fi
@@ -72,6 +75,9 @@ if [ "$PLOT_BI" = "true" ]; then
     log_msg "publishWebACM0.sh        : FAILED - could not copy RollingBI.png" >> "$ERROR_LOG"
     exit 1
   fi
+elif [ -f "$DEST_ROLLING_DIR/RollingBI.png" ]; then
+  rm -f "$DEST_ROLLING_DIR/RollingBI.png"
+  log_msg "publishWebACM0.sh        : Removed stale RollingBI.png (plot_bi=false)" >> "$MAIN_LOG"
 else
   log_msg "publishWebACM0.sh        : Rolling BI not required (plot_bi=false)" >> "$MAIN_LOG"
 fi

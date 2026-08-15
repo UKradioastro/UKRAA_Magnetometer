@@ -69,14 +69,21 @@ if [ ! -f "$INDEX_FILE" ]; then
 fi
 
 # Verify key webpage hooks exist.
-assert_contains 'id="daily_HDZBI"'
-assert_contains 'id="navDailyHdzbi"'
-assert_contains 'id="navDemoDailyHdzbi"'
+assert_contains 'id="HDZ"'
+assert_contains 'id="BI"'
+assert_contains 'id="navHdz"'
+assert_contains 'id="navBi"'
+assert_contains 'id="navDemoHdz"'
+assert_contains 'id="navDemoBi"'
 assert_contains 'id="cardHDZ"'
 assert_contains 'id="cardBI"'
-assert_contains 'function refreshOptionalDailyGraphs()'
+assert_contains 'id="cardRollingHDZ"'
+assert_contains 'id="cardRollingBI"'
+assert_contains 'function refreshOptionalGraphs()'
 assert_contains './temp/HDZ.png'
 assert_contains './temp/BI.png'
+assert_contains './temp/rolling/RollingHDZ.png'
+assert_contains './temp/rolling/RollingBI.png'
 
 rm -rf "$TEST_ROOT"
 mkdir -p "$TEST_ROOT"
