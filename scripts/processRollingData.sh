@@ -32,6 +32,31 @@ else
     exit 1
 fi
 
+# read HDZ and BI plot flags from plot.ini (defaults: true true)
+read -r PLOT_HDZ PLOT_BI < <(su pi -c "/usr/bin/python3 $BASE_PATH/scripts/GetPlotOptionsACM0.py")
+
+if [ "$PLOT_HDZ" = "true" ]; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingHDZACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+        log_msg "processRollingData.sh    : Completed rolling HDZ plot" >> "$MAIN_LOG"
+    else
+        log_msg "processRollingData.sh    : FAILED rolling HDZ plot" >> "$ERROR_LOG"
+        exit 1
+    fi
+else
+    log_msg "processRollingData.sh    : Skipping rolling HDZ plot (plot_hdz = false in plot.ini)" >> "$MAIN_LOG"
+fi
+
+if [ "$PLOT_BI" = "true" ]; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingBIACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+        log_msg "processRollingData.sh    : Completed rolling BI plot" >> "$MAIN_LOG"
+    else
+        log_msg "processRollingData.sh    : FAILED rolling BI plot" >> "$ERROR_LOG"
+        exit 1
+    fi
+else
+    log_msg "processRollingData.sh    : Skipping rolling BI plot (plot_bi = false in plot.ini)" >> "$MAIN_LOG"
+fi
+
 if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlertsACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh    : Completed rolling alert evaluation" >> "$MAIN_LOG"
 else

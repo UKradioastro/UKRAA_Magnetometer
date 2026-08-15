@@ -13,7 +13,7 @@
 <style>
 body {font-family: "Lato", sans-serif}
 .mySlides {display: none}
-.status-banner {border-radius: 12px; color: #fff; margin: 0 auto 24px; max-width: 800px; padding: 18px 20px; text-align: left}
+.status-banner {color: #fff; margin: 0 auto; max-width: 960px; padding: 18px 20px; text-align: left}
 .status-banner.quiet {background: #2f6f44}
 .status-banner.yellow {background: #b8860b}
 .status-banner.amber {background: #cc7000}
@@ -39,11 +39,11 @@ body {font-family: "Lato", sans-serif}
     <div class="w3-dropdown-hover w3-hide-small">
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
-        <a href="#rolling" class="w3-bar-item w3-button">ROLLING PLOTS</a>
+        <a href="#rolling" class="w3-bar-item w3-button">ROLLING STATUS</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
-        <a href="#daily_XYZ" class="w3-bar-item w3-button">DAY XYZ GRAPHS</a>
-        <a href="#daily_HDZ" class="w3-bar-item w3-button" id="navDailyHdz">DAY HDZ GRAPHS</a>
-        <a href="#daily_BI" class="w3-bar-item w3-button" id="navDailyBi">DAY BI GRAPHS</a>
+        <a href="#XYZ" class="w3-bar-item w3-button">XYZ GRAPHS</a>
+        <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz">HDZ GRAPHS</a>
+        <a href="#BI" class="w3-bar-item w3-button" id="navBi">BI GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -54,11 +54,11 @@ body {font-family: "Lato", sans-serif}
 <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
-  <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING PLOTS</a>
+  <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING STATUS</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
-  <a href="#daily_XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY XYZ GRAPHS</a>
-  <a href="#daily_HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoDailyHdz">DAY HDZ GRAPHS</a>
-  <a href="#daily_BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoDailyBi">DAY BI GRAPHS</a>
+  <a href="#XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">XYZ GRAPHS</a>
+  <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz">HDZ GRAPHS</a>
+  <a href="#BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoBi">BI GRAPHS</a>
 </div>
 
 
@@ -118,14 +118,9 @@ body {font-family: "Lato", sans-serif}
         <p id="alertSummary" style="margin:0">Waiting for the latest rolling status file.</p>
         <p id="alertMeta" class="status-meta">Status JSON: unavailable</p>
       </div>
-      <div class="w3-row w3-padding-16">
+      <div class="w3-row">
         <div class="w3-auto">
-          <img src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling activity plot" style="width:100%">
-        </div>
-      </div>
-      <div class="w3-row w3-padding-16">
-        <div class="w3-auto">
-          <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
+          <img src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-margin-bottom" alt="rolling activity plot" style="width:100%">
         </div>
       </div>
     </div>
@@ -144,26 +139,36 @@ body {font-family: "Lato", sans-serif}
     </div>
   </div>
 
-  <!-- Daily XYZ plot -->
-  <div class="w3-black" id="daily_XYZ">
+  <!-- XYZ plots: rolling + daily -->
+  <div class="w3-black" id="XYZ">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
-      <h2 class="w3-wide">MY DAILY XYZ RESULTS</h2>
-      <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
+      <h2 class="w3-wide">MY XYZ RESULTS</h2>
+      <p class="w3-center">Rolling 24-hour plot (updated every 5 minutes) followed by yesterday's full-day plot</p>
       <p class="w3-center">No accuracy is claimed for any published data</p>
-    <div class="w3-row w3-padding-32">
+    <div class="w3-row w3-padding-16">
+      <div class="w3-auto">
+          <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
+      </div>
+    </div>
+    <div class="w3-row w3-padding-16">
       <div class="w3-auto">
           <img src="./temp/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
       </div>
     </div>
   </div>
 
-  <!-- Daily HDZ plots (optional) -->
-  <div class="w3-white optional-graph-section" id="daily_HDZ">
+  <!-- HDZ plots (optional): rolling + daily -->
+  <div class="w3-white optional-graph-section" id="HDZ">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
-      <h2 class="w3-wide">MY DAILY HDZ RESULTS</h2>
+      <h2 class="w3-wide">MY HDZ RESULTS</h2>
       <p class="w3-center">These graphs are displayed when HDZ plotting is enabled.</p>
       <p class="w3-center">No accuracy is claimed for any published data.</p>
 
+      <div class="w3-row w3-padding-16 optional-graph-card" id="cardRollingHDZ">
+        <div class="w3-auto">
+          <img src="./temp/rolling/RollingHDZ.png" class="w3-round w3-margin-bottom" alt="rolling HDZ plot" style="width:100%">
+        </div>
+      </div>
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardHDZ">
         <div class="w3-auto">
           <img src="./temp/HDZ.png" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
@@ -172,13 +177,18 @@ body {font-family: "Lato", sans-serif}
     </div>
   </div>
 
-  <!-- Daily BI plots (optional) -->
-  <div class="w3-black optional-graph-section" id="daily_BI">
+  <!-- BI plots (optional): rolling + daily -->
+  <div class="w3-black optional-graph-section" id="BI">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
-      <h2 class="w3-wide">MY DAILY BI RESULTS</h2>
+      <h2 class="w3-wide">MY BI RESULTS</h2>
       <p class="w3-center">These graphs are displayed when BI plotting is enabled.</p>
       <p class="w3-center">No accuracy is claimed for any published data.</p>
 
+      <div class="w3-row w3-padding-16 optional-graph-card" id="cardRollingBI">
+        <div class="w3-auto">
+          <img src="./temp/rolling/RollingBI.png" class="w3-round w3-margin-bottom" alt="rolling BI plot" style="width:100%">
+        </div>
+      </div>
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardBI">
         <div class="w3-auto">
           <img src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
@@ -358,54 +368,47 @@ function probeImage(url) {
   });
 }
 
-function refreshOptionalDailyGraphs() {
+function setGroupVisibility(sectionId, isVisible, navMainId, navMobileId) {
+  var section = document.getElementById(sectionId);
+  var navMain = document.getElementById(navMainId);
+  var navMobile = document.getElementById(navMobileId);
+  var displayValue = isVisible ? "block" : "none";
+
+  section.style.display = displayValue;
+  navMain.style.display = displayValue;
+  navMobile.style.display = displayValue;
+}
+
+function refreshOptionalGraphs() {
   var optionalGraphs = [
-    { image: "./temp/HDZ.png", cardId: "cardHDZ" },
-    { image: "./temp/BI.png", cardId: "cardBI" }
+    { image: "./temp/rolling/RollingHDZ.png", cardId: "cardRollingHDZ", group: "HDZ" },
+    { image: "./temp/HDZ.png", cardId: "cardHDZ", group: "HDZ" },
+    { image: "./temp/rolling/RollingBI.png", cardId: "cardRollingBI", group: "BI" },
+    { image: "./temp/BI.png", cardId: "cardBI", group: "BI" }
   ];
 
   Promise.all(optionalGraphs.map(function(entry) {
     return probeImage(entry.image);
   })).then(function(results) {
-    var hasAnyGraph = false;
+    var groupHasGraph = { HDZ: false, BI: false };
 
     for (var i = 0; i < optionalGraphs.length; i++) {
       var card = document.getElementById(optionalGraphs[i].cardId);
       if (results[i]) {
         card.style.display = "block";
-        hasAnyGraph = true;
+        groupHasGraph[optionalGraphs[i].group] = true;
       } else {
         card.style.display = "none";
       }
     }
 
-    var sectionHDZ = document.getElementById("daily_HDZ");
-    var navMainHDZ = document.getElementById("navDailyHdz");
-    var navMobileHDZ = document.getElementById("navDemoDailyHdz");
-    var sectionBI = document.getElementById("daily_BI");
-    var navMainBI = document.getElementById("navDailyBi");
-    var navMobileBI = document.getElementById("navDemoDailyBi");
-
-    if (hasAnyGraph) {
-      sectionHDZ.style.display = "block";
-      navMainHDZ.style.display = "block";
-      navMobileHDZ.style.display = "block";
-      sectionBI.style.display = "block";
-      navMainBI.style.display = "block";
-      navMobileBI.style.display = "block";
-    } else {
-      sectionHDZ.style.display = "none";
-      navMainHDZ.style.display = "none";
-      navMobileHDZ.style.display = "none";
-      sectionBI.style.display = "none";
-      navMainBI.style.display = "none";
-      navMobileBI.style.display = "none";
-    }
+    setGroupVisibility("HDZ", groupHasGraph.HDZ, "navHdz", "navDemoHdz");
+    setGroupVisibility("BI", groupHasGraph.BI, "navBi", "navDemoBi");
   });
 }
 
 refreshRollingStatus();
-refreshOptionalDailyGraphs();
+refreshOptionalGraphs();
 </script>
 
 </body>

@@ -17,7 +17,7 @@ set terminal pngcairo \
              background "#ffffff" \
              enhanced \
              font "DejaVuSansCondensed,10" \
-             size 960,960 \
+             size 960,720 \
              rounded
 
 set datafile separator ","
@@ -25,7 +25,9 @@ set datafile separator ","
 stats rollingData using 9 output prefix "ASTAT" nooutput
 startX = system("sh -lc 'head -n 1 \"".rollingData."\" | cut -d, -f1'")
 endX = system("sh -lc 'tail -n 1 \"".rollingData."\" | cut -d, -f1'")
-topRange = (ASTAT_max > redThreshold ? ASTAT_max + 10 : redThreshold + 10)
+topRange = (ASTAT_max < 50) ? 60 : \
+           (ASTAT_max < 100) ? 110 : \
+           (ASTAT_max > redThreshold ? ASTAT_max + 10 : redThreshold + 10)
 plotTitle = sprintf("Rolling magnetic field for the last 24 hours\nUpdated every 5 minutes\n%s UTC to %s UTC", startX, endX)
 
 set xdata time
