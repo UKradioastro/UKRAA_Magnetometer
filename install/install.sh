@@ -58,6 +58,15 @@ else
 fi
 echo ""
 
+echo "Set up default plot configuration..."
+if [ ! -f /home/pi/UKRAA_Magnetometer/config/plot.ini ]; then
+	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/plot.ini.example /home/pi/UKRAA_Magnetometer/config/plot.ini
+	echo "Created /home/pi/UKRAA_Magnetometer/config/plot.ini"
+else
+	echo "Existing /home/pi/UKRAA_Magnetometer/config/plot.ini retained"
+fi
+echo ""
+
 echo "Sort out UKRAA Magnetometer file permissions..."
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.py
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.sh

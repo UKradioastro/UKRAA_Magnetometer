@@ -32,6 +32,25 @@ amber_threshold_nt = 100
 red_threshold_nt = 200
 ```
 
+### Enable or disable alert emails
+
+Email sending is off by default so a fresh install does not log SMTP failures every 5 minutes.
+
+In `alerts.ini`:
+
+```
+[alerts]
+email_enabled = true
+```
+
+Notes:
+
+* When `email_enabled = false`, thresholds, alert levels, plots and the web status page all still work; only email sending is skipped.
+* Suppression is logged once per level transition, not on every run.
+* The daily heartbeat email is also skipped while `email_enabled = false`.
+* The manual test scripts (`testAlertEmailACM0.sh`, `testHeartbeatEmailACM0.sh`) still send, so you can verify SMTP before enabling.
+* Environment variable override: `MAGNETOMETER_EMAIL_ENABLED`
+
 By default, `EvaluateAlertsACM0.py` reads:
 `/home/pi/UKRAA_Magnetometer/config/alerts.ini`
 
