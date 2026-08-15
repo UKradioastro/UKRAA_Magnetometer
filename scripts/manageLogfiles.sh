@@ -70,4 +70,5 @@ log_msg "manageLogfiles.sh       : Created new dashboard-summary.log" >> "$MAIN_
 
 # change owner from root to pi for new log files
 chown pi:pi log-MagnetometerACM0.txt log-error.txt dashboard-summary.log
+chmod 664 log-MagnetometerACM0.txt log-error.txt dashboard-summary.log
 
