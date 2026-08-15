@@ -155,6 +155,9 @@ def build_settings(base_path):
 
     settings = {
         'config_path': config_path,
+        'email_enabled': parse_bool(
+            get_config_value(parser, 'MAGNETOMETER_EMAIL_ENABLED', 'alerts', 'email_enabled', 'false'),
+            False),
         'configured_levels': get_configured_levels(parser),
         'smtp_host': get_config_value(parser, 'MAGNETOMETER_SMTP_HOST', 'smtp', 'host', ''),
         'smtp_port': smtp_port,
@@ -341,7 +344,7 @@ def build_heartbeat_mail_settings(settings):
 
 
 def maybe_send_daily_heartbeat(status, previous_state, settings, activity_plot_path):
-    if not settings['heartbeat_enabled']:
+    if not settings['email_enabled'] or not settings['heartbeat_enabled']:
         return {
             'attempted': False,
             'sent': False,
@@ -492,6 +495,9 @@ def main():
             status = build_default_status()
             log_msg('No rolling status JSON found; sending test email with default status values')
 
+        if not settings['email_enabled']:
+            log_msg('email_enabled is false in alerts.ini; sending test email anyway because it was requested')
+
         subject, body = build_test_email_message(settings, status)
         success, error_text = send_email(settings, subject, body, activity_plot_path)
         if success:
@@ -505,6 +511,9 @@ def main():
         if status is None:
             status = build_default_status()
             log_msg('No rolling status JSON found; sending heartbeat test email with default status values')
+
+        if not settings['email_enabled']:
+            log_msg('email_enabled is false in alerts.ini; sending heartbeat test email anyway because it was requested')
 
         heartbeat_settings = build_heartbeat_mail_settings(settings)
         subject, body = build_heartbeat_email_message(status, settings, utc_now().replace(microsecond=0))
@@ -555,6 +564,14 @@ def main():
             next_state['last_email_level'] = current_level
         save_state(state_path, next_state)
         log_msg(f'No email alert required (level {previous_level.upper()} -> {current_level.upper()})')
+        return 0
+
+    if not settings['email_enabled']:
+        # Record the level so suppression is logged once per transition, not every run.
+        next_state['last_email_level'] = current_level
+        next_state['last_email_error'] = ''
+        save_state(state_path, next_state)
+        log_msg(f'Alert email suppressed for {current_level.upper()} (email_enabled = false in alerts.ini)')
         return 0
 
     subject, body = build_email_message(status, previous_state, configured_levels, web_url)

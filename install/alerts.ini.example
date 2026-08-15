@@ -5,6 +5,10 @@
 # Environment variables still override these values when set.
 
 [alerts]
+# Set true to enable alert and heartbeat emails.
+# Leave false until the [smtp] and [email] settings below are filled in.
+email_enabled = false
+
 # Comma-separated levels that should trigger email on upward transitions.
 # Valid values: RED, AMBER, YELLOW
 email_alert_levels = RED,AMBER,YELLOW
