@@ -29,6 +29,17 @@ sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
 echo "UKRAA Magnetometer directory structure created"
 echo ""
 
+echo "Creating UKRAA Magnetometer log files..."
+# cron runs the wrapper scripts as root, but the work steps drop to user pi with su.
+# Pre-create the log files as pi so those redirections are not blocked by root ownership.
+for logFile in log-MagnetometerACM0.txt log-error.txt dashboard-summary.log; do
+	sudo -u pi touch /home/pi/UKRAA_Magnetometer/logfiles/"$logFile"
+done
+chown -v pi:pi /home/pi/UKRAA_Magnetometer/logfiles /home/pi/UKRAA_Magnetometer/logfiles/*
+chmod -v 664 /home/pi/UKRAA_Magnetometer/logfiles/*
+echo "UKRAA Magnetometer log files created"
+echo ""
+
 echo "Set up default rolling alert configuration..."
 if [ ! -f /home/pi/UKRAA_Magnetometer/config/alerts.ini ]; then
 	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/alerts.ini.example /home/pi/UKRAA_Magnetometer/config/alerts.ini
