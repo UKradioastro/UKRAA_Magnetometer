@@ -91,4 +91,15 @@ else
     log_msg "processData.sh          : Skipping BI plot (plot_bi = false in plot.ini)" >> "$MAIN_LOG"
 fi
 
+# entry to build and plot the 7d/1m/3m/6m/1y historical windows
+if /bin/bash /home/pi/UKRAA_Magnetometer/scripts/processHistoricalData.sh \
+                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
+                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt; then
+    log_msg "processData.sh          : Completed historical plots" >> "$MAIN_LOG"
+else
+    log_msg "processData.sh          : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
+    log_msg "processData.sh          : FAILED to build historical plots" >> "$ERROR_LOG"
+    exit 1
+fi
+
 log_msg "processData.sh          : Completed processing and plotting" >> "$MAIN_LOG"

@@ -44,6 +44,7 @@ body {font-family: "Lato", sans-serif}
         <a href="#XYZ" class="w3-bar-item w3-button">XYZ GRAPHS</a>
         <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz">HDZ GRAPHS</a>
         <a href="#BI" class="w3-bar-item w3-button" id="navBi">BI GRAPHS</a>
+        <a href="#history" class="w3-bar-item w3-button">HISTORY GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -59,6 +60,7 @@ body {font-family: "Lato", sans-serif}
   <a href="#XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">XYZ GRAPHS</a>
   <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz">HDZ GRAPHS</a>
   <a href="#BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoBi">BI GRAPHS</a>
+  <a href="#history" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">HISTORY GRAPHS</a>
 </div>
 
 
@@ -192,6 +194,102 @@ body {font-family: "Lato", sans-serif}
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardBI">
         <div class="w3-auto">
           <img src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History plots: 7 day, 1 month, 3 month, 6 month, 1 year -->
+  <div class="w3-white" id="history">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:1000px">
+      <h2 class="w3-wide">HISTORY GRAPHS</h2>
+      <p class="w3-center">7-day, 1-month, 3-month, 6-month and 1-year magnetic field histories</p>
+      <p class="w3-center">No accuracy is claimed for any published data</p>
+
+      <h3 class="w3-left-align">XYZ history</h3>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <img src="./temp/history/7d/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="7 day xyz history plot" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <img src="./temp/history/1m/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="1 month xyz history plot" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <img src="./temp/history/3m/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="3 month xyz history plot" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <img src="./temp/history/6m/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="6 month xyz history plot" style="width:100%">
+        </div>
+      </div>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto">
+          <img src="./temp/history/1y/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="1 year xyz history plot" style="width:100%">
+        </div>
+      </div>
+
+      <!-- HDZ history (optional, shown only when plot_hdz is enabled) -->
+      <div class="optional-graph-section" id="historyHDZ">
+        <h3 class="w3-left-align">HDZ history</h3>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory7dHDZ">
+          <div class="w3-auto">
+            <img src="./temp/history/7d/HDZ.png" class="w3-round w3-margin-bottom" alt="7 day hdz history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory1mHDZ">
+          <div class="w3-auto">
+            <img src="./temp/history/1m/HDZ.png" class="w3-round w3-margin-bottom" alt="1 month hdz history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory3mHDZ">
+          <div class="w3-auto">
+            <img src="./temp/history/3m/HDZ.png" class="w3-round w3-margin-bottom" alt="3 month hdz history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory6mHDZ">
+          <div class="w3-auto">
+            <img src="./temp/history/6m/HDZ.png" class="w3-round w3-margin-bottom" alt="6 month hdz history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory1yHDZ">
+          <div class="w3-auto">
+            <img src="./temp/history/1y/HDZ.png" class="w3-round w3-margin-bottom" alt="1 year hdz history plot" style="width:100%">
+          </div>
+        </div>
+      </div>
+
+      <!-- BI history (optional, shown only when plot_bi is enabled) -->
+      <div class="optional-graph-section" id="historyBI">
+        <h3 class="w3-left-align">BI history</h3>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory7dBI">
+          <div class="w3-auto">
+            <img src="./temp/history/7d/BI.png" class="w3-round w3-margin-bottom" alt="7 day bi history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory1mBI">
+          <div class="w3-auto">
+            <img src="./temp/history/1m/BI.png" class="w3-round w3-margin-bottom" alt="1 month bi history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory3mBI">
+          <div class="w3-auto">
+            <img src="./temp/history/3m/BI.png" class="w3-round w3-margin-bottom" alt="3 month bi history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory6mBI">
+          <div class="w3-auto">
+            <img src="./temp/history/6m/BI.png" class="w3-round w3-margin-bottom" alt="6 month bi history plot" style="width:100%">
+          </div>
+        </div>
+        <div class="w3-row w3-padding-16 optional-graph-card" id="cardHistory1yBI">
+          <div class="w3-auto">
+            <img src="./temp/history/1y/BI.png" class="w3-round w3-margin-bottom" alt="1 year bi history plot" style="width:100%">
+          </div>
         </div>
       </div>
     </div>
@@ -383,8 +481,18 @@ function refreshOptionalGraphs() {
   var optionalGraphs = [
     { image: "./temp/rolling/RollingHDZ.png", cardId: "cardRollingHDZ", group: "HDZ" },
     { image: "./temp/HDZ.png", cardId: "cardHDZ", group: "HDZ" },
+    { image: "./temp/history/7d/HDZ.png", cardId: "cardHistory7dHDZ", group: "HDZ" },
+    { image: "./temp/history/1m/HDZ.png", cardId: "cardHistory1mHDZ", group: "HDZ" },
+    { image: "./temp/history/3m/HDZ.png", cardId: "cardHistory3mHDZ", group: "HDZ" },
+    { image: "./temp/history/6m/HDZ.png", cardId: "cardHistory6mHDZ", group: "HDZ" },
+    { image: "./temp/history/1y/HDZ.png", cardId: "cardHistory1yHDZ", group: "HDZ" },
     { image: "./temp/rolling/RollingBI.png", cardId: "cardRollingBI", group: "BI" },
-    { image: "./temp/BI.png", cardId: "cardBI", group: "BI" }
+    { image: "./temp/BI.png", cardId: "cardBI", group: "BI" },
+    { image: "./temp/history/7d/BI.png", cardId: "cardHistory7dBI", group: "BI" },
+    { image: "./temp/history/1m/BI.png", cardId: "cardHistory1mBI", group: "BI" },
+    { image: "./temp/history/3m/BI.png", cardId: "cardHistory3mBI", group: "BI" },
+    { image: "./temp/history/6m/BI.png", cardId: "cardHistory6mBI", group: "BI" },
+    { image: "./temp/history/1y/BI.png", cardId: "cardHistory1yBI", group: "BI" }
   ];
 
   Promise.all(optionalGraphs.map(function(entry) {
@@ -404,6 +512,8 @@ function refreshOptionalGraphs() {
 
     setGroupVisibility("HDZ", groupHasGraph.HDZ, "navHdz", "navDemoHdz");
     setGroupVisibility("BI", groupHasGraph.BI, "navBi", "navDemoBi");
+    document.getElementById("historyHDZ").style.display = groupHasGraph.HDZ ? "block" : "none";
+    document.getElementById("historyBI").style.display = groupHasGraph.BI ? "block" : "none";
   });
 }
 
