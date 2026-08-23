@@ -28,6 +28,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
+- [Operational checks](#operational-checks)
 - [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
 - [License](#license)
 - [Contact us](#contact-us)
@@ -192,7 +193,7 @@ A number of plots will be created:
 
 Note: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration filesfiles - see **User Manual: Additional graphs** for more details.
 
-The raw data will also be processed on a continuous 5 minute basis, again via CRON, to produce a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user will receive an email alert of such - see [Rolling alert emails](#rolling-alert-emails) for more details.
+The raw data will also be processed on a continuous 5 minute basis, again via CRON, to produce a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user has the option to receive an email alert - see **User Manual: Rolling alert emails** for more details.
 
 A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.
 
@@ -202,7 +203,7 @@ To access the webpage on your desktop PC or your smart phone…
 
 2.	In the search bar type the following and press enter
 ```
-http://rpi4-UKRAA-MAG.local
+http://TEST-MAG.local
 ```
 
 This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s events plots.
@@ -215,9 +216,17 @@ Where *hostname* is the hostname for your RPi setup.
 
 Code is also supplied that will enable the user to upload, via FTP, to their host website, should they have one - see **User Manual: FTP service** for more details.
 
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
 ### Operational checks
 
-After updating scripts on your RPi, run:
+After installing/updating scripts on your RPi, run:
 
 ```
 sudo bash /home/pi/UKRAA_Magnetometer/scripts/runPostUpdateChecksACM0.sh
@@ -345,7 +354,7 @@ SOFTWARE.
 <!-- =============================================================================== --> 
 ### Contact us
 
-Please send an e-mail to Magnetometer@ukraa.com
+Please send an e-mail to PicoMagnetometer@ukraa.com
 
 [Back to Contents...](#contents)
 
