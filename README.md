@@ -316,7 +316,7 @@ If scheduled in cron, summary snapshots can be collected in:
 <!-- =============================================================================== --> 
 ## Optional Rolling alert Emails
 
-Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
+Rolling alert evaluation supports user defined activity thresholds:
 
 * **Yellow** at **50 nT**
 * **Amber** at **100 nT**
@@ -494,7 +494,7 @@ This immediate heartbeat test does not update daily heartbeat schedule/state tra
 <!-- =============================================================================== --> 
 ## Optional Remote FTP upload
 
-You can upload plot PNG files to an external Hostinger site while keeping local web publishing as the primary path.
+You can upload plot PNG files to an external hosting site while keeping local web publishing as the primary path.
 
 Remote upload config file:
 
