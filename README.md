@@ -11,11 +11,11 @@
 [![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-4%2F5-red.svg?logo=raspberrypi)](https://www.raspberrypi.org/)
 [![Made for Raspberry Pi](https://img.shields.io/badge/Made%20for-Raspberry%20Pi-A22846.svg?logo=raspberrypi)](https://www.raspberrypi.com/)
 
-Set of Python code to run on a RPi4/5 to get, process and present data from the UKRAA PicoMagnetometer
+Set of Python, gnuplot and shell scripts to run on a RPi4/5 to record, process and present data from the UKRAA PicoMagnetometer.
 
-This software was written to suit a specific set-up, feel free to use as you see fit.
+This software was written to suit a specific set-up; feel free to use as you see fit.
 
-Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folder
+Instructions for initial setting up of a Raspberry Pi4/5 are included in the **docs** folder
 
 ---
 
@@ -41,7 +41,7 @@ Instructions for setting up a Raspberry Pi4/5 are included in the **docs** folde
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that your UKRAA PicoMagnetometer is connected to a RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/ttyAC*** in a terminal window on the RPi4/5 and reviewing the response.
+The code assumes that your UKRAA PicoMagnetometer is the only device using USB that is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/ttyAC*** in a terminal window on the RPi4/5 and reviewing the response.
 
 The code assumes username is **pi**. 
 
@@ -53,7 +53,7 @@ If there are other devices connected to the RPi and your magnetometer is not **/
 
 **GetDataRawACM0.py** is run as a service.
 
-Other scripts (Python, gnuplot) are run from **cron** using shell scripts.
+Other scripts (Python and gnuplot) are run from **cron** using shell scripts.
 
 [Back to Contents...](#contents)
 
@@ -159,7 +159,7 @@ When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **
 
 That's it!
 
-The code is now set up to run automatically; it will get the data from the PicoMagnetometer, process the data, plot the data and post the plots to your intranet web page.
+The code is now set up to run automatically; it will record the data from the PicoMagnetometer, process the data, plot the data and post the plots to your intranet web page.
 
 There are other functions that are customisable by the user, such as **email alerts** and **FTP service** to users’ external website, that are covered in the **User Manual**.
 
@@ -182,22 +182,23 @@ This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_S
 <!-- =============================================================================== --> 
 ## What does the code do
 
-The code receives the event data from the UKRAA Magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
+The code records data from the UKRAA Magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
 
-The raw data will be processed overnight, via CRON, to get magnetic field values per minute, in the x, y and z directions, from your previous day's data.
+The raw data will be processed daily, via CRON, to get magnetic field values per minute in the X (N->S), Y (E->W) and Z (U->D) directions from your previous day’s data.  The maximum hourly variation of the magnetic field values in the X (N->S) and Y (E->W) directions will also be produced.
 
 A number of plots will be created:
 * X, Y and Z (North/South, East/West and up/down)
+* Maximum hourly variation in X and Y directions
 * H, D and Z (Local horizontal plane, declination angle and up/down)
 * B and I (Total strength Earths magnetic field and angle of Earths magnetic field)
 
-Note: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration filesfiles - see **User Manual: Additional graphs** for more details.
+**Note**: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration filesfiles - see **User Manual: Additional graphs** for more details.
 
-The raw data will also be processed on a continuous 5 minute basis, again via CRON, to produce a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user has the option to receive an email alert - see **User Manual: Rolling alert emails** for more details.
+The raw data will also be processed on a continuous 5 minute basis, again via CRON, to generate a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user has the option to receive an email alert - see **User Manual: Rolling alert emails** for more details.
 
 A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.
 
-To access the webpage on your desktop PC or your smart phone…
+To access the PicoMagnetometer webpage on your desktop PC or your smart phone…
 
 1.	Open your preferred web application (Safari, Chrome, Firefox, etc.).
 
@@ -206,7 +207,7 @@ To access the webpage on your desktop PC or your smart phone…
 http://TEST-MAG.local
 ```
 
-This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s events plots.
+This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s plots.
 
 NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
 
@@ -259,14 +260,6 @@ If scheduled in cron, summary snapshots can be collected in:
 ```
 /home/pi/UKRAA_Magnetometer/logfiles/dashboard-summary.log
 ```
-
-Migration note (daily plot image names):
-
-- Previous daily web/temp files: `X.png`, `Y.png`, `Z.png`, `H.png`, `D.png`, `B.png`, `I.png`
-- Current daily web/temp files: `XYZ.png`, `HDZ.png`, `BI.png` (plus `Activity.png` unchanged)
-
-The daily gnuplot scripts now generate composite multiplot images with temperature overlay on the y2 axis.
-
 
 [Back to Contents...](#contents)
 
