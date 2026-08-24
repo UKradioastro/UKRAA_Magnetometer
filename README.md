@@ -29,9 +29,9 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
 - [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
-- [Optional: Post install operational checks](#operational-checks)
-- [Optional: Rolling alert Emails](#Optional:-Rolling-alert-Emails)
-- [Optional: Remote FTP upload](#Optional:-Remote-FTP-upload)
+- [Optional Post install operational checks](#Optional-Post-install-operational-checks)
+- [Optional Rolling alert Emails](#Optional-Rolling-alert-Emails)
+- [Optional Remote FTP upload](#Optional-Remote-FTP-upload)
 - [License](#license)
 - [Contact us](#contact-us)
 
@@ -270,7 +270,7 @@ sudo systemctl disable PicoMagnetometerACM0.service
 
 &nbsp;
 <!-- =============================================================================== -->
-### Optional: Post install operational checks
+## Optional Post install operational checks
 
 After installing/updating scripts on your RPi, you can run:
 
@@ -314,9 +314,7 @@ If scheduled in cron, summary snapshots can be collected in:
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Optional: Rolling alert Emails
-
-## Rolling alert emails
+## Optional Rolling alert Emails
 
 Rolling alert evaluation now supports AuroraWatch-style activity thresholds:
 
@@ -494,9 +492,7 @@ This immediate heartbeat test does not update daily heartbeat schedule/state tra
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Optional: Remote FTP upload
-
-### Optional remote FTP upload to external website
+## Optional Remote FTP upload
 
 You can upload plot PNG files to an external Hostinger site while keeping local web publishing as the primary path.
 
