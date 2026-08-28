@@ -22,7 +22,10 @@ set terminal pngcairo \
 
 set datafile separator ","
 
-stats rollingData using 9 output prefix "ASTAT" nooutput
+# Collapse minute activity values into one maximum per UTC clock hour for this plot.
+hourlyActivityData = "< awk -F, 'tolower($9) != \"nan\" { hour = substr($1, 1, 13); if (hour != previousHour) { if (previousHour != \"\") printf \"%s:30:00,%.1f\\n\", previousHour, maximum; previousHour = hour; maximum = $9 + 0 } else if ($9 + 0 > maximum) maximum = $9 + 0 } END { if (previousHour != \"\") printf \"%s:30:00,%.1f\\n\", previousHour, maximum }' \"".rollingData."\""
+
+stats hourlyActivityData using 2 output prefix "ASTAT" nooutput
 startX = system("sh -lc 'head -n 1 \"".rollingData."\" | cut -d, -f1'")
 endX = system("sh -lc 'tail -n 1 \"".rollingData."\" | cut -d, -f1'")
 topRange = (ASTAT_max < 50) ? 60 : \
@@ -35,7 +38,7 @@ set timefmt "%Y-%m-%d %H:%M:%S"
 set format x "%H:%M"
 set grid xtics ytics
 set key outside above center
-set boxwidth 60 absolute
+set boxwidth 3600 absolute
 
 set xrange [startX:endX]
 set yrange [0:topRange]
@@ -54,8 +57,8 @@ my_colour(val) = (val < yellowThreshold) ? 0x00FF00 : (val <= amberThreshold) ? 
 set key title plotTitle font ",12"
 
 set output archivePlot
-plot rollingData using 1:9:(my_colour($9)) with boxes fillstyle solid 1.0 noborder notitle linecolor rgb variable, \
-     rollingData using 1:9 with boxes fillstyle empty border rgb "black" notitle linecolor rgb "black"
+plot hourlyActivityData using 1:2:(my_colour($2)) with boxes fillstyle solid 1.0 noborder notitle linecolor rgb variable, \
+     hourlyActivityData using 1:2 with boxes fillstyle empty border rgb "black" notitle linecolor rgb "black"
 set output
 
 set output tempPlot
