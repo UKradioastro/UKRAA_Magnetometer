@@ -79,7 +79,7 @@ set ylabel "H (nT)"
 set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
-set yrange [HSTAT_min - 100:HSTAT_max + 100]
+set yrange [HSTAT_min - 10:HSTAT_max + 10]
 set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
@@ -107,7 +107,7 @@ set ylabel "D (deg)"
 set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
-set yrange [DSTAT_min - 5:DSTAT_max + 5]
+set yrange [DSTAT_min - 0.5:DSTAT_max + 0.5]
 set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
@@ -135,7 +135,7 @@ set ylabel "Z (nT)"
 set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 set xlabel "Time (UTC)"
-set yrange [ZSTAT_min - 500:ZSTAT_max + 500]
+set yrange [ZSTAT_min - 10:ZSTAT_max + 10]
 set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
@@ -169,7 +169,7 @@ set ylabel "H (nT)"
 set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
-set yrange [HSTAT_min - 100:HSTAT_max + 100]
+set yrange [HSTAT_min - 10:HSTAT_max + 10]
 set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
@@ -197,7 +197,7 @@ set ylabel "D (deg)"
 set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 unset xlabel
-set yrange [DSTAT_min - 5:DSTAT_max + 5]
+set yrange [DSTAT_min - 0.5:DSTAT_max + 0.5]
 set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
@@ -225,7 +225,7 @@ set ylabel "Z (nT)"
 set ylabel textcolor rgb magneticColor
 set ytics textcolor rgb magneticColor
 set xlabel "Time (UTC)"
-set yrange [ZSTAT_min - 500:ZSTAT_max + 500]
+set yrange [ZSTAT_min - 10:ZSTAT_max + 10]
 set y2label "Temperature (°C)"
 set y2label textcolor rgb tempColor
 set y2tics textcolor rgb tempColor
