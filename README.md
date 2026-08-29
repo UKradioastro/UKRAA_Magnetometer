@@ -295,6 +295,8 @@ If this is the case you will need to:
 <!-- =============================================================================== -->
 ## Optional Post install operational checks
 
+### runPostUpdateChecksACM0.sh
+
 After installing/updating scripts on your RPi, you can run:
 
 ```
@@ -305,6 +307,7 @@ This executes:
 - optional daily publish logic checks
 - optional HDZ/BI web visibility checks
 
+### checkDailyPublishHealthACM0.sh
 For daily runtime monitoring, a health marker is written by:
 
 ```
@@ -326,6 +329,7 @@ The marker reports one of three states:
 - `FAIL` - raw data existed but the processed file or one or more published
   plots are missing. This is a real fault. Exit code 1.
 
+### showDashboardSummaryACM0.sh
 One-line dashboard summary on demand:
 
 ```
@@ -346,58 +350,23 @@ If scheduled in cron, summary snapshots can be collected in:
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Optional Remote FTP upload
+## Optional HDZ and/or BI plots
 
-You can upload plot PNG files to an external hosting site while keeping local web publishing as the primary path.
+Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**.
 
-Remote upload config file:
+By default the option of producing HDZ and/or BI plots is turned off (**false**), and the plots do not appear as an option from the intranet webpage.
 
-* `/home/pi/UKRAA_Magnetometer/config/remote-upload.ini`
+Should the user wish to have access to HDZ and/or BI rolling plots and yesterday’s plots for these options then change the following in the plots.ini file:
 
-Template created by installer:
+- For HDZ plots change line 13
+    - From **plot_hdz = false**
+    - To **plot_hdz = true**
 
-* `install/remote-upload.ini.example`
+- For BI plots change line 19
+    - From **plot_bi = false**
+    - To **plot_bi = true**
 
-Example settings:
-
-```
-[ftp]
-enabled = true
-site = your-uploader-fp
-user = your-upload-user
-password = your-upload-password
-port = 21
-directory = /data
-timeout_seconds = 30
-passive = true
-create_dirs = true
-upload_status_json = false
-```
-
-Behavior:
-
-* Daily run (09:30 via `moveGraphs.sh`) uploads:
-	* `Activity.png`, `X.png`, `Y.png`, `Z.png` to `/data`
-* Rolling run (every 5 minutes via `processRollingData.sh`) uploads:
-	* `RollingActivity.png`, `RollingXYZ.png` to `/data/rolling`
-* Optional rolling status JSON upload:
-	* set `upload_status_json = true`
-	* uploads `data/status/current.json` to `/data/status/current.json`
-	* external webpage status fallback (`status/current.json`) requires this to be true.
-* Remote upload failures are non-blocking and do not stop local publishing.
-
-Manual test commands:
-
-```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh daily
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh rolling
-```
-
-Combined test helper:
-
-```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testRemoteUploadACM0.sh
-```
+These plots will automatically be added to the intranet webpage if selected; with the rolling plot being present after 5 minutes and yesterdays plot being present after 09:30 the next day.
 
 [Back to Contents...](#contents)
 
