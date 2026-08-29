@@ -30,7 +30,7 @@ ssl = false
 [email]
 from = magnetometer@example.com
 to = you@example.com
-attach_plot = true
+attach_plot = false
 
 [web]
 url = http://rpi4-UKRAA-MAG.local

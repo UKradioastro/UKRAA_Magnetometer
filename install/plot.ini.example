@@ -10,10 +10,10 @@
 # declination, and vertical component in nT).
 # Useful for comparing against reference observatories such as the
 # British Geological Survey (BGS).
-plot_hdz = true
+plot_hdz = false
 
 # Set to true to generate a daily B, I plot (total field intensity
 # and inclination in nT / degrees).
 # Useful for comparing against reference observatories such as the
 # British Geological Survey (BGS).
-plot_bi = true
+plot_bi = false

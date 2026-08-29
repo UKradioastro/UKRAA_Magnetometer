@@ -237,6 +237,10 @@ Code is also supplied that will enable the user to upload, via FTP, to their hos
 sudo systemctl status PicoMagnetometerACM0.service
 ```
 
+Two **GREEN enabled** and a **GREEN active (running)** indicates service running correctly.
+
+![img_06](images/RPi_imager_06.PNG)
+
 &nbsp;
 
 2. To **start** your service, type the following command and press enter.
@@ -251,6 +255,13 @@ sudo systemctl start PicoMagnetometerACM0.service
 sudo systemctl stop PicoMagnetometerACM0.service
 ```
 
+An enabled service that is stopped will only have two **GREEN enables** and an **inactive(dead)**
+
+![img_07](images/RPi_imager_07.PNG)
+
+If this is the case you will need to:
+- Start the service
+
 &nbsp;
 
 4. To **enable** your service, type the following command and press enter.
@@ -264,6 +275,15 @@ sudo systemctl enable PicoMagnetometerACM0.service
 ```
 sudo systemctl disable PicoMagnetometerACM0.service
 ```
+
+A disabled service will have a **YELLOW disabled**, a **GREEN enabled** and an **inactive (dead)**
+
+![img_08](images/RPi_imager_08.PNG)
+
+If this is the case you will need to:
+- Enable the service
+- Start the service
+
 
 [Back to Contents...](#contents)
 
@@ -316,6 +336,67 @@ If scheduled in cron, summary snapshots can be collected in:
 
 ```
 /home/pi/UKRAA_Magnetometer/logfiles/dashboard-summary.log
+```
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
+## Optional Remote FTP upload
+
+You can upload plot PNG files to an external hosting site while keeping local web publishing as the primary path.
+
+Remote upload config file:
+
+* `/home/pi/UKRAA_Magnetometer/config/remote-upload.ini`
+
+Template created by installer:
+
+* `install/remote-upload.ini.example`
+
+Example settings:
+
+```
+[ftp]
+enabled = true
+site = your-uploader-fp
+user = your-upload-user
+password = your-upload-password
+port = 21
+directory = /data
+timeout_seconds = 30
+passive = true
+create_dirs = true
+upload_status_json = false
+```
+
+Behavior:
+
+* Daily run (09:30 via `moveGraphs.sh`) uploads:
+	* `Activity.png`, `X.png`, `Y.png`, `Z.png` to `/data`
+* Rolling run (every 5 minutes via `processRollingData.sh`) uploads:
+	* `RollingActivity.png`, `RollingXYZ.png` to `/data/rolling`
+* Optional rolling status JSON upload:
+	* set `upload_status_json = true`
+	* uploads `data/status/current.json` to `/data/status/current.json`
+	* external webpage status fallback (`status/current.json`) requires this to be true.
+* Remote upload failures are non-blocking and do not stop local publishing.
+
+Manual test commands:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh daily
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh rolling
+```
+
+Combined test helper:
+
+```
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testRemoteUploadACM0.sh
 ```
 
 [Back to Contents...](#contents)
