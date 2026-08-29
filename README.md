@@ -378,11 +378,20 @@ These plots will automatically be added to the intranet webpage if selected; wit
 <!-- =============================================================================== --> 
 ## Optional Rolling alert Emails
 
+Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **alert.ini**.
+
+By default the option of producing rolling email alerts is turned off (**false**).
+
+Should the user wish to receive rolling email alerts from their PicoMagnetometer follow the instructions below;
+
 Rolling alert evaluation supports user defined activity thresholds:
 
 * **Yellow** at **50 nT**
 * **Amber** at **100 nT**
 * **Red** at **200 nT**
+
+
+The user can define their own alert values by modifying lines 18, 19 and 20 of **alert.ini**.
 
 The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
 
@@ -399,7 +408,7 @@ The same threshold values are also used by:
 2. Place it on the Pi as:
 	`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
 
-3. Edit the values for your SMTP service and recipients.
+3. Edit the values for your SMTP service and recipients.  **DO THIS BEFORE CHANGING THE STATE OF email_enabled**
 
 4. Set activity thresholds in the same file under `[alerts]`:
 
@@ -443,10 +452,36 @@ Set `MAGNETOMETER_EMAIL_ALERT_LEVELS` as a comma-separated list:
 * `RED,AMBER`
 * `RED,AMBER,YELLOW`
 
+For instance:
+- if you only require RED trigger alerts set **email_alert_levels = RED**
+- if you require both RED and AMBER trigger alerts set **email_alert_levels = RED,AMBER**
+- if you require all alerts set **email_alert_levels = RED,AMBER,YELLOW**
+
+
 ### Configure SMTP and recipients
 
 You can set SMTP/email values in the `.ini` file, or by environment variables.
 Environment variables take precedence if both are set.
+
+In alerts.ini:
+
+```
+[smtp]
+host = smtp.example.com
+port = 587
+username = your-smtp-username
+password = your-smtp-password
+starttls = true
+ssl = false
+
+[email]
+from = magnetometer@example.com
+to = you@example.com
+attach_plot = false 
+```
+
+Notes:
+- If `RollingActivity.png` exists, it is attached to the alert email if **attach_plot = true**
 
 Available environment variables are:
 
@@ -520,6 +555,7 @@ Notes:
 
 * `hour_utc` is the first UTC hour of the day when the heartbeat can send.
 * Only one heartbeat attempt is made per UTC day (success or failure), to avoid retry spam every 5 minutes.
+* If `RollingActivity.png` exists, it is attached to the heartbeat email if **attach_plot = true**
 * If `heartbeat.to` is blank, it uses `[email] to`.
 
 Environment variable overrides are also available:
@@ -555,6 +591,12 @@ This immediate heartbeat test does not update daily heartbeat schedule/state tra
 &nbsp;
 <!-- =============================================================================== --> 
 ## Optional Remote FTP upload
+
+Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **remote-upload.ini**.
+
+By default the option of uploading plot PNG files is turned off (**false**).
+
+Should the user wish to upload plot PNG files from their PicoMagnetometer to an externally hosted webpage follow the instructions below;
 
 You can upload plot PNG files to an external hosting site while keeping local web publishing as the primary path.
 
