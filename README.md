@@ -209,6 +209,9 @@ To access the PicoMagnetometer webpage on your desktop PC or your smart phone…
 http://TEST-MAG.local
 ```
 
+![img_05](images/RPi_imager_05.PNG)
+
+
 This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s plots.
 
 NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
