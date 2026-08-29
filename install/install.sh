@@ -20,11 +20,15 @@ echo "Creating UKRAA Magnetometer directory structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/processed
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/raw
 sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/logfiles
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/Activity
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/BI
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/HDZ
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/XYZ
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/rolling
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/rolling
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/status
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
-sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/temp
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/rolling
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
 echo "UKRAA Magnetometer directory structure created"
 echo ""
@@ -175,7 +179,12 @@ sleep 10
 
 # if successful
 echo "Removing install directory and exiting..."
-exec rm -vrf /home/pi/UKRAA_Magnetometer/install
+cd /home/pi || cd /
+rm -vrf /home/pi/UKRAA_Magnetometer/install
 echo ""
 
 echo "Finished installing UKRAA Magnetometer software..."
+echo ""
+echo "NOTE: the install directory you launched this from has just been deleted."
+echo "      Run 'cd ~' before any further commands, otherwise your shell will"
+echo "      report: getcwd: cannot access parent directories"

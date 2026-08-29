@@ -2,6 +2,9 @@
 
 set -u
 
+# The installer deletes its own directory, so a leftover cwd can break child shells.
+cd / || exit 1
+
 BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 
 run_check() {

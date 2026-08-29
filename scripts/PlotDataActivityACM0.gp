@@ -86,6 +86,8 @@ pathPlot1 = basePath."/plots/Activity/"\
              .".png"
 pathTemp1 = basePath."/temp/Activity.png"
 
+system("sh -lc 'mkdir -p \"".basePath."/plots/Activity\" \"".basePath."/temp\"'")
+
 # Title for graph
 dateTag = system("date -d yesterday +'%Y-%m-%d'")
 startX = system("sh -lc 'head -n 1 \"".FileData."\" | cut -d, -f1'")

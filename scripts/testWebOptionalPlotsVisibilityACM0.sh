@@ -2,8 +2,19 @@
 
 set -u
 
+# The installer deletes the source WWW folder, so run from a directory that always exists.
+cd / || exit 1
+
 BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
-INDEX_FILE="$BASE_PATH/WWW/index.html"
+WEB_ROOT=${MAGNETOMETER_WEB_ROOT:-/var/www/html}
+
+# Prefer the source copy (development checkout); fall back to the deployed copy (installed system).
+if [ -f "$BASE_PATH/WWW/index.html" ]; then
+    INDEX_FILE="$BASE_PATH/WWW/index.html"
+else
+    INDEX_FILE="$WEB_ROOT/index.html"
+fi
+
 TEST_ROOT=${1:-"$BASE_PATH/temp/test-web-optional-visibility"}
 
 if [ "${1:-}" = "--help" ]; then
