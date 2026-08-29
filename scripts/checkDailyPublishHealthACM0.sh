@@ -11,7 +11,15 @@ mkdir -p "$STATUS_DIR"
 
 YESTERDAY=$(date -d yesterday +%Y-%m-%d)
 PROCESSED_FILE="$BASE_PATH/data/processed/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
+RAW_FILE="$BASE_PATH/data/raw/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
 WEB_TEMP_DIR="$WEB_ROOT/temp"
+
+# No raw data for that date means there was nothing to process, not a pipeline fault
+# (fresh install, or the acquisition service was stopped all day).
+if [ ! -f "$RAW_FILE" ]; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: PENDING : date=$YESTERDAY : no raw data recorded for that date: $RAW_FILE" > "$MARKER_FILE"
+    exit 0
+fi
 
 status="PASS"
 issues=""
@@ -40,17 +48,30 @@ for required_file in Activity.png XYZ.png; do
 done
 
 # Optional daily web files are only required when enabled.
-if [ -x "$BASE_PATH/scripts/GetPlotOptionsACM0.py" ]; then
-    read -r plot_hdz plot_bi < <(/usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptionsACM0.py")
+PLOT_OPTIONS_SCRIPT="$BASE_PATH/scripts/GetPlotOptionsACM0.py"
 
-    if [ "$plot_hdz" = "true" ]; then
+if [ ! -f "$PLOT_OPTIONS_SCRIPT" ]; then
+    status="FAIL"
+    append_issue "missing plot options script: $PLOT_OPTIONS_SCRIPT"
+elif ! plot_options=$(/usr/bin/python3 "$PLOT_OPTIONS_SCRIPT" 2>&1); then
+    status="FAIL"
+    append_issue "could not read plot options: $plot_options"
+else
+    read -r plot_hdz plot_bi <<< "$plot_options"
+
+    if [ -z "${plot_hdz:-}" ] || [ -z "${plot_bi:-}" ]; then
+        status="FAIL"
+        append_issue "unexpected plot options output: '$plot_options'"
+    fi
+
+    if [ "${plot_hdz:-}" = "true" ]; then
         if [ ! -f "$WEB_TEMP_DIR/HDZ.png" ]; then
             status="FAIL"
             append_issue "missing web HDZ file while plot_hdz=true: $WEB_TEMP_DIR/HDZ.png"
         fi
     fi
 
-    if [ "$plot_bi" = "true" ]; then
+    if [ "${plot_bi:-}" = "true" ]; then
         if [ ! -f "$WEB_TEMP_DIR/BI.png" ]; then
             status="FAIL"
             append_issue "missing web BI file while plot_bi=true: $WEB_TEMP_DIR/BI.png"

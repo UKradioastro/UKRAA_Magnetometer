@@ -294,6 +294,15 @@ Marker output file:
 /home/pi/UKRAA_Magnetometer/data/status/daily-health.txt
 ```
 
+The marker reports one of three states:
+
+- `PASS` - yesterday was processed and all expected plots are published.
+- `PENDING` - no raw data was recorded for yesterday, so there was nothing to
+  process. Expected on the first day after a fresh install, or if the
+  acquisition service was stopped all day. Exit code 0.
+- `FAIL` - raw data existed but the processed file or one or more published
+  plots are missing. This is a real fault. Exit code 1.
+
 One-line dashboard summary on demand:
 
 ```

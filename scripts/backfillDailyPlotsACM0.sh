@@ -16,7 +16,17 @@ log_msg() {
 
 log_msg "backfillDailyPlotsACM0.sh : Started backfill check for newly enabled daily plots" >> "$MAIN_LOG"
 
-read -r PLOT_HDZ PLOT_BI < <(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptionsACM0.py")
+if ! PLOT_OPTIONS=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptionsACM0.py" 2>&1); then
+    log_msg "backfillDailyPlotsACM0.sh : FAILED to read plot options: $PLOT_OPTIONS" >> "$ERROR_LOG"
+    exit 1
+fi
+
+read -r PLOT_HDZ PLOT_BI <<< "$PLOT_OPTIONS"
+
+if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ]; then
+    log_msg "backfillDailyPlotsACM0.sh : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
+    exit 1
+fi
 
 if [ "$PLOT_HDZ" = "true" ] && [ ! -f "$BASE_PATH/temp/HDZ.png" ]; then
     log_msg "backfillDailyPlotsACM0.sh : HDZ.png missing while plot_hdz=true, regenerating for yesterday" >> "$MAIN_LOG"

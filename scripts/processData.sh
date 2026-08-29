@@ -59,7 +59,19 @@ else
 fi
 
 # read HDZ and BI plot flags from plot.ini (defaults: true true)
-read -r PLOT_HDZ PLOT_BI < <(su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/GetPlotOptionsACM0.py")
+if ! PLOT_OPTIONS=$(su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/GetPlotOptionsACM0.py" 2>&1); then
+    log_msg "processData.sh          : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
+    log_msg "processData.sh          : FAILED to read plot options: $PLOT_OPTIONS" >> "$ERROR_LOG"
+    exit 1
+fi
+
+read -r PLOT_HDZ PLOT_BI <<< "$PLOT_OPTIONS"
+
+if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ]; then
+    log_msg "processData.sh          : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
+    log_msg "processData.sh          : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
+    exit 1
+fi
 
 # entry to plot yesterdays H, D, Z magnetic data (optional)
 if [ "$PLOT_HDZ" = "true" ]; then
