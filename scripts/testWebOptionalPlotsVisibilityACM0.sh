@@ -15,12 +15,12 @@ else
     INDEX_FILE="$WEB_ROOT/index.html"
 fi
 
-TEST_ROOT=${1:-"$BASE_PATH/temp/test-web-optional-visibility"}
+TEST_ROOT=${1:-"$BASE_PATH/tests/web-optional-visibility"}
 
 if [ "${1:-}" = "--help" ]; then
     echo "Usage: $0 [TEST_ROOT]"
     echo "  Verifies optional HDZ/BI web section visibility contract."
-    echo "  Default TEST_ROOT: $BASE_PATH/temp/test-web-optional-visibility"
+    echo "  Default TEST_ROOT: $BASE_PATH/tests/web-optional-visibility"
     exit 0
 fi
 

@@ -90,6 +90,14 @@ else
   fi
 fi
 
+# Older versions put test sandboxes under temp/, which then got published. Remove any leftovers.
+for stale_dir in "$SOURCE_DIR"/test-* "$WEB_ROOT"/temp/test-*; do
+  if [ -d "$stale_dir" ]; then
+    rm -rf "$stale_dir"
+    log_msg "moveGraphs.sh           : Removed stale test sandbox $stale_dir" >> "$MAIN_LOG"
+  fi
+done
+
 # entry to move yesterdays graphs from temp to web root
 COPY_OUTPUT_FILE=$(mktemp)
 

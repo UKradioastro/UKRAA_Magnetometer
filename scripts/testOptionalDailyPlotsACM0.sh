@@ -6,13 +6,14 @@ set -u
 cd / || exit 1
 
 BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
-TEST_ROOT=${1:-"$BASE_PATH/temp/test-optional-daily-plots"}
+# Kept outside temp/ because moveGraphs.sh copies all of temp/ to the web root.
+TEST_ROOT=${1:-"$BASE_PATH/tests/optional-daily-plots"}
 TEST_BASE_PATH="$TEST_ROOT/UKRAA_Magnetometer"
 
 if [ "${1:-}" = "--help" ]; then
     echo "Usage: $0 [TEST_ROOT]"
     echo "  Runs optional HDZ/BI daily publish tests against a temporary sandbox."
-    echo "  Default TEST_ROOT: $BASE_PATH/temp/test-optional-daily-plots"
+    echo "  Default TEST_ROOT: $BASE_PATH/tests/optional-daily-plots"
     exit 0
 fi
 
