@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- Head -->
 <head>
 <title>UKRAA Magnetometer</title>
 <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
@@ -10,6 +11,8 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Style -->
 <style>
 body {font-family: "Lato", sans-serif}
 .mySlides {display: none}
@@ -24,9 +27,11 @@ body {font-family: "Lato", sans-serif}
 .optional-graph-section {display: none}
 .optional-graph-card {display: none}
 </style>
+<!-- End of Style -->
 </head>
+<!-- End of Head -->
 
-
+<!-- Body -->
 <body>
 
 <!-- Navbar -->
@@ -60,17 +65,16 @@ body {font-family: "Lato", sans-serif}
   <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz">HDZ GRAPHS</a>
   <a href="#BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoBi">BI GRAPHS</a>
 </div>
-
+<!-- End of Navbar -->
 
 <!-- Page content -->
 <div class="w3-content" style="max-width:2000px;margin-top:46px" id="home">
 
   <!-- Automatic Slideshow Images -->
   <div class="mySlides w3-display-container w3-center">
-    <img src="./images/SunHeader.png" alt="banner" style="width:100%">
-    <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
-      <h3>Solar image</h3>
-      <p><b>Stephen Heliczer of Hertford Astronomy Group</b></p>   
+    <img src="./images/Header.png" alt="banner" style="width:100%">
+    <div class="w3-display-bottomtop w3-container w3-text-white w3-padding-32 w3-hide-small">
+      <h3>Aurora generation</h3>
     </div>
   </div>
 
@@ -83,7 +87,7 @@ body {font-family: "Lato", sans-serif}
       <p class="w3-justify">The UK Radio Astronomy Association was established in 2008 as a registered charity (registration no 1123866) in the United Kingdom. UKRAA’s objectives are to promote the science of radio astronomy and all branches of radio astronomical research. Prior to UKRAA’s formation, British Astronomical Association’s Radio Astronomy Group (RAG) members had designed and built working protypes of a VLF Receiver and Magnetometer. UKRAA was set up to handle the manufacture and sale of these products and the production of technical manuals covering the use of the products and the background science.</p>
       <p class="w3-left-align"><b><i>Not for profit</i></b></p>
       <p class="w3-justify">UKRAA is a not for profit business. Any surplus income funds the development of new products and our outreach activities. To keep our prices low UKRAA relies on the volunteers and Trustees giving their time.</p>
-      <p class="w3-left-align"><b><i>Activities</i></b>
+      <p class="w3-left-align"><b><i>Activities</i></b></p>
       <p class="w3-justify">Our primary activity is to supply equipment to amateur astronomers and other interested researchers. The design of new products and the manufacture of equipment for sale is all carried out by volunteers. To promote radio astronomy to amateur astronomers we give talks to local Astronomical Societies and amateur radio clubs and have provided support to schools and university departments on educational projects.</p>
     </div>
   </div>
@@ -132,6 +136,7 @@ body {font-family: "Lato", sans-serif}
     <h2 class="w3-wide">MY DAILY ACTIVITY RESULTS</h2>
     <p class="w3-center">This data is from my <b>Magnetometer</b> detector</p>
     <p class="w3-center">No accuracy is claimed for any published data</p>
+	</div>
     <div class="w3-row w3-padding-32">
       <div class="w3-auto">
         <img src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
@@ -145,6 +150,7 @@ body {font-family: "Lato", sans-serif}
       <h2 class="w3-wide">MY XYZ RESULTS</h2>
       <p class="w3-center">Rolling 24-hour plot (updated every 5 minutes) followed by yesterday's full-day plot</p>
       <p class="w3-center">No accuracy is claimed for any published data</p>
+	</div>
     <div class="w3-row w3-padding-16">
       <div class="w3-auto">
           <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
@@ -216,12 +222,11 @@ body {font-family: "Lato", sans-serif}
       </div>
     </div>
   </div>
-</div>
-  
-<!-- End Page Content -->
-</div>
 
+</div>
+<!-- End of Page Content -->
 
+<!-- Scripts -->
 <script>
 // Automatic Slideshow - change image every 4 seconds
 var myIndex = 0;
@@ -410,6 +415,9 @@ function refreshOptionalGraphs() {
 refreshRollingStatus();
 refreshOptionalGraphs();
 </script>
+<!-- End of Scripts -->
 
 </body>
+<!-- End of Body -->
+
 </html>
