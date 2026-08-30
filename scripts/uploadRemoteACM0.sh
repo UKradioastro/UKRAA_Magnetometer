@@ -12,21 +12,21 @@ log_msg() {
 }
 
 if [ -z "$MODE" ]; then
-    log_msg "uploadRemoteACM0.sh     : FAILED - mode is required (daily|rolling)" >> "$ERROR_LOG"
+    log_msg "uploadRemoteACM0.sh       : FAILED - mode is required (daily|rolling)" >> "$ERROR_LOG"
     exit 2
 fi
 
 if [ "$MODE" != "daily" ] && [ "$MODE" != "rolling" ]; then
-    log_msg "uploadRemoteACM0.sh     : FAILED - invalid mode '$MODE' (use daily|rolling)" >> "$ERROR_LOG"
+    log_msg "uploadRemoteACM0.sh       : FAILED - invalid mode '$MODE' (use daily|rolling)" >> "$ERROR_LOG"
     exit 2
 fi
 
 if [ ! -f "$CONFIG_PATH" ]; then
-    log_msg "uploadRemoteACM0.sh     : FAILED - missing config file: $CONFIG_PATH" >> "$ERROR_LOG"
+    log_msg "uploadRemoteACM0.sh       : FAILED - missing config file: $CONFIG_PATH" >> "$ERROR_LOG"
     exit 1
 fi
 
-log_msg "uploadRemoteACM0.sh     : Started remote FTP upload ($MODE)" >> "$MAIN_LOG"
+log_msg "uploadRemoteACM0.sh       : Started remote FTP upload ($MODE)" >> "$MAIN_LOG"
 
 UPLOAD_OUTPUT=$(mktemp)
 /usr/bin/python3 - "$MODE" "$BASE_PATH" "$CONFIG_PATH" > "$UPLOAD_OUTPUT" 2>&1 <<'PY'
@@ -196,13 +196,13 @@ while IFS= read -r line; do
 
     case "$line" in
         INFO:*)
-            log_msg "uploadRemoteACM0.sh     : ${line#INFO: }" >> "$MAIN_LOG"
+            log_msg "uploadRemoteACM0.sh       : ${line#INFO: }" >> "$MAIN_LOG"
             ;;
         ERROR:*)
-            log_msg "uploadRemoteACM0.sh     : FAILED - ${line#ERROR: }" >> "$ERROR_LOG"
+            log_msg "uploadRemoteACM0.sh       : FAILED - ${line#ERROR: }" >> "$ERROR_LOG"
             ;;
         *)
-            log_msg "uploadRemoteACM0.sh     : $line" >> "$MAIN_LOG"
+            log_msg "uploadRemoteACM0.sh       : $line" >> "$MAIN_LOG"
             ;;
     esac
 done < "$UPLOAD_OUTPUT"
@@ -210,9 +210,9 @@ done < "$UPLOAD_OUTPUT"
 rm -f "$UPLOAD_OUTPUT"
 
 if [ "$UPLOAD_EXIT" -eq 0 ]; then
-    log_msg "uploadRemoteACM0.sh     : Completed remote FTP upload ($MODE)" >> "$MAIN_LOG"
+    log_msg "uploadRemoteACM0.sh       : Completed remote FTP upload ($MODE)" >> "$MAIN_LOG"
     exit 0
 fi
 
-log_msg "uploadRemoteACM0.sh     : FAILED remote FTP upload ($MODE)" >> "$ERROR_LOG"
+log_msg "uploadRemoteACM0.sh       : FAILED remote FTP upload ($MODE)" >> "$ERROR_LOG"
 exit "$UPLOAD_EXIT"

@@ -19,7 +19,7 @@ fileData = pathData."/" \
 is_missing = system("sudo /bin/bash ".basePath."/scripts/isMissing.sh ".fileData)
 if (is_missing == 1) {
     print system("date +'%Y-%m-%d %H:%M:%S'") \
-          ." : PlotDataXYZACM0.gp       : FAILED - data file missing"
+          ." : PlotDataXYZACM0.gp        : FAILED - data file missing"
     exit
 }
 
@@ -72,7 +72,7 @@ plotTitle = sprintf("XYZ magnetic field for %s\nGraph is updated every day at 9.
 set xrange [startX:endX]
 
 print system("date +'%Y-%m-%d %H:%M:%S'") \
-      ." : PlotDataXYZACM0.gp       : Started XYZ plot for " \
+      ." : PlotDataXYZACM0.gp        : Started XYZ plot for " \
       .dateTag
 
 set output archivePlot
@@ -256,5 +256,5 @@ unset multiplot
 set output
 
 print system("date +'%Y-%m-%d %H:%M:%S'") \
-      ." : PlotDataXYZACM0.gp       : Completed XYZ plot for " \
+      ." : PlotDataXYZACM0.gp        : Completed XYZ plot for " \
       .dateTag

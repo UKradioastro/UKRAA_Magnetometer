@@ -39,7 +39,7 @@ redThreshold = real(word(thresholdValues, 3))
 
 # print to log file
 print system("date +'%Y-%m-%d %H:%M:%S'")\
-      ." : PlotDataActivityACM0.gp  : Started Activity plot for "\
+      ." : PlotDataActivityACM0.gp   : Started Activity plot for "\
       .targetDate
 
 # Path to data file for graphing
@@ -57,9 +57,9 @@ is_missing = system("/bin/bash ".basePath."/scripts/isMissing.sh ".FileData)
 if (is_missing == 1) \
            {
            print system("date +'%Y-%m-%d %H:%M:%S'")\
-                 ." : PlotDataActivityACM0.gp  : FAILED - data file missing, so..."; 
+                 ." : PlotDataActivityACM0.gp   : FAILED - data file missing, so..."; 
            print system("date +'%Y-%m-%d %H:%M:%S'")\
-                 ." : PlotDataActivityACM0.gp  : **FAILED** to complete Activity plot for "\
+                 ." : PlotDataActivityACM0.gp   : **FAILED** to complete Activity plot for "\
                  .targetDate
            exit
            }
@@ -196,7 +196,7 @@ set output
 
 # print to log file
 print system("date +'%Y-%m-%d %H:%M:%S'")\
-      ." : PlotDataActivityACM0.gp  : Completed Activity plot for "\
+      ." : PlotDataActivityACM0.gp   : Completed Activity plot for "\
       .targetDate
 
 # EOF

@@ -19,7 +19,7 @@ fileData = pathData."/" \
 is_missing = system("sudo /bin/bash ".basePath."/scripts/isMissing.sh ".fileData)
 if (is_missing == 1) {
     print system("date +'%Y-%m-%d %H:%M:%S'") \
-          ." : PlotDataBIACM0.gp        : FAILED - data file missing"
+          ." : PlotDataBIACM0.gp         : FAILED - data file missing"
     exit
 }
 
@@ -71,7 +71,7 @@ plotTitle = sprintf("BI magnetic field for %s\nGraph is updated every day at 9.3
 set xrange [startX:endX]
 
 print system("date +'%Y-%m-%d %H:%M:%S'") \
-      ." : PlotDataBIACM0.gp        : Started BI plot for " \
+      ." : PlotDataBIACM0.gp         : Started BI plot for " \
       .dateTag
 
 set output archivePlot
@@ -199,5 +199,5 @@ unset multiplot
 set output
 
 print system("date +'%Y-%m-%d %H:%M:%S'") \
-      ." : PlotDataBIACM0.gp        : Completed BI plot for " \
+      ." : PlotDataBIACM0.gp         : Completed BI plot for " \
       .dateTag

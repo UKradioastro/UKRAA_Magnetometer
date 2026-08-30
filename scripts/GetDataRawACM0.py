@@ -50,7 +50,7 @@ def main():
                         , file = outfile)
     finally:
         ser.close()
-        
-                        
+
+
 if __name__ == "__main__":
     main()
