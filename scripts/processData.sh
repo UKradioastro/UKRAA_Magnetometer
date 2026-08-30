@@ -2,7 +2,8 @@
 
 # data bash script - scrape, process and plot
 
-LOG_DIR=/home/pi/UKRAA_Magnetometer/logfiles
+BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-MagnetometerACM0.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 
@@ -12,12 +13,10 @@ log_msg() {
 }
 
 # log message to main logfile
-log_msg "processData.sh            : Started processing and plotting" >> "$MAIN_LOG"
+log_msg "processData.sh            : Started yesterdays processing and plotting" >> "$MAIN_LOG"
 
 # entry to process yesterdays data
-if su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataRawACM0.py \
-                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessDataRawACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processData.sh            : Completed processing yesterdays data" >> "$MAIN_LOG"
 else
     log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -26,9 +25,7 @@ else
 fi
 
 # entry to process yesterdays hourly data
-if su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDataHourACM0.py \
-                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessDataHourACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processData.sh            : Completed processing yesterdays hourly data" >> "$MAIN_LOG"
 else
     log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -37,9 +34,7 @@ else
 fi
 
 # entry to plot yesterdays XYZ magnetic data
-if su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataXYZACM0.gp\
-                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataXYZACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processData.sh            : Completed plotting XYZ data" >> "$MAIN_LOG"
 else
     log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -48,9 +43,7 @@ else
 fi
 
 # entry to plot yesterdays Activity magnetic data
-if su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataActivityACM0.gp\
-                        >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                       2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataActivityACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processData.sh            : Completed plotting Activity data" >> "$MAIN_LOG"
 else
     log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -75,9 +68,7 @@ fi
 
 # entry to plot yesterdays H, D, Z magnetic data (optional)
 if [ "$PLOT_HDZ" = "true" ]; then
-    if su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataHDZACM0.gp\
-                            >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                           2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataHDZACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "processData.sh            : Completed plotting HDZ data" >> "$MAIN_LOG"
     else
         log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -90,9 +81,7 @@ fi
 
 # entry to plot yesterdays B, I magnetic data (optional)
 if [ "$PLOT_BI" = "true" ]; then
-    if su pi -c "/usr/bin/gnuplot /home/pi/UKRAA_Magnetometer/scripts/PlotDataBIACM0.gp\
-                            >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt \
-                           2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataBIACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "processData.sh            : Completed plotting BI data" >> "$MAIN_LOG"
     else
         log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -103,4 +92,4 @@ else
     log_msg "processData.sh            : Skipping BI plot (plot_bi = false in plot.ini)" >> "$MAIN_LOG"
 fi
 
-log_msg "processData.sh            : Completed processing and plotting" >> "$MAIN_LOG"
+log_msg "processData.sh            : Completed yesterdays processing and plotting" >> "$MAIN_LOG"
