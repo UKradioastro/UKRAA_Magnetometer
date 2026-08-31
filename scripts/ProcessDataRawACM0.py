@@ -75,7 +75,6 @@ def load_minute_bins(raw_data_file, raw_field_names, target_date):
     return minute_bins, detector_name
 
 # print message to log file to say started
-
 TargetDate = get_target_date()
 BasePath = get_base_path()
 
@@ -110,14 +109,10 @@ ProcessedDataFile = build_day_path(BasePath, 'processed', TargetDate)
 StartTime_str = TargetDate.strftime('%Y-%m-%d') + ' 00:00:00'
 
 StartTime_datetime = datetime.datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S')
-# uncomment next lines to print the response
-#print('ProcessDataRawACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
 EndTime_str = TargetDate.strftime('%Y-%m-%d') + ' 23:59:59'
 
 EndTime_datetime = datetime.datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S')
-# uncomment next lines to print the response
-#print('ProcessDataRawACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
 
 # define what the time change will be
 minute = datetime.timedelta(
@@ -128,8 +123,6 @@ minute = datetime.timedelta(
     minutes      =  1,
     hours        =  0,
     weeks        =  0)
-# uncomment next lines to print the response
-#print('ProcessDataRawACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute

@@ -81,7 +81,6 @@ def load_hour_bins(raw_data_file, raw_field_names, target_date):
     return hour_bins, detector_name
 
 # print message to log file to say started
-
 TargetDate = get_target_date()
 BasePath = get_base_path()
 
@@ -105,7 +104,7 @@ pathExists = os.path.exists(ProcessedPath)
 if not pathExists:
     # create directory structure
     ensure_directory(ProcessedPath)
-    log_msg('New directory created   : ' + ProcessedPath)
+    log_msg('New directory created : ' + ProcessedPath)
 
 # Processed data file name
 ProcessedDataFile = build_day_path(BasePath, os.path.join('processed', 'hour'), TargetDate)
@@ -116,14 +115,10 @@ ProcessedDataFile = build_day_path(BasePath, os.path.join('processed', 'hour'), 
 StartTime_str = TargetDate.strftime('%Y-%m-%d') + ' 00:00:00'
 
 StartTime_datetime = datetime.datetime.strptime(StartTime_str, '%Y-%m-%d %H:%M:%S')
-# uncomment next lines to print the response
-#print('ProcessDataRawACM0.py: Value of variable (StartTime_datetime): ',StartTime_datetime)
 
 EndTime_str = TargetDate.strftime('%Y-%m-%d') + ' 23:59:59'
 
 EndTime_datetime = datetime.datetime.strptime(EndTime_str, '%Y-%m-%d %H:%M:%S')
-# uncomment next lines to print the response
-#print('ProcessDataRawACM0.py: Value of variable (EndTime_datetime): ',EndTime_datetime)
 
 # define what the time change will be
 minute = datetime.timedelta(
@@ -134,8 +129,6 @@ minute = datetime.timedelta(
     minutes      =  0,
     hours        =  1,
     weeks        =  0)
-# uncomment next lines to print the response
-#print('ProcessDataRawACM0.py: Value of variable (minute): ', minute)
 
 # set up variable to use in loop
 ProcessedTime = StartTime_datetime - minute
