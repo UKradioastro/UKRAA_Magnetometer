@@ -49,6 +49,21 @@ def cfg_value(parser, section, option, default_value=''):
     return default_value
 
 
+def get_plot_options(base_path):
+    plot_config_path = os.path.join(base_path, 'config', 'plot.ini')
+    if not os.path.exists(plot_config_path):
+        return True, True
+
+    parser = configparser.ConfigParser()
+    with open(plot_config_path, mode='r', encoding='utf-8-sig') as config_file:
+        parser.read_string(config_file.read())
+
+    return (
+        parse_bool(cfg_value(parser, 'plots', 'plot_hdz', 'true'), True),
+        parse_bool(cfg_value(parser, 'plots', 'plot_bi', 'true'), True),
+    )
+
+
 def redact_sensitive(text, user, password):
     redacted = str(text)
     if user:
@@ -135,15 +150,34 @@ def upload_files(mode, base_path, config_path):
                 print(f'INFO: Optional daily file not present, skipping: {file_name}')
     else:
         rolling_remote_dir = posixpath.join(base_remote_dir, 'rolling')
+        plot_hdz, plot_bi = get_plot_options(base_path)
         upload_entries = [
             ('RollingActivity.png', os.path.join(base_path, 'temp', 'rolling', 'RollingActivity.png'), rolling_remote_dir),
             ('RollingXYZ.png', os.path.join(base_path, 'temp', 'rolling', 'RollingXYZ.png'), rolling_remote_dir),
         ]
 
+        if plot_hdz:
+            upload_entries.append(
+                ('RollingHDZ.png', os.path.join(base_path, 'temp', 'rolling', 'RollingHDZ.png'), rolling_remote_dir))
+        else:
+            print('INFO: Optional rolling HDZ upload disabled (plot_hdz=false)')
+
+        if plot_bi:
+            upload_entries.append(
+                ('RollingBI.png', os.path.join(base_path, 'temp', 'rolling', 'RollingBI.png'), rolling_remote_dir))
+        else:
+            print('INFO: Optional rolling BI upload disabled (plot_bi=false)')
+
         if upload_status_json:
             status_remote_dir = posixpath.join(base_remote_dir, 'status')
             upload_entries.append(
                 ('current.json', os.path.join(base_path, 'data', 'status', 'current.json'), status_remote_dir))
+
+        noaa_path = os.path.join(base_path, 'temp', 'noaa', 'latest.jpg')
+        if os.path.exists(noaa_path):
+            upload_entries.append(('latest.jpg', noaa_path, posixpath.join(base_remote_dir, 'noaa')))
+        else:
+            print('INFO: NOAA aurora forecast image not present, skipping')
 
     missing = [name for name, local_path, _ in upload_entries if not os.path.exists(local_path)]
     if missing:

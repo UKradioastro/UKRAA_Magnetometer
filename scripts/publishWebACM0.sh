@@ -6,8 +6,10 @@ MAIN_LOG="$LOG_DIR/log-MagnetometerACM0.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 SOURCE_DIR="$BASE_PATH/temp/rolling"
 SOURCE_STATUS="$BASE_PATH/data/status/current.json"
+SOURCE_NOAA="$BASE_PATH/temp/noaa/latest.jpg"
 DEST_ROLLING_DIR=/var/www/html/temp/rolling
 DEST_STATUS_DIR=/var/www/html/status
+DEST_NOAA_DIR=/var/www/html/temp/noaa
 
 log_msg() {
     printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
@@ -48,7 +50,7 @@ if [ "$PLOT_BI" = "true" ] && [ ! -f "$SOURCE_DIR/RollingBI.png" ]; then
   exit 1
 fi
 
-mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR"
+mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR" "$DEST_NOAA_DIR"
 
 if cp -a "$SOURCE_DIR/RollingXYZ.png" "$DEST_ROLLING_DIR/" >> "$ERROR_LOG" 2>&1; then
   log_msg "publishWebACM0.sh         : Copied RollingXYZ.png to $DEST_ROLLING_DIR" >> "$MAIN_LOG"
@@ -97,6 +99,17 @@ if cp -a "$SOURCE_STATUS" "$DEST_STATUS_DIR/current.json" >> "$ERROR_LOG" 2>&1; 
 else
   log_msg "publishWebACM0.sh         : FAILED - could not copy current.json" >> "$ERROR_LOG"
   exit 1
+fi
+
+if [ -f "$SOURCE_NOAA" ]; then
+  if cp -a "$SOURCE_NOAA" "$DEST_NOAA_DIR/latest.jpg" >> "$ERROR_LOG" 2>&1; then
+    chmod 644 "$DEST_NOAA_DIR/latest.jpg"
+    log_msg "publishWebACM0.sh         : Copied NOAA aurora forecast to $DEST_NOAA_DIR" >> "$MAIN_LOG"
+  else
+    log_msg "publishWebACM0.sh         : WARNING - could not copy NOAA aurora forecast" >> "$ERROR_LOG"
+  fi
+else
+  log_msg "publishWebACM0.sh         : NOAA aurora forecast not present, skipping" >> "$MAIN_LOG"
 fi
 
 log_msg "publishWebACM0.sh         : Completed publishing rolling web assets" >> "$MAIN_LOG"

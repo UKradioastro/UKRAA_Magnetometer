@@ -30,6 +30,7 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [What does the code do](#what-does-the-code-do)
 - [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
 - [Optional Post install operational checks](#Optional-Post-install-operational-checks)
+- [Optional NOAA aurora forecast panel](#Optional-NOAA-aurora-forecast-panel)
 - [Optional Rolling alert Emails](#Optional-Rolling-alert-Emails)
 - [Optional Remote FTP upload](#Optional-Remote-FTP-upload)
 - [License](#license)
@@ -367,6 +368,38 @@ Should the user wish to have access to HDZ and/or BI rolling plots and yesterday
     - To **plot_bi = true**
 
 These plots will automatically be added to the intranet webpage if selected; with the rolling plot being present after 5 minutes and yesterdays plot being present after 09:30 the next day.
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Optional NOAA aurora forecast panel
+
+The webpage can show the latest NOAA Space Weather Prediction Center 30-minute aurora forecast image below the rolling magnetometer status.
+
+The image is downloaded from:
+
+```
+https://services.swpc.noaa.gov/images/animations/ovation/north/latest.jpg
+```
+
+and cached locally as:
+
+```
+/home/pi/UKRAA_Magnetometer/temp/noaa/latest.jpg
+```
+
+The forecast image is updated every 30 minutes by `updateNoaaAuroraForecast.sh`. If the NOAA download fails, the magnetometer data processing, plotting, alerts and web publishing continue to run.
+
+The webpage includes a source citation and link to the official NOAA product page:
+
+```
+https://www.spaceweather.gov/products/aurora-30-minute-forecast
+```
 
 [Back to Contents...](#contents)
 

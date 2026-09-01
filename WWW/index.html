@@ -23,7 +23,10 @@ body {font-family: "Lato", sans-serif}
 .status-banner.red {background: #9f2d2d}
 .status-banner.unknown {background: #4a5568}
 .status-banner.stale {background: #5d4037}
+.status-banner h3 {text-align: center}
 .status-meta {font-size: 0.95rem; margin: 8px 0 0}
+.graph-frame {margin-left: auto; margin-right: auto; max-width: 800px; width: 100%}
+.graph-frame img {display: block; margin-left: auto; margin-right: auto; max-width: 800px}
 .optional-graph-section {display: none}
 .optional-graph-card {display: none}
 </style>
@@ -45,6 +48,7 @@ body {font-family: "Lato", sans-serif}
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
         <a href="#rolling" class="w3-bar-item w3-button">ROLLING STATUS</a>
+        <a href="#noaa" class="w3-bar-item w3-button">NOAA FORECAST</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#XYZ" class="w3-bar-item w3-button">XYZ GRAPHS</a>
         <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz">HDZ GRAPHS</a>
@@ -60,6 +64,7 @@ body {font-family: "Lato", sans-serif}
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
   <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING STATUS</a>
+  <a href="#noaa" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">NOAA FORECAST</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">XYZ GRAPHS</a>
   <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz">HDZ GRAPHS</a>
@@ -123,10 +128,29 @@ body {font-family: "Lato", sans-serif}
         <p id="alertMeta" class="status-meta">Status JSON: unavailable</p>
       </div>
       <div class="w3-row">
-        <div class="w3-auto">
-          <img src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-margin-bottom" alt="rolling activity plot" style="width:100%">
+        <div class="w3-auto graph-frame">
+          <img src="./temp/rolling/RollingActivity.png" data-refresh-src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-margin-bottom" alt="rolling activity plot" style="width:100%">
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- NOAA Aurora Forecast -->
+  <div class="w3-white" id="noaa">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide">NOAA 30-MINUTE AURORA FORECAST</h2>
+      <p class="w3-center">Forecast image supplied by NOAA Space Weather Prediction Center</p>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto graph-frame">
+          <a href="https://www.spaceweather.gov/products/aurora-30-minute-forecast" target="_blank">
+            <img src="./temp/noaa/latest.jpg" data-refresh-src="./temp/noaa/latest.jpg" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="NOAA 30 minute aurora forecast" style="width:100%">
+          </a>
+        </div>
+      </div>
+      <p class="w3-center">
+        Image source:
+        <a href="https://www.spaceweather.gov/products/aurora-30-minute-forecast" target="_blank">NOAA Space Weather Prediction Center 30-minute aurora forecast</a>
+      </p>
     </div>
   </div>
 
@@ -138,8 +162,8 @@ body {font-family: "Lato", sans-serif}
     <p class="w3-center">No accuracy is claimed for any published data</p>
 	</div>
     <div class="w3-row w3-padding-32">
-      <div class="w3-auto">
-        <img src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+      <div class="w3-auto graph-frame">
+        <img src="./temp/Activity.png" data-refresh-src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
       </div>
     </div>
   </div>
@@ -152,13 +176,13 @@ body {font-family: "Lato", sans-serif}
       <p class="w3-center">No accuracy is claimed for any published data</p>
 	</div>
     <div class="w3-row w3-padding-16">
-      <div class="w3-auto">
-          <img src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
+      <div class="w3-auto graph-frame">
+          <img src="./temp/rolling/RollingXYZ.png" data-refresh-src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
       </div>
     </div>
     <div class="w3-row w3-padding-16">
-      <div class="w3-auto">
-          <img src="./temp/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
+      <div class="w3-auto graph-frame">
+          <img src="./temp/XYZ.png" data-refresh-src="./temp/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
       </div>
     </div>
   </div>
@@ -172,12 +196,12 @@ body {font-family: "Lato", sans-serif}
 
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardRollingHDZ">
         <div class="w3-auto">
-          <img src="./temp/rolling/RollingHDZ.png" class="w3-round w3-margin-bottom" alt="rolling HDZ plot" style="width:100%">
+          <img src="./temp/rolling/RollingHDZ.png" data-refresh-src="./temp/rolling/RollingHDZ.png" class="w3-round w3-margin-bottom" alt="rolling HDZ plot" style="width:100%">
         </div>
       </div>
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardHDZ">
         <div class="w3-auto">
-          <img src="./temp/HDZ.png" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
+          <img src="./temp/HDZ.png" data-refresh-src="./temp/HDZ.png" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
         </div>
       </div>
     </div>
@@ -192,12 +216,12 @@ body {font-family: "Lato", sans-serif}
 
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardRollingBI">
         <div class="w3-auto">
-          <img src="./temp/rolling/RollingBI.png" class="w3-round w3-margin-bottom" alt="rolling BI plot" style="width:100%">
+          <img src="./temp/rolling/RollingBI.png" data-refresh-src="./temp/rolling/RollingBI.png" class="w3-round w3-margin-bottom" alt="rolling BI plot" style="width:100%">
         </div>
       </div>
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardBI">
         <div class="w3-auto">
-          <img src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
+          <img src="./temp/BI.png" data-refresh-src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
         </div>
       </div>
     </div>
@@ -291,23 +315,34 @@ function formatAlertSummary(level, isStale, latestActivity) {
     return "The latest magnetometer samples are older than the rolling freshness threshold.";
   }
 
-  if (latestActivity === null || latestActivity === undefined) {
+  var activityValue = Number(latestActivity);
+
+  if (!Number.isFinite(activityValue)) {
     return "No recent activity value is available yet.";
   }
 
   if (level === "red") {
-    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the red threshold.";
+    return "Latest activity is " + activityValue.toFixed(1) + " nT, above the red threshold.";
   }
 
   if (level === "amber") {
-    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the amber threshold.";
+    return "Latest activity is " + activityValue.toFixed(1) + " nT, above the amber threshold.";
   }
 
   if (level === "yellow") {
-    return "Latest activity is " + latestActivity.toFixed(1) + " nT, above the yellow threshold.";
+    return "Latest activity is " + activityValue.toFixed(1) + " nT, above the yellow threshold.";
   }
 
-  return "Latest activity is " + latestActivity.toFixed(1) + " nT, below the yellow threshold.";
+  return "Latest activity is " + activityValue.toFixed(1) + " nT, below the yellow threshold.";
+}
+
+function formatActivityMetaValue(latestActivity) {
+  var activityValue = Number(latestActivity);
+  if (!Number.isFinite(activityValue)) {
+    return "unknown";
+  }
+
+  return activityValue.toFixed(1) + " nT";
 }
 
 function updateAlertBanner(status, statusSourcePath) {
@@ -324,7 +359,7 @@ function updateAlertBanner(status, statusSourcePath) {
   summary.textContent = formatAlertSummary(level, status.is_stale, status.latest_activity_nt);
   meta.textContent = "Last sample: " + (status.latest_sample_time_utc || "unknown")
     + " | Latest processed minute: " + (status.latest_processed_minute_utc || "unknown")
-    + " | Activity: " + (status.latest_activity_nt === null ? "unknown" : status.latest_activity_nt.toFixed(1) + " nT")
+    + " | Activity: " + formatActivityMetaValue(status.latest_activity_nt)
     + " | Status source: " + sourcePath;
 }
 
@@ -346,7 +381,9 @@ function refreshRollingStatus() {
       return;
     }
 
-    fetch(statusCandidates[index], { cache: "no-store" })
+    var statusUrl = statusCandidates[index] + "?t=" + Date.now();
+
+    fetch(statusUrl, { cache: "no-store" })
       .then(function(response) {
         if (!response.ok) {
           throw new Error("status fetch failed");
@@ -384,6 +421,28 @@ function setGroupVisibility(sectionId, isVisible, navMainId, navMobileId) {
   navMobile.style.display = displayValue;
 }
 
+function refreshPlotImages() {
+  var images = document.querySelectorAll("img");
+  var timestamp = Date.now();
+
+  for (var i = 0; i < images.length; i++) {
+    var image = images[i];
+    var refreshSrc = image.getAttribute("data-refresh-src");
+
+    if (!refreshSrc) {
+      var currentSrc = image.getAttribute("src") || "";
+      if (currentSrc.indexOf("./temp/") !== 0) {
+        continue;
+      }
+
+      refreshSrc = currentSrc.split("?")[0];
+      image.setAttribute("data-refresh-src", refreshSrc);
+    }
+
+    image.src = refreshSrc + "?t=" + timestamp;
+  }
+}
+
 function refreshOptionalGraphs() {
   var optionalGraphs = [
     { image: "./temp/rolling/RollingHDZ.png", cardId: "cardRollingHDZ", group: "HDZ" },
@@ -412,8 +471,14 @@ function refreshOptionalGraphs() {
   });
 }
 
-refreshRollingStatus();
-refreshOptionalGraphs();
+function refreshPageData() {
+  refreshRollingStatus();
+  refreshOptionalGraphs();
+  refreshPlotImages();
+}
+
+refreshPageData();
+setInterval(refreshPageData, 300000);
 </script>
 <!-- End of Scripts -->
 
