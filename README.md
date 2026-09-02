@@ -27,6 +27,8 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [Where is my PicoMagnetometer](#where-is-my-Picomagnetometer)
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
+- [Updating the software](#updating-the-software)
+- [Publishing a release](#publishing-a-release)
 - [What does the code do](#what-does-the-code-do)
 - [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
 - [Optional Post install operational checks](#Optional-Post-install-operational-checks)
@@ -107,14 +109,11 @@ ls /dev/tty*
 
 &nbsp;
 
-2. Open a terminal window, type the following command and press enter
-```
-git clone https://github.com/UKradioastro/UKRAA_Magnetometer.git
-```
+2. Open the [UKRAA Magnetometer Releases](https://github.com/UKradioastro/UKRAA_Magnetometer/releases) page and download the source ZIP for the release you want to install.
 
 ![img_01](images/RPi_imager_01.PNG)
 
-This will download all of the code to the directory **UKRAA_Magnetometer** inside **/home/pi**
+Extract the ZIP into **/home/pi** and rename the extracted directory to **UKRAA_Magnetometer** if necessary. The directory should contain `install`, `scripts`, `VERSION` and the other release files directly inside it.
 
 [Back to Contents...](#contents)
 
@@ -174,6 +173,40 @@ sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh
 
 This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_SMOKE_CHECK: PASS` or `HEARTBEAT_SMOKE_CHECK: FAIL` summary.
 
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Updating the software
+
+After a release has been published on GitHub, run the updater already installed on the RPi:
+
+```
+sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometerACM0.sh
+```
+
+The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, configuration files, log files and temporary web files. It then runs `install.sh` to update the service, scheduled jobs and web files.
+
+The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Publishing a release
+
+For each release, update `VERSION` using the format `YYYY.MM.patch`, update `CHANGELOG.md`, commit the changes, and create a GitHub Release with a tag using exactly the same version, for example `2026.09.0`. The updater reads the latest published release and will stop if the tag and `VERSION` do not match.
+
+The patch number starts at `0` for the first release in a month and increases for further releases in that month. Use a two-digit month, such as `2026.09.0`, rather than `2026.9.0`.
 
 [Back to Contents...](#contents)
 

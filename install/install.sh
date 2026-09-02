@@ -28,6 +28,8 @@ echo ""
 echo "Start installing gnuplot software..."
 apt install gnuplot -y
 apt install gnuplot-doc -y
+apt install curl -y
+apt install unzip -y
 echo "gnuplot software installed"
 echo ""
 
