@@ -40,6 +40,15 @@ def get_base_path():
     return os.environ.get('MAGNETOMETER_BASE_PATH', '/home/pi/UKRAA_Magnetometer')
 
 
+def get_version(base_path):
+    version_path = os.path.join(base_path, 'VERSION')
+    try:
+        with open(version_path, mode='r', encoding='UTF-8') as version_file:
+            return version_file.read().strip()
+    except OSError:
+        return 'unknown'
+
+
 def build_day_path(base_path, folder_name, target_date):
     return os.path.join(
         base_path,

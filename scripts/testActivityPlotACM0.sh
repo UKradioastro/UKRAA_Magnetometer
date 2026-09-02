@@ -14,7 +14,7 @@ log_msg() {
 usage() {
     echo "Usage: $0 YYYY-MM-DD [--archive]"
     echo "  YYYY-MM-DD  target UTC date to regenerate"
-    echo "  --archive   also write plots/Activity/YYYY-MM-DD.png (default is temp only)"
+    echo "  --archive   also write plots/Activity/YYYY/YYYY-MM/YYYY-MM-DD.png (default is temp only)"
 }
 
 TARGET_DATE=${1:-}
@@ -53,5 +53,5 @@ fi
 
 echo "Done: $BASE_PATH/temp/Activity.png"
 if [ "$ARCHIVE_MODE" -eq 1 ]; then
-    echo "Archive: $BASE_PATH/plots/Activity/$TARGET_DATE.png"
+    echo "Archive: $BASE_PATH/plots/Activity/$(date -d "$TARGET_DATE" +%Y)/$(date -d "$TARGET_DATE" +%Y-%m)/$TARGET_DATE.png"
 fi

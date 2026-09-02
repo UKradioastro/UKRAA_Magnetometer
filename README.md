@@ -548,7 +548,7 @@ This updates only:
 
 * `/home/pi/UKRAA_Magnetometer/temp/Activity.png`
 
-To also write the dated archive file in `plots/Activity/`, add `--archive`:
+To also write the dated archive file in `plots/Activity/YYYY/YYYY-MM/`, add `--archive`:
 
 ```
 /bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlotACM0.sh YYYY-MM-DD --archive

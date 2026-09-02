@@ -6,6 +6,21 @@ if [ "${MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT:-}" = "1" ]; then
 	RUN_HEARTBEAT_SMOKE_CHECK=1
 fi
 
+NEW_VERSION=$(cat /home/pi/UKRAA_Magnetometer/VERSION 2>/dev/null || echo "unknown")
+INSTALLED_VERSION_FILE=/home/pi/UKRAA_Magnetometer/config/installed-version.txt
+OLD_VERSION=""
+if [ -f "$INSTALLED_VERSION_FILE" ]; then
+	OLD_VERSION=$(cat "$INSTALLED_VERSION_FILE")
+fi
+
+if [ -z "$OLD_VERSION" ]; then
+	echo "Fresh install: v$NEW_VERSION"
+elif [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
+	echo "Re-running install for existing v$NEW_VERSION (no version change)"
+else
+	echo "Upgrading UKRAA Magnetometer: v$OLD_VERSION -> v$NEW_VERSION"
+fi
+
 
 echo "Start installing UKRAA Magnetometer software..."
 echo ""
@@ -19,7 +34,7 @@ echo ""
 echo "Creating UKRAA Magnetometer directory structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/processed
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/raw
-sudo -u pi mkdir -v  /home/pi/UKRAA_Magnetometer/logfiles
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/logfiles
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/Activity
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/BI
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/HDZ
@@ -170,9 +185,11 @@ echo "Final cleanup..."
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/docs
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/images
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/WWW
-sudo -u pi rm -v   /home/pi/UKRAA_Magnetometer/README.md
+sudo -u pi rm -vf  /home/pi/UKRAA_Magnetometer/README.md
 echo "Finished final cleanup"
 echo ""
+
+echo "$NEW_VERSION" | sudo -u pi tee /home/pi/UKRAA_Magnetometer/config/installed-version.txt > /dev/null
 
 echo "Completed installing UKRAA Magnetometer software."
 echo ""

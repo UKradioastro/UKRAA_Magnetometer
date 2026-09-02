@@ -81,12 +81,19 @@ EndXaxis = nextDate." 00:00:00"
 # setting output path to include data stamp
 # Path to directory to store file
 
-pathPlot1 = basePath."/plots/Activity/"\
-             .targetDate\
-             .".png"
+plotYear = substr(targetDate, 1, 4)
+plotYearMonth = substr(targetDate, 1, 7)
+plotMonthDir = basePath."/plots/Activity/".plotYear."/".plotYearMonth
+pathPlot1 = plotMonthDir."/".targetDate.".png"
 pathTemp1 = basePath."/temp/Activity.png"
 
-system("sh -lc 'mkdir -p \"".basePath."/plots/Activity\" \"".basePath."/temp\"'")
+# mkdir -p plus 0/1 flag so a fresh year/month archive folder can be logged, matching the Python processors
+dirCreated = system("sh -lc 'if [ -d \"".plotMonthDir."\" ]; then echo 0; else mkdir -p \"".plotMonthDir."\"; echo 1; fi'")
+if (dirCreated == 1) {
+    print system("date +'%Y-%m-%d %H:%M:%S'")\
+          ." : PlotDataActivityACM0.gp   : New directory created : ".plotMonthDir
+}
+system("sh -lc 'mkdir -p \"".basePath."/temp\"'")
 
 # Title for graph
 dateTag = system("date -d yesterday +'%Y-%m-%d'")
