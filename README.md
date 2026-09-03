@@ -106,8 +106,6 @@ ls /dev/tty*
 
 1. Log into your Raspberry Pi4/5 using VNC.
 
-&nbsp;
-
 2. Open a terminal window, type the following command and press enter
 
 ```
