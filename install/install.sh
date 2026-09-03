@@ -40,7 +40,8 @@ echo "RPi wallpaper changed"
 echo ""
 
 echo "Creating UKRAA Magnetometer directory structure..."
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/processed
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/minute
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/hour
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/raw
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/logfiles
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/Activity

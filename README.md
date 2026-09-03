@@ -222,6 +222,30 @@ The code records data from the UKRAA Magnetometer via serial over the supplied U
 
 The raw data will be processed daily, via CRON, to get magnetic field values per minute in the X (N->S), Y (E->W) and Z (U->D) directions from your previous day’s data.  The maximum hourly variation of the magnetic field values in the X (N->S) and Y (E->W) directions will also be produced.
 
+The live data tree is organised as a clean-install layout:
+
+```
+/home/pi/UKRAA_Magnetometer/data/
+├── alerts/
+├── minute/
+│   └── YYYY/
+│       └── YYYY-MM/
+│           └── YYYY-MM-DD.csv
+├── hour/
+│   └── YYYY/
+│       └── YYYY-MM/
+│           └── YYYY-MM-DD.csv
+├── raw/
+│   └── YYYY/
+│       └── YYYY-MM/
+│           └── YYYY-MM-DD.csv
+├── rolling/
+├── status/
+└── tests/
+```
+
+The `minute` folder holds the daily minute-level processed data, while the `hour` folder holds the hourly summary files.
+
 A number of plots will be created:
 * X, Y and Z (North/South, East/West and up/down)
 * Maximum hourly variation in X and Y directions
@@ -360,7 +384,7 @@ The marker reports one of three states:
 - `PENDING` - no raw data was recorded for yesterday, so there was nothing to
   process. Expected on the first day after a fresh install, or if the
   acquisition service was stopped all day. Exit code 0.
-- `FAIL` - raw data existed but the processed file or one or more published
+- `FAIL` - raw data existed but the minute data file or one or more published
   plots are missing. This is a real fault. Exit code 1.
 
 ### showDashboardSummaryACM0.sh

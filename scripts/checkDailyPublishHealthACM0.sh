@@ -10,7 +10,7 @@ MARKER_FILE="$STATUS_DIR/daily-health.txt"
 mkdir -p "$STATUS_DIR"
 
 YESTERDAY=$(date -d yesterday +%Y-%m-%d)
-PROCESSED_FILE="$BASE_PATH/data/processed/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
+MINUTE_FILE="$BASE_PATH/data/minute/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
 RAW_FILE="$BASE_PATH/data/raw/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
 WEB_TEMP_DIR="$WEB_ROOT/temp"
 
@@ -34,9 +34,9 @@ append_issue() {
 }
 
 # Daily processing output check.
-if [ ! -f "$PROCESSED_FILE" ]; then
+if [ ! -f "$MINUTE_FILE" ]; then
     status="FAIL"
-    append_issue "missing processed day file: $PROCESSED_FILE"
+    append_issue "missing minute data file: $MINUTE_FILE"
 fi
 
 # Required daily web files check.

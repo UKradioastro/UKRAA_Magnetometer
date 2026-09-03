@@ -90,18 +90,18 @@ RawFieldNames = RAW_FIELD_NAMES
 RawDataFile = build_day_path(BasePath, 'raw', TargetDate)
 
 
-# Processed data path
-ProcessedPath = build_month_path(BasePath, 'processed', TargetDate)
+# Minute data path
+MinutePath = build_month_path(BasePath, 'minute', TargetDate)
 
 # check if the specific path exists
-pathExists = os.path.exists(ProcessedPath)
+pathExists = os.path.exists(MinutePath)
 if not pathExists:
     # create directory structure
-    ensure_directory(ProcessedPath)
-    log_msg('New directory created : ' + ProcessedPath)
+    ensure_directory(MinutePath)
+    log_msg('New directory created : ' + MinutePath)
 
-# Processed data file name
-ProcessedDataFile = build_day_path(BasePath, 'processed', TargetDate)
+# Minute data file name
+ProcessedDataFile = build_day_path(BasePath, 'minute', TargetDate)
 
 # =============================================================================
 # Main program

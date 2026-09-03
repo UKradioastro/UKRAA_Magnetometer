@@ -44,7 +44,7 @@ print system("date +'%Y-%m-%d %H:%M:%S'")\
 
 # Path to data file for graphing
 FileData = basePath\
-           ."/data/processed/hour/"\
+           ."/data/hour/"\
            .substr(targetDate, 1, 4)\
            ."/"\
            .substr(targetDate, 1, 7)\

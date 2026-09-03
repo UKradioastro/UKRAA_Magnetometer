@@ -6,7 +6,7 @@ reset
 set print "-"
 
 basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
-pathData = basePath."/data/processed"
+pathData = basePath."/data/minute"
 
 fileData = pathData."/" \
            .system("date -d yesterday +'%Y'") \
