@@ -6,9 +6,27 @@ BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-MagnetometerACM0.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
-NOAA_URL=${MAGNETOMETER_NOAA_AURORA_URL:-https://services.swpc.noaa.gov/images/animations/ovation/north/latest.jpg}
 NOAA_DIR="$BASE_PATH/temp/noaa"
 NOAA_IMAGE="$NOAA_DIR/latest.jpg"
+
+if ! PLOT_OPTIONS=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptionsACM0.py" 2>&1); then
+    log_msg "updateNoaaAuroraForecast.sh : FAILED to read plot options: $PLOT_OPTIONS" >> "$ERROR_LOG"
+    exit 1
+fi
+
+read -r PLOT_HDZ PLOT_BI PLOT_NOAA NOAA_HEMISPHERE <<< "$PLOT_OPTIONS"
+if [ -z "${PLOT_NOAA:-}" ] || [ -z "${NOAA_HEMISPHERE:-}" ]; then
+    log_msg "updateNoaaAuroraForecast.sh : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
+    exit 1
+fi
+
+if [ "$PLOT_NOAA" = "false" ]; then
+    log_msg "updateNoaaAuroraForecast.sh : NOAA aurora forecast disabled (plot_noaa=false), skipping update" >> "$MAIN_LOG"
+    rm -f "$NOAA_IMAGE"
+    exit 0
+fi
+
+NOAA_URL=${MAGNETOMETER_NOAA_AURORA_URL:-https://services.swpc.noaa.gov/images/animations/ovation/${NOAA_HEMISPHERE}/latest.jpg}
 
 log_msg() {
     printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"

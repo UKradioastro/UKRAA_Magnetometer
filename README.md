@@ -412,12 +412,31 @@ These plots will automatically be added to the intranet webpage if selected; wit
 <!-- =============================================================================== -->
 ## Optional NOAA aurora forecast panel
 
-The webpage can show the latest NOAA Space Weather Prediction Center 30-minute aurora forecast image below the rolling magnetometer status.
+The webpage can show the latest NOAA Space Weather Prediction Center 30-minute aurora forecast image below the rolling magnetometer status, and this can now be enabled or disabled per installation.
 
-The image is downloaded from:
+Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**. Add or edit the following values:
+
+```ini
+[plots]
+plot_noaa = true
+noaa_hemisphere = north
+```
+
+- `plot_noaa = true` enables the panel.
+- `plot_noaa = false` disables the panel and removes any stale NOAA image from the published web output.
+- `noaa_hemisphere = north` selects the northern aurora forecast.
+- `noaa_hemisphere = south` selects the southern aurora forecast.
+
+The image is downloaded from the chosen NOAA forecast URL, for example:
 
 ```
 https://services.swpc.noaa.gov/images/animations/ovation/north/latest.jpg
+```
+
+or
+
+```
+https://services.swpc.noaa.gov/images/animations/ovation/south/latest.jpg
 ```
 
 and cached locally as:

@@ -136,7 +136,7 @@ body {font-family: "Lato", sans-serif}
   </div>
 
   <!-- NOAA Aurora Forecast -->
-  <div class="w3-white" id="noaa">
+  <div class="w3-grey" id="noaa" style="display:none">
     <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px">
       <h2 class="w3-wide">NOAA 30-MINUTE AURORA FORECAST</h2>
       <p class="w3-center">Forecast image supplied by NOAA Space Weather Prediction Center</p>
@@ -468,6 +468,13 @@ function refreshOptionalGraphs() {
 
     setGroupVisibility("HDZ", groupHasGraph.HDZ, "navHdz", "navDemoHdz");
     setGroupVisibility("BI", groupHasGraph.BI, "navBi", "navDemoBi");
+  });
+
+  probeImage("./temp/noaa/latest.jpg").then(function(hasNoaaImage) {
+    var noaaSection = document.getElementById("noaa");
+    if (noaaSection) {
+      noaaSection.style.display = hasNoaaImage ? "block" : "none";
+    }
   });
 }
 

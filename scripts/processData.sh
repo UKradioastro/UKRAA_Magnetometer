@@ -58,9 +58,9 @@ if ! PLOT_OPTIONS=$(su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scrip
     exit 1
 fi
 
-read -r PLOT_HDZ PLOT_BI <<< "$PLOT_OPTIONS"
+read -r PLOT_HDZ PLOT_BI PLOT_NOAA NOAA_HEMISPHERE <<< "$PLOT_OPTIONS"
 
-if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ]; then
+if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] || [ -z "${NOAA_HEMISPHERE:-}" ]; then
     log_msg "processData.sh            : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
     log_msg "processData.sh            : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
     exit 1

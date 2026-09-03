@@ -33,9 +33,9 @@ if ! PLOT_OPTIONS=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_
   exit 1
 fi
 
-read -r PLOT_HDZ PLOT_BI <<< "$PLOT_OPTIONS"
+read -r PLOT_HDZ PLOT_BI PLOT_NOAA NOAA_HEMISPHERE <<< "$PLOT_OPTIONS"
 
-if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ]; then
+if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] || [ -z "${NOAA_HEMISPHERE:-}" ]; then
   log_msg "publishWebACM0.sh         : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
   exit 1
 fi
@@ -101,15 +101,24 @@ else
   exit 1
 fi
 
-if [ -f "$SOURCE_NOAA" ]; then
-  if cp -a "$SOURCE_NOAA" "$DEST_NOAA_DIR/latest.jpg" >> "$ERROR_LOG" 2>&1; then
-    chmod 644 "$DEST_NOAA_DIR/latest.jpg"
-    log_msg "publishWebACM0.sh         : Copied NOAA aurora forecast to $DEST_NOAA_DIR" >> "$MAIN_LOG"
+if [ "$PLOT_NOAA" = "true" ]; then
+  if [ -f "$SOURCE_NOAA" ]; then
+    if cp -a "$SOURCE_NOAA" "$DEST_NOAA_DIR/latest.jpg" >> "$ERROR_LOG" 2>&1; then
+      chmod 644 "$DEST_NOAA_DIR/latest.jpg"
+      log_msg "publishWebACM0.sh         : Copied NOAA aurora forecast to $DEST_NOAA_DIR" >> "$MAIN_LOG"
+    else
+      log_msg "publishWebACM0.sh         : WARNING - could not copy NOAA aurora forecast" >> "$ERROR_LOG"
+    fi
   else
-    log_msg "publishWebACM0.sh         : WARNING - could not copy NOAA aurora forecast" >> "$ERROR_LOG"
+    log_msg "publishWebACM0.sh         : NOAA aurora forecast not present, skipping" >> "$MAIN_LOG"
   fi
 else
-  log_msg "publishWebACM0.sh         : NOAA aurora forecast not present, skipping" >> "$MAIN_LOG"
+  if [ -f "$DEST_NOAA_DIR/latest.jpg" ]; then
+    rm -f "$DEST_NOAA_DIR/latest.jpg"
+    log_msg "publishWebACM0.sh         : Removed stale NOAA aurora forecast (plot_noaa=false)" >> "$MAIN_LOG"
+  else
+    log_msg "publishWebACM0.sh         : NOAA aurora forecast not required (plot_noaa=false)" >> "$MAIN_LOG"
+  fi
 fi
 
 log_msg "publishWebACM0.sh         : Completed publishing rolling web assets" >> "$MAIN_LOG"

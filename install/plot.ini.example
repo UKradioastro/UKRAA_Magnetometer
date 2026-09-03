@@ -17,3 +17,14 @@ plot_hdz = false
 # Useful for comparing against reference observatories such as the
 # British Geological Survey (BGS).
 plot_bi = false
+
+# Set to true to download and show the NOAA aurora forecast panel.
+# This is enabled by default to keep the webpage aligned with the current
+# operational behaviour.
+plot_noaa = true
+
+# Select which hemisphere forecast to display:
+# north or south
+# For northern sites, use "north".
+# For southern sites, use "south".
+noaa_hemisphere = north

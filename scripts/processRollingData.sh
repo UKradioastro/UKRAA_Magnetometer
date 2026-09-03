@@ -42,9 +42,9 @@ if ! PLOT_OPTIONS=$(su pi -c "/usr/bin/python3 $BASE_PATH/scripts/GetPlotOptions
     exit 1
 fi
 
-read -r PLOT_HDZ PLOT_BI <<< "$PLOT_OPTIONS"
+read -r PLOT_HDZ PLOT_BI PLOT_NOAA NOAA_HEMISPHERE <<< "$PLOT_OPTIONS"
 
-if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ]; then
+if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] || [ -z "${NOAA_HEMISPHERE:-}" ]; then
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
     log_msg "processRollingData.sh     : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
     exit 1

@@ -144,6 +144,19 @@ def _parse_bool(value_text, default_value):
     return value_text.strip().lower() in ('true', '1', 'yes')
 
 
+def _parse_hemisphere(value_text, default_value):
+    if value_text is None:
+        return default_value
+
+    normalized = value_text.strip().lower()
+    if normalized in ('n', 'north', 'northern'):
+        return 'north'
+    if normalized in ('s', 'south', 'southern'):
+        return 'south'
+
+    return default_value
+
+
 def get_plot_options(base_path):
     plot_ini_path = build_plot_ini_path(base_path)
     parser = _load_ini_parser(plot_ini_path)
@@ -156,8 +169,21 @@ def get_plot_options(base_path):
         os.environ.get('MAGNETOMETER_PLOT_BI',
                        parser.get('plots', 'plot_bi', fallback='true')),
         True)
+    plot_noaa = _parse_bool(
+        os.environ.get('MAGNETOMETER_PLOT_NOAA',
+                       parser.get('plots', 'plot_noaa', fallback='true')),
+        True)
+    noaa_hemisphere = _parse_hemisphere(
+        os.environ.get('MAGNETOMETER_NOAA_HEMISPHERE',
+                       parser.get('plots', 'noaa_hemisphere', fallback='north')),
+        'north')
 
-    return plot_hdz, plot_bi
+    return plot_hdz, plot_bi, plot_noaa, noaa_hemisphere
+
+
+def get_noaa_options(base_path):
+    plot_hdz, plot_bi, plot_noaa, noaa_hemisphere = get_plot_options(base_path)
+    return plot_noaa, noaa_hemisphere
 
 
 def _load_ini_parser(config_path):

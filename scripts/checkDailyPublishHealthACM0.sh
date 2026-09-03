@@ -57,9 +57,9 @@ elif ! plot_options=$(/usr/bin/python3 "$PLOT_OPTIONS_SCRIPT" 2>&1); then
     status="FAIL"
     append_issue "could not read plot options: $plot_options"
 else
-    read -r plot_hdz plot_bi <<< "$plot_options"
+    read -r plot_hdz plot_bi plot_noaa noaa_hemisphere <<< "$plot_options"
 
-    if [ -z "${plot_hdz:-}" ] || [ -z "${plot_bi:-}" ]; then
+    if [ -z "${plot_hdz:-}" ] || [ -z "${plot_bi:-}" ] || [ -z "${plot_noaa:-}" ] || [ -z "${noaa_hemisphere:-}" ]; then
         status="FAIL"
         append_issue "unexpected plot options output: '$plot_options'"
     fi
