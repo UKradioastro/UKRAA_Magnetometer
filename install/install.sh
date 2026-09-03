@@ -33,6 +33,12 @@ apt install unzip -y
 echo "gnuplot software installed"
 echo ""
 
+echo "Change RPi desktop wallpaper..."
+sudo -u pi cp -v  /home/pi/UKRAA_Magnetometer/images/wallpaperPicoMagnetometer.png /home/pi/Pictures/wallpaperPicoMagnetometer.png
+sudo -u pi pcmanfm --set-wallpaper /home/pi/Pictures/wallpaperPicoMagnetometer.png
+echo "RPi wallpaper changed"
+echo ""
+
 echo "Creating UKRAA Magnetometer directory structure..."
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/processed
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/raw
