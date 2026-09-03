@@ -28,9 +28,17 @@ echo ""
 echo "Start installing gnuplot software..."
 apt install gnuplot -y
 apt install gnuplot-doc -y
-apt install curl -y
-apt install unzip -y
 echo "gnuplot software installed"
+echo ""
+
+echo "Start installing curl software..."
+apt install curl -y
+echo "curl software installed"
+echo ""
+
+echo "Start installing unzip software..."
+apt install unzip -y
+echo "unzip software installed"
 echo ""
 
 echo "Provide RPi desktop wallpaper..."
