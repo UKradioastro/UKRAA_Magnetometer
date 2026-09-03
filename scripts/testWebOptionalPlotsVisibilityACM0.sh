@@ -7,6 +7,7 @@ cd / || exit 1
 
 BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 WEB_ROOT=${MAGNETOMETER_WEB_ROOT:-/var/www/html}
+FILE_OWNER=${MAGNETOMETER_FILE_OWNER:-pi}
 
 # Prefer the source copy (development checkout); fall back to the deployed copy (installed system).
 if [ -f "$BASE_PATH/WWW/index.html" ]; then
@@ -15,7 +16,7 @@ else
     INDEX_FILE="$WEB_ROOT/index.html"
 fi
 
-TEST_ROOT=${1:-"$BASE_PATH/tests/web-optional-visibility"}
+TEST_ROOT=${1:-"$BASE_PATH/data/tests/web-optional-visibility"}
 
 if [ "${1:-}" = "--help" ]; then
     echo "Usage: $0 [TEST_ROOT]"
@@ -99,6 +100,10 @@ assert_contains './temp/rolling/RollingBI.png'
 rm -rf "$TEST_ROOT"
 mkdir -p "$TEST_ROOT"
 
+if [ "$(id -u)" -eq 0 ]; then
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+fi
+
 # Contract cases: section hidden when none exist, shown when one or more exist.
 run_case "none_present" "" "hide"
 run_case "hdz_only" "HDZ.png" "show"
@@ -106,4 +111,7 @@ run_case "bi_only" "BI.png" "show"
 run_case "all_present" "HDZ.png BI.png" "show"
 
 log "All optional web visibility checks passed."
+if [ "$(id -u)" -eq 0 ]; then
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+fi
 log "Test root: $TEST_ROOT"

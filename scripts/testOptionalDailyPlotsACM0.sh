@@ -6,9 +6,10 @@ set -u
 cd / || exit 1
 
 BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
-# Kept outside temp/ because moveGraphs.sh copies all of temp/ to the web root.
-TEST_ROOT=${1:-"$BASE_PATH/tests/optional-daily-plots"}
+# Kept under data/ so validation sandboxes are treated like project data, not root-level clutter.
+TEST_ROOT=${1:-"$BASE_PATH/data/tests/optional-daily-plots"}
 TEST_BASE_PATH="$TEST_ROOT/UKRAA_Magnetometer"
+FILE_OWNER=${MAGNETOMETER_FILE_OWNER:-pi}
 
 if [ "${1:-}" = "--help" ]; then
     echo "Usage: $0 [TEST_ROOT]"
@@ -102,6 +103,10 @@ UPLOAD
 rm -rf "$TEST_ROOT"
 mkdir -p "$TEST_ROOT"
 
+if [ "$(id -u)" -eq 0 ]; then
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+fi
+
 run_case "hdz_on_bi_on_all_present" "true" "true" "true" "true" 0
 run_case "hdz_on_bi_on_bi_missing" "true" "true" "true" "false" 1
 run_case "hdz_on_bi_off" "true" "false" "true" "false" 0
@@ -110,4 +115,7 @@ run_case "hdz_off_bi_off" "false" "false" "false" "false" 0
 run_case "hdz_on_hdz_missing" "true" "false" "false" "false" 1
 
 log "All optional daily plot publish tests passed."
+if [ "$(id -u)" -eq 0 ]; then
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+fi
 log "Test root: $TEST_ROOT"
