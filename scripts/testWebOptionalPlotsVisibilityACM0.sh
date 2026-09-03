@@ -100,8 +100,9 @@ assert_contains './temp/rolling/RollingBI.png'
 rm -rf "$TEST_ROOT"
 mkdir -p "$TEST_ROOT"
 
+# Chown the shared tests/ parent too, since mkdir -p creates it as root when invoked via sudo.
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
 fi
 
 # Contract cases: section hidden when none exist, shown when one or more exist.
@@ -112,6 +113,6 @@ run_case "all_present" "HDZ.png BI.png" "show"
 
 log "All optional web visibility checks passed."
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
 fi
 log "Test root: $TEST_ROOT"

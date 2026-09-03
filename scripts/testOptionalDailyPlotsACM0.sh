@@ -52,7 +52,7 @@ run_case() {
 
     cat > "$scripts_dir/GetPlotOptionsACM0.py" <<PY
 #!/usr/bin/env python3
-print("$plot_hdz $plot_bi")
+print("$plot_hdz $plot_bi true north")
 PY
     chmod +x "$scripts_dir/GetPlotOptionsACM0.py"
 
@@ -103,8 +103,9 @@ UPLOAD
 rm -rf "$TEST_ROOT"
 mkdir -p "$TEST_ROOT"
 
+# Chown the shared tests/ parent too, since mkdir -p creates it as root when invoked via sudo.
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
 fi
 
 run_case "hdz_on_bi_on_all_present" "true" "true" "true" "true" 0
@@ -116,6 +117,6 @@ run_case "hdz_on_hdz_missing" "true" "false" "false" "false" 1
 
 log "All optional daily plot publish tests passed."
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$TEST_ROOT"
+    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
 fi
 log "Test root: $TEST_ROOT"

@@ -35,8 +35,12 @@ echo ""
 
 echo "Change RPi desktop wallpaper..."
 sudo -u pi cp -v  /home/pi/UKRAA_Magnetometer/images/wallpaperPicoMagnetometer.png /home/pi/Pictures/wallpaperPicoMagnetometer.png
-sudo -u pi pcmanfm --set-wallpaper /home/pi/Pictures/wallpaperPicoMagnetometer.png
-echo "RPi wallpaper changed"
+if pgrep -u pi pcmanfm > /dev/null; then
+	sudo -u pi -H DISPLAY=:0 XAUTHORITY=/home/pi/.Xauthority pcmanfm --set-wallpaper /home/pi/Pictures/wallpaperPicoMagnetometer.png
+	echo "RPi wallpaper changed"
+else
+	echo "No active desktop session detected (e.g. running over SSH); wallpaper file copied but not applied live"
+fi
 echo ""
 
 echo "Creating UKRAA Magnetometer directory structure..."
