@@ -15,7 +15,7 @@ Set of Python, gnuplot and shell scripts to run on a RPi4/5 to record, process a
 
 This software was written to suit a specific set-up; feel free to use as you see fit.
 
-Instructions for initial setting up of a Raspberry Pi4/5 are included in the **docs** folder
+Instructions for initial setting up of a Raspberry Pi4/5 are included in the **docs** folder on the supplied microSD card for your UKRAA PicoMagnetometer.
 
 ---
 
@@ -27,14 +27,15 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [Where is my PicoMagnetometer](#where-is-my-Picomagnetometer)
 - [Getting the software onto your RPi](#getting-the-software-onto-your-RPi)
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
-- [Updating the software](#updating-the-software)
-- [Publishing a release](#publishing-a-release)
 - [What does the code do](#what-does-the-code-do)
+- [PicoMagnetometer webpage](#picomagnetometer-webpage)
 - [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
 - [Optional Post install operational checks](#Optional-Post-install-operational-checks)
 - [Optional NOAA aurora forecast panel](#Optional-NOAA-aurora-forecast-panel)
 - [Optional Rolling alert Emails](#Optional-Rolling-alert-Emails)
 - [Optional Remote FTP upload](#Optional-Remote-FTP-upload)
+- [Updating the software](#updating-the-software)
+- [Publishing a release](#publishing-a-release)
 - [License](#license)
 - [Contact us](#contact-us)
 
@@ -46,13 +47,11 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes that your UKRAA PicoMagnetometer is the only device using USB that is connected to the RPi4/5 via supplied USB cable and that it is /dev/ttyACM0 - you can check this by using **ls /dev/ttyAC*** in a terminal window on the RPi4/5 and reviewing the response.
-
 The code assumes username is **pi**. 
 
 If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in all the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
 
-The code assumes one magnetometer connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
+The code assumes that your UKRAA PicoMagnetometer is connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
 
 If there are other devices connected to the RPi and your magnetometer is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRaw.py** python script, where *ttyACMx* is the tty address of you connected magnetometer.
 
@@ -109,11 +108,11 @@ ls /dev/tty*
 
 &nbsp;
 
-2. Open the [UKRAA Magnetometer Releases](https://github.com/UKradioastro/UKRAA_Magnetometer/releases) page and download the source ZIP for the release you want to install.
+2. Open a terminal window, type the following command and press enter
 
 ![img_01](images/RPi_imager_01.PNG)
 
-Extract the ZIP into **/home/pi** and rename the extracted directory to **UKRAA_Magnetometer** if necessary. The directory should contain `install`, `scripts`, `VERSION` and the other release files directly inside it.
+This will download all of the code to the directory **UKRAA_Magnetometer** inside `/home/pi`.
 
 [Back to Contents...](#contents)
 
@@ -126,19 +125,10 @@ Extract the ZIP into **/home/pi** and rename the extracted directory to **UKRAA_
 ## Installing the software onto your RPi
 
 
+
 1. Open a terminal window and type the following command and press enter
 ```
-cd ~/UKRAA_Magnetometer/install
-```
-
-![img_02](images/RPi_imager_02.PNG)
-
-This will take you to the **install** directory inside **/home/pi/UKRAA_Magnetometer**
-
-
-2. Type the following command and press enter
-```
-chmod +x *.sh
+chmod +x ~/UKRAA_Magnetometer/install/*.sh
 ```
 
 ![img_03](images/RPi_imager_03.PNG)
@@ -146,9 +136,9 @@ chmod +x *.sh
 This will make the **install.sh** script executable.
 
 
-3. Type the following command and press enter
+2. Type the following command and press enter
 ```
-sudo bash install.sh
+sudo bash ~/UKRAA_Magnetometer/install/install.sh
 ```
 
 ![img_04](images/RPi_imager_04.PNG)
@@ -181,32 +171,42 @@ This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_S
 ---
 
 &nbsp;
-<!-- =============================================================================== -->
-## Updating the software
 
-After a release has been published on GitHub, run the updater already installed on the RPi:
+<!-- =============================================================================== --> 
+## What does the code do
 
-```
-sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometerACM0.sh
-```
+### Things it does right from the start
+The code records data from the UKRAA Magnetometer via serial over the supplied USB cable and stores the data to the raw data folder.
 
-The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, configuration files, log files and temporary web files. It then runs `install.sh` to update the service, scheduled jobs and web files.
+The raw data will be processed daily, via CRON, to get magnetic field values per minute in the X (N->S), Y (E->W) and Z (U->D) directions from your previous day’s data.  The maximum hourly variation of the magnetic field values in the X (N->S) and Y (E->W) directions will also be produced.
 
-The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
+A number of plots will be created:
+* X, Y and Z (North/South, East/West and up/down)
+* Maximum hourly variation in X and Y directions
 
-[Back to Contents...](#contents)
+The raw data will also be processed on a continuous 5 minute basis, again via CRON, to generate a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.
 
-&nbsp;
+A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.  To access the webpage, see **PicoMagnetometer webpage** section for details.
 
----
+### Things it do with selectable options
 
-&nbsp;
-<!-- =============================================================================== -->
-## Publishing a release
+#### Additional plots
+There is the option of the following additional rolling and daily plots
+* H, D and Z (Local horizontal plane, declination angle and up/down)
+* B and I (Total strength of Earth’s magnetic field and angle of Earth’s magnetic field)
 
-For each release, update `VERSION` using the format `YYYY.MM.patch`, update `CHANGELOG.md`, commit the changes, and create a GitHub Release with a tag using exactly the same version, for example `2026.09.0`. The updater reads the latest published release and will stop if the tag and `VERSION` do not match.
+These are configurable through `plot.ini` file, see **Optional HDZ and/or BI plots** section for details.
 
-The patch number starts at `0` for the first release in a month and increases for further releases in that month. Use a two-digit month, such as `2026.09.0`, rather than `2026.9.0`.
+#### Email alerts
+There is the option of receiving email alerts when an activity threshold is passed.
+
+This is configurable through the `alerts.ini` file, see **Optional Rolling alert Emails** section for details.
+
+#### Upload, via FTP, to external hosted website 
+There is the option of uploading all generated plot to an externally hosted webpage.
+
+This is configurable through the `remote-upload.ini` file, see **Optional Remote FTP upload** section for details.
+
 
 [Back to Contents...](#contents)
 
@@ -216,47 +216,7 @@ The patch number starts at `0` for the first release in a month and increases fo
 
 &nbsp;
 <!-- =============================================================================== --> 
-## What does the code do
-
-The code records data from the UKRAA Magnetometer via serial over the supplied USB cable and stores the event data to the raw data folder.
-
-The raw data will be processed daily, via CRON, to get magnetic field values per minute in the X (N->S), Y (E->W) and Z (U->D) directions from your previous day’s data.  The maximum hourly variation of the magnetic field values in the X (N->S) and Y (E->W) directions will also be produced.
-
-The live data tree is organised as a clean-install layout:
-
-```
-/home/pi/UKRAA_Magnetometer/data/
-├── alerts/
-├── minute/
-│   └── YYYY/
-│       └── YYYY-MM/
-│           └── YYYY-MM-DD.csv
-├── hour/
-│   └── YYYY/
-│       └── YYYY-MM/
-│           └── YYYY-MM-DD.csv
-├── raw/
-│   └── YYYY/
-│       └── YYYY-MM/
-│           └── YYYY-MM-DD.csv
-├── rolling/
-├── status/
-└── tests/
-```
-
-The `minute` folder holds the daily minute-level processed data, while the `hour` folder holds the hourly summary files.
-
-A number of plots will be created:
-* X, Y and Z (North/South, East/West and up/down)
-* Maximum hourly variation in X and Y directions
-* H, D and Z (Local horizontal plane, declination angle and up/down)
-* B and I (Total strength Earths magnetic field and angle of Earths magnetic field)
-
-**Note**: H, D & Z plots together with B & I plots are disabled by default, these plots can be reactivated by changing the configuration filesfiles - see **User Manual: Additional graphs** for more details.
-
-The raw data will also be processed on a continuous 5 minute basis, again via CRON, to generate a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.  Should a threshold level be reached for % change of magnetic field, then the user has the option to receive an email alert - see **User Manual: Rolling alert emails** for more details.
-
-A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.
+## PicoMagnetometer webpage
 
 To access the PicoMagnetometer webpage on your desktop PC or your smart phone…
 
@@ -438,11 +398,15 @@ These plots will automatically be added to the intranet webpage if selected; wit
 
 The webpage can show the latest NOAA Space Weather Prediction Center 30-minute aurora forecast image below the rolling magnetometer status, and this can now be enabled or disabled per installation.
 
-Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**. Add or edit the following values:
+Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**.
+
+By default the option of producing NOAA aurora forecast images is turned off (**false**), and the images do not appear as an option from the intranet webpage.
+
+Should the user wish to have the NOAA aurora forcast image option selected then change the following in the plots.ini file:
 
 ```ini
 [plots]
-plot_noaa = true
+plot_noaa = false
 noaa_hemisphere = north
 ```
 
@@ -765,7 +729,40 @@ Combined test helper:
 ---
 
 &nbsp;
+<!-- =============================================================================== -->
+## Updating the software
 
+After a release has been published on GitHub, run the updater already installed on the RPi:
+
+```
+sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometerACM0.sh
+```
+
+The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, configuration files, log files and temporary web files. It then runs `install.sh` to update the service, scheduled jobs and web files.
+
+The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Publishing a release
+
+For each release, update `VERSION` using the format `YYYY.MM.patch`, update `CHANGELOG.md`, commit the changes, and create a GitHub Release with a tag using exactly the same version, for example `2026.09.0`. The updater reads the latest published release and will stop if the tag and `VERSION` do not match.
+
+The patch number starts at `0` for the first release in a month and increases for further releases in that month. Use a two-digit month, such as `2026.09.0`, rather than `2026.9.0`.
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
 <!-- =============================================================================== --> 
 ### License
 
