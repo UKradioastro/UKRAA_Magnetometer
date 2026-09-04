@@ -10,6 +10,9 @@
 # cron entry to cache the NOAA 30-minute aurora forecast image
 */30 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/updateNoaaAuroraForecast.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
 
+# cron entry to download and plot the NOAA planetary Kp forecast
+15 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/updateKpForecastACM0.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-MagnetometerACM0.txt 2>> /home/pi/UKRAA_Magnetometer/logfiles/log-error.txt
+
 # cron entry to manage logfiles - on a Sunday 00:00 each week
 00 00 * * 00 /bin/bash /home/pi/UKRAA_Magnetometer/scripts/manageLogfiles.sh
 

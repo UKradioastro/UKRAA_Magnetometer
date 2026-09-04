@@ -28,3 +28,7 @@ plot_noaa = true
 # For northern sites, use "north".
 # For southern sites, use "south".
 noaa_hemisphere = north
+
+# Set to true to download and show the NOAA planetary Kp forecast.
+# The chart includes the NOAA G1-G5 geomagnetic storm scale.
+plot_kp = true

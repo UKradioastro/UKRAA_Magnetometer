@@ -49,6 +49,7 @@ body {font-family: "Lato", sans-serif}
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
         <a href="#rolling" class="w3-bar-item w3-button">ROLLING STATUS</a>
         <a href="#noaa" class="w3-bar-item w3-button">NOAA FORECAST</a>
+        <a href="#kp" class="w3-bar-item w3-button" id="navKp">PLANETARY KP</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#XYZ" class="w3-bar-item w3-button">XYZ GRAPHS</a>
         <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz">HDZ GRAPHS</a>
@@ -65,6 +66,7 @@ body {font-family: "Lato", sans-serif}
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
   <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING STATUS</a>
   <a href="#noaa" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">NOAA FORECAST</a>
+  <a href="#kp" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoKp">PLANETARY KP</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">XYZ GRAPHS</a>
   <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz">HDZ GRAPHS</a>
@@ -151,6 +153,22 @@ body {font-family: "Lato", sans-serif}
         Image source:
         <a href="https://www.spaceweather.gov/products/aurora-30-minute-forecast" target="_blank">NOAA Space Weather Prediction Center 30-minute aurora forecast</a>
       </p>
+    </div>
+  </div>
+
+  <!-- Planetary Kp Forecast -->
+  <div class="w3-white" id="kp" style="display:none">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:960px">
+      <h2 class="w3-wide">NOAA PLANETARY KP FORECAST</h2>
+      <p class="w3-center">Forecast Kp values with the NOAA G1-G5 geomagnetic storm scale</p>
+      <div class="w3-row w3-padding-16">
+        <div class="w3-auto graph-frame">
+          <a href="https://www.spaceweather.gov/products/planetary-k-index" target="_blank">
+            <img src="./temp/kp/PlanetaryKp.png" data-refresh-src="./temp/kp/PlanetaryKp.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="NOAA planetary Kp forecast" style="width:100%">
+          </a>
+        </div>
+      </div>
+      <p class="w3-center">Forecast data source: <a href="https://www.spaceweather.gov/products/planetary-k-index" target="_blank">NOAA Space Weather Prediction Center planetary K-index</a>.</p>
     </div>
   </div>
 
@@ -475,6 +493,10 @@ function refreshOptionalGraphs() {
     if (noaaSection) {
       noaaSection.style.display = hasNoaaImage ? "block" : "none";
     }
+  });
+
+  probeImage("./temp/kp/PlanetaryKp.png").then(function(hasKpImage) {
+    setGroupVisibility("kp", hasKpImage, "navKp", "navDemoKp");
   });
 }
 

@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses calendar versioning in the format `YYYY.MM.patch`.
 
+## [Unreleased]
+
+### Added
+- Optional NOAA planetary Kp forecast panel with a colour-coded NOAA G1-G5 geomagnetic storm scale.
+- Hourly NOAA Kp forecast download, local CSV cache, gnuplot chart, local web publishing and optional FTP upload.
+
 ## [2026.09.1] - 2026-09-03
 
 ### Added
