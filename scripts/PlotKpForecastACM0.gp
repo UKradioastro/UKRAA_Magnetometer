@@ -11,6 +11,10 @@ system("sh -lc 'mkdir -p \"".basePath."/plots/kp\" \"".basePath."/temp/kp\"'")
 
 set terminal pngcairo background "#ffffff" enhanced font "DejaVuSansCondensed,10" size 960,780 rounded
 set datafile separator ","
+
+# stats must run before xdata is switched to timedata mode.
+stats kpData using 2 output prefix "KPSTAT" nooutput
+
 set xdata time
 set timefmt "%Y-%m-%d %H:%M:%S"
 set format x "%d %b\n%H:%M"
@@ -19,8 +23,18 @@ set mxtics 2
 set grid xtics ytics
 set boxwidth 9000 absolute
 set style fill solid 0.9 noborder
-set yrange [0:9]
-set ytics 0,1,9
+
+topRange = (KPSTAT_max < 5) ? 5 : \
+           (KPSTAT_max < 6) ? 6 : \
+           (KPSTAT_max < 7) ? 7 : \
+           (KPSTAT_max < 8) ? 8 : 9
+set yrange [0:topRange]
+set ytics 0,1,topRange
+
+# Centre the display window on today so the chart shows a week either side of now.
+startX = system("sh -lc 'date -d \"-3 days\" +\"%Y-%m-%d 00:00:00\"'")
+endX = system("sh -lc 'date -d \"+3 days\" +\"%Y-%m-%d 00:00:00\"'")
+set xrange [startX:endX]
 set xlabel "Forecast time (UTC)"
 set ylabel "Planetary Kp index"
 set title "NOAA Planetary Kp Index Forecast\nUpdated hourly from NOAA SWPC forecast data"
