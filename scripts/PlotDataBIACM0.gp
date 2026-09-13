@@ -72,6 +72,8 @@ unset key
 set lmargin 10
 set rmargin 10
 set y2tics
+unset my2tics
+set ytics nomirror
 
 startX = system("sh -lc 'head -n 1 \"".fileData."\" | cut -d, -f1'")
 endX = system("sh -lc 'tail -n 1 \"".fileData."\" | cut -d, -f1'")

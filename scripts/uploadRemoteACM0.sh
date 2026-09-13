@@ -52,7 +52,7 @@ def cfg_value(parser, section, option, default_value=''):
 def get_plot_options(base_path):
     plot_config_path = os.path.join(base_path, 'config', 'plot.ini')
     if not os.path.exists(plot_config_path):
-        return True, True, True, 'north'
+        return True, True, True, 'north', True
 
     parser = configparser.ConfigParser()
     with open(plot_config_path, mode='r', encoding='utf-8-sig') as config_file:
@@ -67,6 +67,7 @@ def get_plot_options(base_path):
         parse_bool(cfg_value(parser, 'plots', 'plot_bi', 'true'), True),
         parse_bool(cfg_value(parser, 'plots', 'plot_noaa', 'true'), True),
         hemisphere,
+        parse_bool(cfg_value(parser, 'plots', 'plot_kp', 'true'), True),
     )
 
 
@@ -156,7 +157,7 @@ def upload_files(mode, base_path, config_path):
                 print(f'INFO: Optional daily file not present, skipping: {file_name}')
     else:
         rolling_remote_dir = posixpath.join(base_remote_dir, 'rolling')
-        plot_hdz, plot_bi, plot_noaa, noaa_hemisphere = get_plot_options(base_path)
+        plot_hdz, plot_bi, plot_noaa, noaa_hemisphere, plot_kp = get_plot_options(base_path)
         upload_entries = [
             ('RollingActivity.png', os.path.join(base_path, 'temp', 'rolling', 'RollingActivity.png'), rolling_remote_dir),
             ('RollingXYZ.png', os.path.join(base_path, 'temp', 'rolling', 'RollingXYZ.png'), rolling_remote_dir),
@@ -187,6 +188,15 @@ def upload_files(mode, base_path, config_path):
                 print('INFO: NOAA aurora forecast image not present, skipping')
         else:
             print(f'INFO: NOAA aurora forecast upload disabled (plot_noaa=false, hemisphere={noaa_hemisphere})')
+
+        if plot_kp:
+            kp_path = os.path.join(base_path, 'temp', 'kp', 'PlanetaryKp.png')
+            if os.path.exists(kp_path):
+                upload_entries.append(('PlanetaryKp.png', kp_path, posixpath.join(base_remote_dir, 'kp')))
+            else:
+                print('INFO: Planetary Kp forecast image not present, skipping')
+        else:
+            print('INFO: Planetary Kp forecast upload disabled (plot_kp=false)')
 
     missing = [name for name, local_path, _ in upload_entries if not os.path.exists(local_path)]
     if missing:

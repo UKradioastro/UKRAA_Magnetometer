@@ -146,7 +146,9 @@ set xrange [ StartXaxis : EndXaxis ] noreverse nowriteback
 # Y-axis labels and ranges
 set ylabel "Activity (nT)" 
 set ylabel textcolor rgb "black" rotate
-topRange = (ACTIVITYdata_max > redThreshold) ? (ACTIVITYdata_max + 20) : (redThreshold + 20)
+topRange = (ACTIVITYdata_max < 50) ? 60 : \
+           (ACTIVITYdata_max < 100) ? 110 : \
+           (ACTIVITYdata_max > redThreshold ? ACTIVITYdata_max + 20 : redThreshold + 20)
 set yrange [ 0 : topRange ] noreverse nowriteback
 
 # set STATS labels on graph

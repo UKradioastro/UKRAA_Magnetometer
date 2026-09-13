@@ -32,6 +32,7 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
 - [Optional Post install operational checks](#Optional-Post-install-operational-checks)
 - [Optional NOAA aurora forecast panel](#Optional-NOAA-aurora-forecast-panel)
+- [Optional planetary Kp forecast panel](#Optional-planetary-Kp-forecast-panel)
 - [Optional Rolling alert Emails](#Optional-Rolling-alert-Emails)
 - [Optional Remote FTP upload](#Optional-Remote-FTP-upload)
 - [Updating the software](#updating-the-software)
@@ -441,6 +442,36 @@ The webpage includes a source citation and link to the official NOAA product pag
 
 ```
 https://www.spaceweather.gov/products/aurora-30-minute-forecast
+```
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Optional planetary Kp forecast panel
+
+The webpage can show a NOAA planetary Kp forecast chart, updated hourly. It includes a colour key for the NOAA G-scale: quiet conditions below Kp 5, then G1 through G5 for Kp 5 through 9.
+
+Within `/home/pi/UKRAA_Magnetometer/config/plot.ini`, add or edit:
+
+```ini
+[plots]
+plot_kp = true
+```
+
+- `plot_kp = true` enables the panel.
+- `plot_kp = false` disables the panel and removes the locally cached and published Kp chart.
+
+The forecast is downloaded from NOAA's JSON feed, cached as `/home/pi/UKRAA_Magnetometer/data/kp/latest.csv`, and rendered to `/home/pi/UKRAA_Magnetometer/temp/kp/PlanetaryKp.png`. `updateKpForecastACM0.sh` refreshes the data and chart hourly.
+
+Forecast data source and G-scale definitions:
+
+```
+https://www.spaceweather.gov/products/planetary-k-index
 ```
 
 [Back to Contents...](#contents)

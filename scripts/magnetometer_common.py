@@ -186,6 +186,16 @@ def get_noaa_options(base_path):
     return plot_noaa, noaa_hemisphere
 
 
+def get_kp_options(base_path):
+    plot_ini_path = build_plot_ini_path(base_path)
+    parser = _load_ini_parser(plot_ini_path)
+
+    return _parse_bool(
+        os.environ.get('MAGNETOMETER_PLOT_KP',
+                       parser.get('plots', 'plot_kp', fallback='true')),
+        True)
+
+
 def _load_ini_parser(config_path):
     parser = configparser.ConfigParser()
     if not os.path.exists(config_path):

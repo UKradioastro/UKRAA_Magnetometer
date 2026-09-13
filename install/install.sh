@@ -56,12 +56,16 @@ sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/BI
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/HDZ
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/XYZ
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/rolling
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/kp
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/kp
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/rolling
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/status
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/kp
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/noaa
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/rolling
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
+chown -R pi:pi /home/pi/UKRAA_Magnetometer/data/kp /home/pi/UKRAA_Magnetometer/temp/kp /home/pi/UKRAA_Magnetometer/plots/kp
 echo "UKRAA Magnetometer directory structure created"
 echo ""
 

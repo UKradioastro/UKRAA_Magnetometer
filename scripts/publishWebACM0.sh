@@ -7,9 +7,11 @@ ERROR_LOG="$LOG_DIR/log-error.txt"
 SOURCE_DIR="$BASE_PATH/temp/rolling"
 SOURCE_STATUS="$BASE_PATH/data/status/current.json"
 SOURCE_NOAA="$BASE_PATH/temp/noaa/latest.jpg"
+SOURCE_KP="$BASE_PATH/temp/kp/PlanetaryKp.png"
 DEST_ROLLING_DIR=/var/www/html/temp/rolling
 DEST_STATUS_DIR=/var/www/html/status
 DEST_NOAA_DIR=/var/www/html/temp/noaa
+DEST_KP_DIR=/var/www/html/temp/kp
 
 log_msg() {
     printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
@@ -35,7 +37,12 @@ fi
 
 read -r PLOT_HDZ PLOT_BI PLOT_NOAA NOAA_HEMISPHERE <<< "$PLOT_OPTIONS"
 
-if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] || [ -z "${NOAA_HEMISPHERE:-}" ]; then
+if ! PLOT_KP=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetKpOptionsACM0.py" 2>&1); then
+  log_msg "publishWebACM0.sh         : FAILED to read Kp plot option: $PLOT_KP" >> "$ERROR_LOG"
+  exit 1
+fi
+
+if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] || [ -z "${NOAA_HEMISPHERE:-}" ] || { [ "$PLOT_KP" != "true" ] && [ "$PLOT_KP" != "false" ]; }; then
   log_msg "publishWebACM0.sh         : FAILED - unexpected plot options output: '$PLOT_OPTIONS'" >> "$ERROR_LOG"
   exit 1
 fi
@@ -50,7 +57,7 @@ if [ "$PLOT_BI" = "true" ] && [ ! -f "$SOURCE_DIR/RollingBI.png" ]; then
   exit 1
 fi
 
-mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR" "$DEST_NOAA_DIR"
+mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR" "$DEST_NOAA_DIR" "$DEST_KP_DIR"
 
 if cp -a "$SOURCE_DIR/RollingXYZ.png" "$DEST_ROLLING_DIR/" >> "$ERROR_LOG" 2>&1; then
   log_msg "publishWebACM0.sh         : Copied RollingXYZ.png to $DEST_ROLLING_DIR" >> "$MAIN_LOG"
@@ -119,6 +126,22 @@ else
   else
     log_msg "publishWebACM0.sh         : NOAA aurora forecast not required (plot_noaa=false)" >> "$MAIN_LOG"
   fi
+fi
+
+if [ "$PLOT_KP" = "true" ]; then
+  if [ -f "$SOURCE_KP" ]; then
+    if cp -a "$SOURCE_KP" "$DEST_KP_DIR/PlanetaryKp.png" >> "$ERROR_LOG" 2>&1; then
+      chmod 644 "$DEST_KP_DIR/PlanetaryKp.png"
+      log_msg "publishWebACM0.sh         : Copied planetary Kp forecast to $DEST_KP_DIR" >> "$MAIN_LOG"
+    else
+      log_msg "publishWebACM0.sh         : WARNING - could not copy planetary Kp forecast" >> "$ERROR_LOG"
+    fi
+  else
+    log_msg "publishWebACM0.sh         : Planetary Kp forecast not present, skipping" >> "$MAIN_LOG"
+  fi
+elif [ -f "$DEST_KP_DIR/PlanetaryKp.png" ]; then
+  rm -f "$DEST_KP_DIR/PlanetaryKp.png"
+  log_msg "publishWebACM0.sh         : Removed stale planetary Kp forecast (plot_kp=false)" >> "$MAIN_LOG"
 fi
 
 log_msg "publishWebACM0.sh         : Completed publishing rolling web assets" >> "$MAIN_LOG"
