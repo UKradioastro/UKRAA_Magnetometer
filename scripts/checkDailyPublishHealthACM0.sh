@@ -79,6 +79,40 @@ else
     fi
 fi
 
+# Mature, enabled period plots are required only after their complete-day
+# threshold has been reached; younger periods intentionally show a placeholder.
+PERIOD_STATUS_FILE="$STATUS_DIR/period-plots.json"
+if [ ! -f "$PERIOD_STATUS_FILE" ]; then
+    status="FAIL"
+    append_issue "missing period plot availability: $PERIOD_STATUS_FILE"
+elif ! period_requirements=$(/usr/bin/python3 - "$PERIOD_STATUS_FILE" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding='UTF-8') as status_file:
+    status = json.load(status_file)
+
+for period_name, period in status['periods'].items():
+    if not (period['enabled'] and period['available']):
+        continue
+    for family_name, family_enabled in status['families'].items():
+        if family_enabled:
+            print(period_name, family_name.upper())
+PY
+); then
+    status="FAIL"
+    append_issue "could not read period plot availability: $period_requirements"
+else
+    while read -r period_name family_name; do
+        [ -n "${period_name:-}" ] || continue
+        period_file="$WEB_ROOT/temp/periods/$period_name/$family_name.png"
+        if [ ! -f "$period_file" ]; then
+            status="FAIL"
+            append_issue "missing mature period plot: $period_file"
+        fi
+    done <<< "$period_requirements"
+fi
+
 # Write a short marker line that can be monitored externally.
 if [ "$status" = "PASS" ]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: PASS : date=$YESTERDAY" > "$MARKER_FILE"

@@ -32,3 +32,12 @@ noaa_hemisphere = north
 # Set to true to download and show the NOAA planetary Kp forecast.
 # The chart includes the NOAA G1-G5 geomagnetic storm scale.
 plot_kp = false
+
+# Set individual long-period magnetic plots to true to generate them after
+# daily processing. Each enabled period includes XYZ and any enabled HDZ/BI
+# families when enough completed daily data has accumulated.
+plot_week = false
+plot_month = false
+plot_3month = false
+plot_6month = false
+plot_year = false

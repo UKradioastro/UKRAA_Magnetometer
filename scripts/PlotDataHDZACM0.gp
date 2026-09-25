@@ -26,7 +26,7 @@ if (is_missing == 1) {
 dateTag = system("date -d yesterday +'%Y-%m-%d'")
 plotYear = substr(dateTag, 1, 4)
 plotYearMonth = substr(dateTag, 1, 7)
-plotMonthDir = basePath."/plots/HDZ/".plotYear."/".plotYearMonth
+plotMonthDir = basePath."/plots/day/HDZ/".plotYear."/".plotYearMonth
 archivePlot = plotMonthDir."/".dateTag.".png"
 tempPlot = basePath."/temp/yesterday/HDZ.png"
 

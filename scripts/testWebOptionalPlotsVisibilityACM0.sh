@@ -80,13 +80,20 @@ assert_contains 'id="navDemoBi"'
 assert_contains 'id="navNoaa"'
 assert_contains 'id="navDemoNoaa"'
 assert_contains 'id="navKp"'
+assert_contains 'id="periods"'
+assert_contains 'id="navPeriods"'
+assert_contains 'id="navDemoPeriods"'
+assert_contains 'id="periodPlotCards"'
 assert_contains 'id="cardHDZ"'
 assert_contains 'id="cardBI"'
 assert_contains 'id="cardRollingHDZ"'
 assert_contains 'id="cardRollingBI"'
 assert_contains 'function refreshOptionalGraphs()'
+assert_contains 'function refreshPeriodPlots()'
 assert_contains './status/plot-options.json'
 assert_contains './temp/status/plot-options.json'
+assert_contains './status/period-plots.json'
+assert_contains './temp/periods/'
 assert_contains './temp/yesterday/HDZ.png'
 assert_contains './temp/yesterday/BI.png'
 assert_contains './temp/rolling/RollingHDZ.png'
@@ -103,6 +110,7 @@ fi
 # Contract cases: configuration controls visibility even before an image exists.
 run_case "disabled" "false" "hide"
 run_case "enabled_without_image" "true" "show"
+run_case "period_enabled_without_image" "true" "show"
 
 log "All optional web visibility checks passed."
 if [ "$(id -u)" -eq 0 ]; then

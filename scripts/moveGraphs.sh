@@ -131,6 +131,25 @@ then
 
   log_msg "moveGraphs.sh             : Completed moving graphs" >> "$MAIN_LOG"
 
+  PERIOD_STATUS_SOURCE="$BASE_PATH/data/status/period-plots.json"
+  if [ -f "$PERIOD_STATUS_SOURCE" ]; then
+    mkdir -p "$WEB_ROOT/status"
+    cp -a "$PERIOD_STATUS_SOURCE" "$WEB_ROOT/status/period-plots.json"
+    chmod 644 "$WEB_ROOT/status/period-plots.json"
+    log_msg "moveGraphs.sh             : Published period plot availability" >> "$MAIN_LOG"
+  else
+    log_msg "moveGraphs.sh             : Period plot availability not present" >> "$MAIN_LOG"
+  fi
+
+  if [ -d "$BASE_PATH/temp/periods" ]; then
+    rm -rf "$WEB_ROOT/temp/periods"
+    cp -a "$BASE_PATH/temp/periods" "$WEB_ROOT/temp/"
+    log_msg "moveGraphs.sh             : Published period plot images" >> "$MAIN_LOG"
+  else
+    rm -rf "$WEB_ROOT/temp/periods"
+    log_msg "moveGraphs.sh             : No period plot images to publish" >> "$MAIN_LOG"
+  fi
+
   if /bin/bash "$BASE_PATH/scripts/uploadRemoteACM0.sh" daily; then
     log_msg "moveGraphs.sh             : Completed remote daily upload" >> "$MAIN_LOG"
   else

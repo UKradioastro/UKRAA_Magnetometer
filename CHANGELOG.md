@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses calendar versioning in the format `YYYY.MM.patch`.
 
+## [Unreleased]
+
+### Added
+- Optional week, month, 3-month, 6-month, and year magnetic plots, controlled by `plot_week`, `plot_month`, `plot_3month`, `plot_6month`, and `plot_year` in `plot.ini`.
+- Daily magnetic-summary processing for long-period plots, including data-coverage tracking and one-time historical backfill support.
+- Shared period plot renderers for XYZ, HDZ, and BI, plus readiness status in `status/period-plots.json`.
+- Local and FTP publication of available period plots and their readiness status.
+- Webpage long-period graph section with a per-period “Not enough data yet” placeholder until a complete window is available.
+- Automated tests for daily-summary values and all long-period availability thresholds.
+
+### Changed
+- Daily plot archives now use the symmetric `plots/day/<family>/YYYY/YYYY-MM/YYYY-MM-DD.png` layout; week-to-year archives use the same period-first structure.
+- Daily processing now generates the daily summary and eligible period plots after completing normal day processing.
+- Daily publish health checks now verify enabled, mature period plots while allowing incomplete windows to remain in placeholder state.
+
 ## [2026.09.3] - 2026-09-25
 
 ### Added

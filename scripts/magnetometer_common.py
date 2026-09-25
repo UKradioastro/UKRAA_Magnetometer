@@ -196,6 +196,21 @@ def get_kp_options(base_path):
         True)
 
 
+def get_period_plot_options(base_path):
+    plot_ini_path = build_plot_ini_path(base_path)
+    parser = _load_ini_parser(plot_ini_path)
+    period_names = ('week', 'month', '3month', '6month', 'year')
+
+    return {
+        period_name: _parse_bool(
+            os.environ.get(
+                'MAGNETOMETER_PLOT_' + period_name.upper(),
+                parser.get('plots', 'plot_' + period_name, fallback='false')),
+            False)
+        for period_name in period_names
+    }
+
+
 def _load_ini_parser(config_path):
     parser = configparser.ConfigParser()
     if not os.path.exists(config_path):

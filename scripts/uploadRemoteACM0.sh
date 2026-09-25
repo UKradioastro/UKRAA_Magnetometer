@@ -157,6 +157,27 @@ def upload_files(mode, base_path, config_path):
                 upload_entries.append((file_name, local_path, remote_dir))
             else:
                 print(f'INFO: Optional daily file not present, skipping: {file_name}')
+
+        period_status_path = os.path.join(base_path, 'data', 'status', 'period-plots.json')
+        if os.path.exists(period_status_path):
+            upload_entries.append(
+                ('period-plots.json', period_status_path, posixpath.join(base_remote_dir, 'status')))
+        else:
+            print('INFO: Period plot availability status not present, skipping')
+
+        periods_directory = os.path.join(base_path, 'temp', 'periods')
+        if os.path.isdir(periods_directory):
+            for period_name in sorted(os.listdir(periods_directory)):
+                period_directory = os.path.join(periods_directory, period_name)
+                if not os.path.isdir(period_directory):
+                    continue
+                remote_period_directory = posixpath.join(base_remote_dir, 'periods', period_name)
+                for file_name in sorted(os.listdir(period_directory)):
+                    if file_name not in ('XYZ.png', 'HDZ.png', 'BI.png'):
+                        continue
+                    local_path = os.path.join(period_directory, file_name)
+                    if os.path.isfile(local_path):
+                        upload_entries.append((file_name, local_path, remote_period_directory))
     else:
         rolling_remote_dir = posixpath.join(base_remote_dir, 'rolling')
         status_remote_dir = posixpath.join(base_remote_dir, 'status')

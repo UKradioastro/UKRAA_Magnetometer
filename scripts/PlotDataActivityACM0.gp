@@ -83,7 +83,7 @@ EndXaxis = nextDate." 00:00:00"
 
 plotYear = substr(targetDate, 1, 4)
 plotYearMonth = substr(targetDate, 1, 7)
-plotMonthDir = basePath."/plots/Activity/".plotYear."/".plotYearMonth
+plotMonthDir = basePath."/plots/day/Activity/".plotYear."/".plotYearMonth
 pathPlot1 = plotMonthDir."/".targetDate.".png"
 pathTemp1 = basePath."/temp/yesterday/Activity.png"
 

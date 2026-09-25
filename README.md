@@ -623,7 +623,7 @@ This updates only:
 
 * `/home/pi/UKRAA_Magnetometer/temp/yesterday/Activity.png`
 
-To also write the dated archive file in `plots/Activity/YYYY/YYYY-MM/`, add `--archive`:
+To also write the dated archive file in `plots/day/Activity/YYYY/YYYY-MM/`, add `--archive`:
 
 ```
 /bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlotACM0.sh YYYY-MM-DD --archive
@@ -698,6 +698,41 @@ This immediate heartbeat test does not update daily heartbeat schedule/state tra
 
 &nbsp;
 <!-- =============================================================================== --> 
+## Optional week-to-year magnetic plots
+
+Long-period XYZ, HDZ, and BI plots use one aggregate value per complete UTC day.
+They are disabled by default. In `config/plot.ini`, enable any required period:
+
+```
+plot_week = true
+plot_month = true
+plot_3month = true
+plot_6month = true
+plot_year = true
+```
+
+Each period is a trailing window ending on yesterday. A graph appears after all
+required days have at least 95% valid minute data: 7, 30, 90, 183, or 365 days.
+Until then, the webpage displays a data-availability placeholder. XYZ is always
+included; HDZ and BI honour the existing `plot_hdz` and `plot_bi` options.
+
+Archives are stored as:
+
+```
+plots/day/XYZ/YYYY/YYYY-MM/YYYY-MM-DD.png
+plots/week/XYZ/YYYY/YYYY-MM/YYYY-MM-DD.png
+plots/month/XYZ/YYYY/YYYY-MM/YYYY-MM-DD.png
+```
+
+The other families follow the same layout. Current web assets are published to
+`temp/yesterday/` for day plots and `temp/periods/<period>/` for longer periods.
+
+To include already processed historical data after upgrading, run this once:
+
+```
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDailySummaryACM0.py --all
+```
+
 ## Optional Remote FTP upload
 
 Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **remote-upload.ini**.
