@@ -5,6 +5,28 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses calendar versioning in the format `YYYY.MM.patch`.
 
+## [Unreleased]
+
+### Added
+- Configuration-driven web visibility using `status/plot-options.json`, so optional HDZ, BI, NOAA aurora, and planetary Kp menu entries follow `plot.ini` instead of depending on whether an image already exists.
+- Immediate NOAA aurora and planetary Kp refresh when either forecast is enabled without a cached image; normal scheduled refreshes remain unchanged.
+- `runCronJobACM0.sh` wrapper to add timestamps and source-script names to otherwise unformatted cron stderr messages.
+- Remote upload of `plot-options.json`, with webpage fallback support for both `status/plot-options.json` and `temp/status/plot-options.json` layouts.
+
+### Changed
+- Daily web plots now use the consistent `temp/yesterday/` layout locally and remotely, alongside the existing `temp/rolling`, `temp/noaa`, and `temp/kp` folders.
+- Enabled optional plots display the existing "Not enough data yet" placeholder until their image is available.
+- The install heartbeat smoke email now identifies itself as an SMTP delivery test and omits unavailable live sensor values during a fresh installation. Scheduled heartbeat emails continue to include live status details.
+- Corrected the documented install-time heartbeat command to use the full `~/UKRAA_Magnetometer/install/install.sh` path.
+- Remote upload documentation now covers optional forecast assets, rolling HDZ/BI plots, plot-option status, and the `yesterday` directory.
+
+### Fixed
+- Fixed `updateNoaaAuroraForecast.sh: log_msg: command not found` by defining the logging function before plot-option validation.
+- Disabled NOAA and Kp entries no longer remain visible because of stale published images.
+- Newly enabled HDZ and BI sections now show both rolling output and a daily placeholder before the first daily plot is generated.
+- External webpages now receive the plot configuration required to show enabled HDZ, BI, NOAA, and Kp menu entries.
+- Remote daily plots are uploaded to the `yesterday` folder expected by the revised webpage.
+
 ## [2026.09.2] - 2026-09-13
 
 ### Added
