@@ -28,7 +28,7 @@ if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] ||
     exit 1
 fi
 
-if [ "$PLOT_HDZ" = "true" ] && [ ! -f "$BASE_PATH/temp/HDZ.png" ]; then
+if [ "$PLOT_HDZ" = "true" ] && [ ! -f "$BASE_PATH/temp/yesterday/HDZ.png" ]; then
     log_msg "backfillDailyPlotsACM0.sh : HDZ.png missing while plot_hdz=true, regenerating for yesterday" >> "$MAIN_LOG"
     if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataHDZACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "backfillDailyPlotsACM0.sh : Completed backfill HDZ plot" >> "$MAIN_LOG"
@@ -40,7 +40,7 @@ else
     log_msg "backfillDailyPlotsACM0.sh : No HDZ backfill needed" >> "$MAIN_LOG"
 fi
 
-if [ "$PLOT_BI" = "true" ] && [ ! -f "$BASE_PATH/temp/BI.png" ]; then
+if [ "$PLOT_BI" = "true" ] && [ ! -f "$BASE_PATH/temp/yesterday/BI.png" ]; then
     log_msg "backfillDailyPlotsACM0.sh : BI.png missing while plot_bi=true, regenerating for yesterday" >> "$MAIN_LOG"
     if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataBIACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "backfillDailyPlotsACM0.sh : Completed backfill BI plot" >> "$MAIN_LOG"

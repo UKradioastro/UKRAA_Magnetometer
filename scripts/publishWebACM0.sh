@@ -59,6 +59,13 @@ fi
 
 mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR" "$DEST_NOAA_DIR" "$DEST_KP_DIR"
 
+PLOT_OPTIONS_TEMP=$(mktemp "$DEST_STATUS_DIR/.plot-options.XXXXXX")
+printf '{"plot_hdz":%s,"plot_bi":%s,"plot_noaa":%s,"plot_kp":%s,"noaa_hemisphere":"%s"}\n' \
+  "$PLOT_HDZ" "$PLOT_BI" "$PLOT_NOAA" "$PLOT_KP" "$NOAA_HEMISPHERE" \
+  > "$PLOT_OPTIONS_TEMP"
+mv -f "$PLOT_OPTIONS_TEMP" "$DEST_STATUS_DIR/plot-options.json"
+chmod 644 "$DEST_STATUS_DIR/plot-options.json"
+
 if cp -a "$SOURCE_DIR/RollingXYZ.png" "$DEST_ROLLING_DIR/" >> "$ERROR_LOG" 2>&1; then
   log_msg "publishWebACM0.sh         : Copied RollingXYZ.png to $DEST_ROLLING_DIR" >> "$MAIN_LOG"
 else

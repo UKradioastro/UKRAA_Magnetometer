@@ -51,7 +51,7 @@ else
     exit 1
 fi
 
-echo "Done: $BASE_PATH/temp/Activity.png"
+echo "Done: $BASE_PATH/temp/yesterday/Activity.png"
 if [ "$ARCHIVE_MODE" -eq 1 ]; then
     echo "Archive: $BASE_PATH/plots/Activity/$(date -d "$TARGET_DATE" +%Y)/$(date -d "$TARGET_DATE" +%Y-%m)/$TARGET_DATE.png"
 fi

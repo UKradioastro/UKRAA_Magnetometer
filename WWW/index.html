@@ -48,12 +48,12 @@ body {font-family: "Lato", sans-serif}
       <button class="w3-padding-large w3-button" title="More">GRAPHS <i class="fa fa-caret-down"></i></button>     
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
         <a href="#rolling" class="w3-bar-item w3-button">ROLLING STATUS</a>
-        <a href="#noaa" class="w3-bar-item w3-button">NOAA FORECAST</a>
-        <a href="#kp" class="w3-bar-item w3-button" id="navKp">PLANETARY KP</a>
+        <a href="#noaa" class="w3-bar-item w3-button" id="navNoaa" style="display:none">NOAA FORECAST</a>
+        <a href="#kp" class="w3-bar-item w3-button" id="navKp" style="display:none">PLANETARY KP</a>
         <a href="#daily_Act" class="w3-bar-item w3-button">DAY ACTIVITY GRAPHS</a>
         <a href="#XYZ" class="w3-bar-item w3-button">XYZ GRAPHS</a>
-        <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz">HDZ GRAPHS</a>
-        <a href="#BI" class="w3-bar-item w3-button" id="navBi">BI GRAPHS</a>
+        <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz" style="display:none">HDZ GRAPHS</a>
+        <a href="#BI" class="w3-bar-item w3-button" id="navBi" style="display:none">BI GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -65,12 +65,12 @@ body {font-family: "Lato", sans-serif}
   <a href="#who" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ABOUT US</a>
   <a href="#detector" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">MAGNETOMETER</a>
   <a href="#rolling" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ROLLING STATUS</a>
-  <a href="#noaa" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">NOAA FORECAST</a>
-  <a href="#kp" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoKp">PLANETARY KP</a>
+  <a href="#noaa" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoNoaa" style="display:none">NOAA FORECAST</a>
+  <a href="#kp" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoKp" style="display:none">PLANETARY KP</a>
   <a href="#daily_Act" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">DAY ACTIVITY GRAPHS</a>
   <a href="#XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">XYZ GRAPHS</a>
-  <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz">HDZ GRAPHS</a>
-  <a href="#BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoBi">BI GRAPHS</a>
+  <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz" style="display:none">HDZ GRAPHS</a>
+  <a href="#BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoBi" style="display:none">BI GRAPHS</a>
 </div>
 <!-- End of Navbar -->
 
@@ -131,7 +131,7 @@ body {font-family: "Lato", sans-serif}
       </div>
       <div class="w3-row">
         <div class="w3-auto graph-frame">
-          <img src="./temp/rolling/RollingActivity.png" data-refresh-src="./temp/rolling/RollingActivity.png" onerror="this.src='./images/default.png';" class="w3-margin-bottom" alt="rolling activity plot" style="width:100%">
+          <img src="./temp/rolling/RollingActivity.png" data-refresh-src="./temp/rolling/RollingActivity.png" onerror="showDefaultImage(this)" class="w3-margin-bottom" alt="rolling activity plot" style="width:100%">
         </div>
       </div>
     </div>
@@ -145,7 +145,7 @@ body {font-family: "Lato", sans-serif}
       <div class="w3-row w3-padding-16">
         <div class="w3-auto graph-frame">
           <a href="https://www.spaceweather.gov/products/aurora-30-minute-forecast" target="_blank">
-            <img src="./temp/noaa/latest.jpg" data-refresh-src="./temp/noaa/latest.jpg" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="NOAA 30 minute aurora forecast" style="width:100%">
+            <img src="./temp/noaa/latest.jpg" data-refresh-src="./temp/noaa/latest.jpg" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="NOAA 30 minute aurora forecast" style="width:100%">
           </a>
         </div>
       </div>
@@ -164,7 +164,7 @@ body {font-family: "Lato", sans-serif}
       <div class="w3-row w3-padding-16">
         <div class="w3-auto graph-frame">
           <a href="https://www.spaceweather.gov/products/planetary-k-index" target="_blank">
-            <img src="./temp/kp/PlanetaryKp.png" data-refresh-src="./temp/kp/PlanetaryKp.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="NOAA planetary Kp forecast" style="width:100%">
+            <img src="./temp/kp/PlanetaryKp.png" data-refresh-src="./temp/kp/PlanetaryKp.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="NOAA planetary Kp forecast" style="width:100%">
           </a>
         </div>
       </div>
@@ -181,7 +181,7 @@ body {font-family: "Lato", sans-serif}
 	</div>
     <div class="w3-row w3-padding-32">
       <div class="w3-auto graph-frame">
-        <img src="./temp/Activity.png" data-refresh-src="./temp/Activity.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
+        <img src="./temp/yesterday/Activity.png" data-refresh-src="./temp/yesterday/Activity.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="daily variation plot" style="width:100%">
       </div>
     </div>
   </div>
@@ -195,12 +195,12 @@ body {font-family: "Lato", sans-serif}
 	</div>
     <div class="w3-row w3-padding-16">
       <div class="w3-auto graph-frame">
-          <img src="./temp/rolling/RollingXYZ.png" data-refresh-src="./temp/rolling/RollingXYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
+          <img src="./temp/rolling/RollingXYZ.png" data-refresh-src="./temp/rolling/RollingXYZ.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="rolling xyz plot" style="width:100%">
       </div>
     </div>
     <div class="w3-row w3-padding-16">
       <div class="w3-auto graph-frame">
-          <img src="./temp/XYZ.png" data-refresh-src="./temp/XYZ.png" onerror="this.src='./images/default.png';" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
+          <img src="./temp/yesterday/XYZ.png" data-refresh-src="./temp/yesterday/XYZ.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="daily xyz variation plot" style="width:100%">
       </div>
     </div>
   </div>
@@ -214,12 +214,12 @@ body {font-family: "Lato", sans-serif}
 
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardRollingHDZ">
         <div class="w3-auto">
-          <img src="./temp/rolling/RollingHDZ.png" data-refresh-src="./temp/rolling/RollingHDZ.png" class="w3-round w3-margin-bottom" alt="rolling HDZ plot" style="width:100%">
+          <img src="./temp/rolling/RollingHDZ.png" data-refresh-src="./temp/rolling/RollingHDZ.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="rolling HDZ plot" style="width:100%">
         </div>
       </div>
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardHDZ">
         <div class="w3-auto">
-          <img src="./temp/HDZ.png" data-refresh-src="./temp/HDZ.png" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
+          <img src="./temp/yesterday/HDZ.png" data-refresh-src="./temp/yesterday/HDZ.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="daily HDZ variation plot" style="width:100%">
         </div>
       </div>
     </div>
@@ -234,12 +234,12 @@ body {font-family: "Lato", sans-serif}
 
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardRollingBI">
         <div class="w3-auto">
-          <img src="./temp/rolling/RollingBI.png" data-refresh-src="./temp/rolling/RollingBI.png" class="w3-round w3-margin-bottom" alt="rolling BI plot" style="width:100%">
+          <img src="./temp/rolling/RollingBI.png" data-refresh-src="./temp/rolling/RollingBI.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="rolling BI plot" style="width:100%">
         </div>
       </div>
       <div class="w3-row w3-padding-16 optional-graph-card" id="cardBI">
         <div class="w3-auto">
-          <img src="./temp/BI.png" data-refresh-src="./temp/BI.png" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
+          <img src="./temp/yesterday/BI.png" data-refresh-src="./temp/yesterday/BI.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
         </div>
       </div>
     </div>
@@ -419,15 +419,6 @@ function refreshRollingStatus() {
   fetchNextStatus(0);
 }
 
-function probeImage(url) {
-  return new Promise(function(resolve) {
-    var probe = new Image();
-    probe.onload = function() { resolve(true); };
-    probe.onerror = function() { resolve(false); };
-    probe.src = url + "?t=" + Date.now();
-  });
-}
-
 function setGroupVisibility(sectionId, isVisible, navMainId, navMobileId) {
   var section = document.getElementById(sectionId);
   var navMain = document.getElementById(navMainId);
@@ -437,6 +428,15 @@ function setGroupVisibility(sectionId, isVisible, navMainId, navMobileId) {
   section.style.display = displayValue;
   navMain.style.display = displayValue;
   navMobile.style.display = displayValue;
+}
+
+function showDefaultImage(image) {
+  var fallback = "./images/default.png";
+  var currentSource = (image.getAttribute("src") || "").split("?")[0];
+
+  if (currentSource !== fallback) {
+    image.src = fallback;
+  }
 }
 
 function refreshPlotImages() {
@@ -462,42 +462,32 @@ function refreshPlotImages() {
 }
 
 function refreshOptionalGraphs() {
-  var optionalGraphs = [
-    { image: "./temp/rolling/RollingHDZ.png", cardId: "cardRollingHDZ", group: "HDZ" },
-    { image: "./temp/HDZ.png", cardId: "cardHDZ", group: "HDZ" },
-    { image: "./temp/rolling/RollingBI.png", cardId: "cardRollingBI", group: "BI" },
-    { image: "./temp/BI.png", cardId: "cardBI", group: "BI" }
-  ];
-
-  Promise.all(optionalGraphs.map(function(entry) {
-    return probeImage(entry.image);
-  })).then(function(results) {
-    var groupHasGraph = { HDZ: false, BI: false };
-
-    for (var i = 0; i < optionalGraphs.length; i++) {
-      var card = document.getElementById(optionalGraphs[i].cardId);
-      if (results[i]) {
-        card.style.display = "block";
-        groupHasGraph[optionalGraphs[i].group] = true;
-      } else {
-        card.style.display = "none";
+  fetch("./status/plot-options.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error("plot options fetch failed");
       }
-    }
+      return response.json();
+    })
+    .then(function(options) {
+      var showHdz = options.plot_hdz === true;
+      var showBi = options.plot_bi === true;
 
-    setGroupVisibility("HDZ", groupHasGraph.HDZ, "navHdz", "navDemoHdz");
-    setGroupVisibility("BI", groupHasGraph.BI, "navBi", "navDemoBi");
-  });
-
-  probeImage("./temp/noaa/latest.jpg").then(function(hasNoaaImage) {
-    var noaaSection = document.getElementById("noaa");
-    if (noaaSection) {
-      noaaSection.style.display = hasNoaaImage ? "block" : "none";
-    }
-  });
-
-  probeImage("./temp/kp/PlanetaryKp.png").then(function(hasKpImage) {
-    setGroupVisibility("kp", hasKpImage, "navKp", "navDemoKp");
-  });
+      document.getElementById("cardRollingHDZ").style.display = showHdz ? "block" : "none";
+      document.getElementById("cardHDZ").style.display = showHdz ? "block" : "none";
+      document.getElementById("cardRollingBI").style.display = showBi ? "block" : "none";
+      document.getElementById("cardBI").style.display = showBi ? "block" : "none";
+      setGroupVisibility("HDZ", showHdz, "navHdz", "navDemoHdz");
+      setGroupVisibility("BI", showBi, "navBi", "navDemoBi");
+      setGroupVisibility("noaa", options.plot_noaa === true, "navNoaa", "navDemoNoaa");
+      setGroupVisibility("kp", options.plot_kp === true, "navKp", "navDemoKp");
+    })
+    .catch(function() {
+      setGroupVisibility("HDZ", false, "navHdz", "navDemoHdz");
+      setGroupVisibility("BI", false, "navBi", "navDemoBi");
+      setGroupVisibility("noaa", false, "navNoaa", "navDemoNoaa");
+      setGroupVisibility("kp", false, "navKp", "navDemoKp");
+    });
 }
 
 function refreshPageData() {

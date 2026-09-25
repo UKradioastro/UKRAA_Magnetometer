@@ -20,7 +20,7 @@ TEST_ROOT=${1:-"$BASE_PATH/data/tests/web-optional-visibility"}
 
 if [ "${1:-}" = "--help" ]; then
     echo "Usage: $0 [TEST_ROOT]"
-    echo "  Verifies optional HDZ/BI web section visibility contract."
+    echo "  Verifies configuration-driven optional web section visibility contract."
     echo "  Default TEST_ROOT: $BASE_PATH/tests/web-optional-visibility"
     exit 0
 fi
@@ -42,9 +42,9 @@ assert_contains() {
 }
 
 compute_expected_visibility() {
-    local temp_dir=$1
+    local enabled=$1
 
-    if [ -f "$temp_dir/HDZ.png" ] || [ -f "$temp_dir/BI.png" ]; then
+    if [ "$enabled" = "true" ]; then
         echo "show"
     else
         echo "hide"
@@ -53,21 +53,11 @@ compute_expected_visibility() {
 
 run_case() {
     local case_name=$1
-    local files_to_create=$2
+    local enabled=$2
     local expected=$3
 
-    local case_dir="$TEST_ROOT/$case_name"
-    local temp_dir="$case_dir/temp"
-
-    rm -rf "$case_dir"
-    mkdir -p "$temp_dir"
-
-    for file_name in $files_to_create; do
-        touch "$temp_dir/$file_name"
-    done
-
     local actual
-    actual=$(compute_expected_visibility "$temp_dir")
+    actual=$(compute_expected_visibility "$enabled")
 
     if [ "$actual" != "$expected" ]; then
         fail "$case_name expected $expected, got $actual"
@@ -87,13 +77,17 @@ assert_contains 'id="navHdz"'
 assert_contains 'id="navBi"'
 assert_contains 'id="navDemoHdz"'
 assert_contains 'id="navDemoBi"'
+assert_contains 'id="navNoaa"'
+assert_contains 'id="navDemoNoaa"'
+assert_contains 'id="navKp"'
 assert_contains 'id="cardHDZ"'
 assert_contains 'id="cardBI"'
 assert_contains 'id="cardRollingHDZ"'
 assert_contains 'id="cardRollingBI"'
 assert_contains 'function refreshOptionalGraphs()'
-assert_contains './temp/HDZ.png'
-assert_contains './temp/BI.png'
+assert_contains './status/plot-options.json'
+assert_contains './temp/yesterday/HDZ.png'
+assert_contains './temp/yesterday/BI.png'
 assert_contains './temp/rolling/RollingHDZ.png'
 assert_contains './temp/rolling/RollingBI.png'
 
@@ -105,11 +99,9 @@ if [ "$(id -u)" -eq 0 ]; then
     chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
 fi
 
-# Contract cases: section hidden when none exist, shown when one or more exist.
-run_case "none_present" "" "hide"
-run_case "hdz_only" "HDZ.png" "show"
-run_case "bi_only" "BI.png" "show"
-run_case "all_present" "HDZ.png BI.png" "show"
+# Contract cases: configuration controls visibility even before an image exists.
+run_case "disabled" "false" "hide"
+run_case "enabled_without_image" "true" "show"
 
 log "All optional web visibility checks passed."
 if [ "$(id -u)" -eq 0 ]; then

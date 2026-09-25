@@ -21,7 +21,7 @@ plot_bi = false
 # Set to true to download and show the NOAA aurora forecast panel.
 # This is enabled by default to keep the webpage aligned with the current
 # operational behaviour.
-plot_noaa = true
+plot_noaa = false
 
 # Select which hemisphere forecast to display:
 # north or south
@@ -31,4 +31,4 @@ noaa_hemisphere = north
 
 # Set to true to download and show the NOAA planetary Kp forecast.
 # The chart includes the NOAA G1-G5 geomagnetic storm scale.
-plot_kp = true
+plot_kp = false

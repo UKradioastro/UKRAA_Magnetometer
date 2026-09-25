@@ -12,7 +12,7 @@ mkdir -p "$STATUS_DIR"
 YESTERDAY=$(date -d yesterday +%Y-%m-%d)
 MINUTE_FILE="$BASE_PATH/data/minute/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
 RAW_FILE="$BASE_PATH/data/raw/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
-WEB_TEMP_DIR="$WEB_ROOT/temp"
+WEB_TEMP_DIR="$WEB_ROOT/temp/yesterday"
 
 # No raw data for that date means there was nothing to process, not a pipeline fault
 # (fresh install, or the acquisition service was stopped all day).

@@ -37,7 +37,7 @@ run_case() {
 
     local case_dir="$TEST_ROOT/$case_name"
     local scripts_dir="$case_dir/scripts"
-    local temp_dir="$case_dir/temp"
+    local temp_dir="$case_dir/temp/yesterday"
     local config_dir="$case_dir/config"
 
     rm -rf "$case_dir"
@@ -66,12 +66,12 @@ PY
         touch "$temp_dir/BI.png"
     fi
 
-    mkdir -p "$TEST_BASE_PATH/logfiles" "$TEST_BASE_PATH/scripts" "$TEST_BASE_PATH/temp"
+    mkdir -p "$TEST_BASE_PATH/logfiles" "$TEST_BASE_PATH/scripts" "$TEST_BASE_PATH/temp/yesterday"
     cp "$scripts_dir/moveGraphs.sh" "$TEST_BASE_PATH/scripts/moveGraphs.sh"
     cp "$scripts_dir/GetPlotOptionsACM0.py" "$TEST_BASE_PATH/scripts/GetPlotOptionsACM0.py"
 
-    rm -rf "$TEST_BASE_PATH/temp"
-    cp -a "$temp_dir" "$TEST_BASE_PATH/temp"
+    rm -rf "$TEST_BASE_PATH/temp/yesterday"
+    cp -a "$temp_dir" "$TEST_BASE_PATH/temp/yesterday"
 
     local host_html="$case_dir/var-www-html"
     mkdir -p "$host_html"
