@@ -74,6 +74,30 @@ else
     log_msg "processRollingData.sh     : Skipping rolling BI plot (plot_bi = false in plot.ini)" >> "$MAIN_LOG"
 fi
 
+if ! PLOT_KP=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetKpOptionsACM0.py" 2>&1); then
+    log_msg "processRollingData.sh     : FAILED to read Kp plot option: $PLOT_KP" >> "$ERROR_LOG"
+    exit 1
+fi
+
+if [ "$PLOT_KP" != "true" ] && [ "$PLOT_KP" != "false" ]; then
+    log_msg "processRollingData.sh     : FAILED - unexpected Kp plot option: '$PLOT_KP'" >> "$ERROR_LOG"
+    exit 1
+fi
+
+if [ "$PLOT_NOAA" = "true" ] && [ ! -f "$BASE_PATH/temp/noaa/latest.jpg" ]; then
+    log_msg "processRollingData.sh     : NOAA forecast enabled without cached data; refreshing now" >> "$MAIN_LOG"
+    if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/updateNoaaAuroraForecast.sh"; then
+        log_msg "processRollingData.sh     : WARNING - immediate NOAA forecast refresh failed; will retry next cycle" >> "$ERROR_LOG"
+    fi
+fi
+
+if [ "$PLOT_KP" = "true" ] && [ ! -f "$BASE_PATH/temp/kp/PlanetaryKp.png" ]; then
+    log_msg "processRollingData.sh     : Kp forecast enabled without cached data; refreshing now" >> "$MAIN_LOG"
+    if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/updateKpForecastACM0.sh"; then
+        log_msg "processRollingData.sh     : WARNING - immediate Kp forecast refresh failed; will retry next cycle" >> "$ERROR_LOG"
+    fi
+fi
+
 if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlertsACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling alert evaluation" >> "$MAIN_LOG"
 else

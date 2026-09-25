@@ -28,7 +28,7 @@ plotYear = substr(dateTag, 1, 4)
 plotYearMonth = substr(dateTag, 1, 7)
 plotMonthDir = basePath."/plots/XYZ/".plotYear."/".plotYearMonth
 archivePlot = plotMonthDir."/".dateTag.".png"
-tempPlot = basePath."/temp/XYZ.png"
+tempPlot = basePath."/temp/yesterday/XYZ.png"
 
 # mkdir -p plus 0/1 flag so a fresh year/month archive folder can be logged, matching the Python processors
 dirCreated = system("sh -lc 'if [ -d \"".plotMonthDir."\" ]; then echo 0; else mkdir -p \"".plotMonthDir."\"; echo 1; fi'")
@@ -36,7 +36,7 @@ if (dirCreated == 1) {
     print system("date +'%Y-%m-%d %H:%M:%S'") \
           ." : PlotDataXYZACM0.gp        : New directory created : ".plotMonthDir
 }
-system("sh -lc 'mkdir -p \"".basePath."/temp\"'")
+system("sh -lc 'mkdir -p \"".basePath."/temp/yesterday\"'")
 
 set terminal pngcairo \
              background "#ffffff" \

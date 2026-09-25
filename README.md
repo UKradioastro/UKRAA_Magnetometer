@@ -161,10 +161,12 @@ There are other functions that are customisable by the user, such as **email ale
 **Optional**: run an install-time heartbeat smoke check (disabled by default):
 
 ```
-sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh
+sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash ~/UKRAA_Magnetometer/install/install.sh
 ```
 
 This runs `--test-heartbeat` once during install and prints a clear `HEARTBEAT_SMOKE_CHECK: PASS` or `HEARTBEAT_SMOKE_CHECK: FAIL` summary.
+
+The check sends a real email, so it passes only when `config/alerts.ini` contains a resolvable SMTP host and valid SMTP credentials and the Raspberry Pi has network access. A fresh install with placeholder SMTP settings is expected to fail without stopping the rest of the installation.
 
 
 [Back to Contents...](#contents)
@@ -619,7 +621,7 @@ You can regenerate the hourly Activity plot for any date without storing an arch
 
 This updates only:
 
-* `/home/pi/UKRAA_Magnetometer/temp/Activity.png`
+* `/home/pi/UKRAA_Magnetometer/temp/yesterday/Activity.png`
 
 To also write the dated archive file in `plots/Activity/YYYY/YYYY-MM/`, add `--archive`:
 

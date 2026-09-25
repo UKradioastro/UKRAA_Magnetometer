@@ -18,8 +18,8 @@ log_msg() {
 # log message to main logfile
 log_msg "moveGraphs.sh             : Started moving graphs" >> "$MAIN_LOG"
 
-# source directory to copy from
-SOURCE_DIR="$BASE_PATH/temp"
+# source directory containing yesterday's web plots
+SOURCE_DIR="$BASE_PATH/temp/yesterday"
 
 # fail fast if the source directory is missing
 if [ ! -d "$SOURCE_DIR" ]; then
@@ -74,8 +74,8 @@ else
     rm -f "$SOURCE_DIR/HDZ.png"
     log_msg "moveGraphs.sh             : Removed stale HDZ.png from temp source (plot_hdz=false)" >> "$MAIN_LOG"
   fi
-  if [ -f "$WEB_ROOT/temp/HDZ.png" ]; then
-    rm -f "$WEB_ROOT/temp/HDZ.png"
+  if [ -f "$WEB_ROOT/temp/yesterday/HDZ.png" ]; then
+    rm -f "$WEB_ROOT/temp/yesterday/HDZ.png"
     log_msg "moveGraphs.sh             : Removed stale HDZ.png from web root (plot_hdz=false)" >> "$MAIN_LOG"
   else
     log_msg "moveGraphs.sh             : HDZ files not required (plot_hdz=false)" >> "$MAIN_LOG"
@@ -94,8 +94,8 @@ else
     rm -f "$SOURCE_DIR/BI.png"
     log_msg "moveGraphs.sh             : Removed stale BI.png from temp source (plot_bi=false)" >> "$MAIN_LOG"
   fi
-  if [ -f "$WEB_ROOT/temp/BI.png" ]; then
-    rm -f "$WEB_ROOT/temp/BI.png"
+  if [ -f "$WEB_ROOT/temp/yesterday/BI.png" ]; then
+    rm -f "$WEB_ROOT/temp/yesterday/BI.png"
     log_msg "moveGraphs.sh             : Removed stale BI.png from web root (plot_bi=false)" >> "$MAIN_LOG"
   else
     log_msg "moveGraphs.sh             : BI files not required (plot_bi=false)" >> "$MAIN_LOG"
@@ -103,17 +103,23 @@ else
 fi
 
 # Older versions put test sandboxes under temp/, which then got published. Remove any leftovers.
-for stale_dir in "$SOURCE_DIR"/test-* "$WEB_ROOT"/temp/test-*; do
+for stale_dir in "$BASE_PATH"/temp/test-* "$WEB_ROOT"/temp/test-*; do
   if [ -d "$stale_dir" ]; then
     rm -rf "$stale_dir"
     log_msg "moveGraphs.sh             : Removed stale test sandbox $stale_dir" >> "$MAIN_LOG"
   fi
 done
 
+# Remove the flat daily files used before daily assets moved under temp/yesterday/.
+for old_daily_file in Activity.png XYZ.png HDZ.png BI.png; do
+  rm -f "$BASE_PATH/temp/$old_daily_file" "$WEB_ROOT/temp/$old_daily_file"
+done
+
 # entry to move yesterdays graphs from temp to web root
 COPY_OUTPUT_FILE=$(mktemp)
+mkdir -p "$WEB_ROOT/temp"
 
-if cp -av "$SOURCE_DIR" "$WEB_ROOT/" \
+if cp -av "$SOURCE_DIR" "$WEB_ROOT/temp/" \
      > "$COPY_OUTPUT_FILE" \
      2>> "$ERROR_LOG"
 then

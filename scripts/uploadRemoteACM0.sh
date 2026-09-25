@@ -140,14 +140,15 @@ def upload_files(mode, base_path, config_path):
     base_remote_dir = base_remote_dir.rstrip('/') or '/'
 
     if mode == 'daily':
+        yesterday_dir = os.path.join(base_path, 'temp', 'yesterday')
         upload_entries = [
-            ('Activity.png', os.path.join(base_path, 'temp', 'Activity.png'), base_remote_dir),
-            ('XYZ.png', os.path.join(base_path, 'temp', 'XYZ.png'), base_remote_dir),
+            ('Activity.png', os.path.join(yesterday_dir, 'Activity.png'), base_remote_dir),
+            ('XYZ.png', os.path.join(yesterday_dir, 'XYZ.png'), base_remote_dir),
         ]
 
         optional_daily_entries = [
-            ('HDZ.png', os.path.join(base_path, 'temp', 'HDZ.png'), base_remote_dir),
-            ('BI.png', os.path.join(base_path, 'temp', 'BI.png'), base_remote_dir),
+            ('HDZ.png', os.path.join(yesterday_dir, 'HDZ.png'), base_remote_dir),
+            ('BI.png', os.path.join(yesterday_dir, 'BI.png'), base_remote_dir),
         ]
 
         for file_name, local_path, remote_dir in optional_daily_entries:

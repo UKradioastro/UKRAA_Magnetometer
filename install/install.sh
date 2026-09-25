@@ -64,6 +64,7 @@ sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/kp
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/noaa
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/rolling
+sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/yesterday
 sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
 chown -R pi:pi /home/pi/UKRAA_Magnetometer/data/kp /home/pi/UKRAA_Magnetometer/temp/kp /home/pi/UKRAA_Magnetometer/plots/kp
 echo "UKRAA Magnetometer directory structure created"
@@ -150,7 +151,7 @@ if [ "$RUN_HEARTBEAT_SMOKE_CHECK" -eq 1 ]; then
 	fi
 else
 	echo "Skipping optional heartbeat smoke check (default)."
-	echo "Enable it with: sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash install.sh"
+	echo "Enable it with: sudo MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT=1 bash ~/UKRAA_Magnetometer/install/install.sh"
 fi
 echo ""
 
