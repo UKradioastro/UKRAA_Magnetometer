@@ -9,7 +9,8 @@ password = your-upload-password
 port = your-upload-port
 
 # Base target folder on the remote site.
-# Daily images upload here; rolling uploads go into <directory>/rolling.
+# Daily images upload to <directory>/yesterday; rolling uploads go into
+# <directory>/rolling; webpage plot options go into <directory>/status.
 directory = /your-upload-directory
 
 # Connection options
@@ -17,6 +18,7 @@ timeout_seconds = 30
 passive = true
 create_dirs = true
 
+# Plot options are always uploaded to <directory>/status/plot-options.json.
 # Optional: when true, rolling uploads also send
 # /home/pi/UKRAA_Magnetometer/data/status/current.json
 # to <directory>/status/current.json

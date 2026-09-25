@@ -462,13 +462,29 @@ function refreshPlotImages() {
 }
 
 function refreshOptionalGraphs() {
-  fetch("./status/plot-options.json?t=" + Date.now(), { cache: "no-store" })
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error("plot options fetch failed");
-      }
-      return response.json();
-    })
+  var optionCandidates = [
+    "./status/plot-options.json",
+    "./temp/status/plot-options.json"
+  ];
+
+  function fetchOptions(index) {
+    if (index >= optionCandidates.length) {
+      return Promise.reject(new Error("plot options fetch failed"));
+    }
+
+    return fetch(optionCandidates[index] + "?t=" + Date.now(), { cache: "no-store" })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error("plot options fetch failed");
+        }
+        return response.json();
+      })
+      .catch(function() {
+        return fetchOptions(index + 1);
+      });
+  }
+
+  fetchOptions(0)
     .then(function(options) {
       var showHdz = options.plot_hdz === true;
       var showBi = options.plot_bi === true;

@@ -6,6 +6,7 @@ MAIN_LOG="$LOG_DIR/log-MagnetometerACM0.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 SOURCE_DIR="$BASE_PATH/temp/rolling"
 SOURCE_STATUS="$BASE_PATH/data/status/current.json"
+SOURCE_PLOT_OPTIONS="$BASE_PATH/data/status/plot-options.json"
 SOURCE_NOAA="$BASE_PATH/temp/noaa/latest.jpg"
 SOURCE_KP="$BASE_PATH/temp/kp/PlanetaryKp.png"
 DEST_ROLLING_DIR=/var/www/html/temp/rolling
@@ -59,11 +60,13 @@ fi
 
 mkdir -p "$DEST_ROLLING_DIR" "$DEST_STATUS_DIR" "$DEST_NOAA_DIR" "$DEST_KP_DIR"
 
-PLOT_OPTIONS_TEMP=$(mktemp "$DEST_STATUS_DIR/.plot-options.XXXXXX")
+PLOT_OPTIONS_TEMP=$(mktemp "$BASE_PATH/data/status/.plot-options.XXXXXX")
 printf '{"plot_hdz":%s,"plot_bi":%s,"plot_noaa":%s,"plot_kp":%s,"noaa_hemisphere":"%s"}\n' \
   "$PLOT_HDZ" "$PLOT_BI" "$PLOT_NOAA" "$PLOT_KP" "$NOAA_HEMISPHERE" \
   > "$PLOT_OPTIONS_TEMP"
-mv -f "$PLOT_OPTIONS_TEMP" "$DEST_STATUS_DIR/plot-options.json"
+mv -f "$PLOT_OPTIONS_TEMP" "$SOURCE_PLOT_OPTIONS"
+chmod 644 "$SOURCE_PLOT_OPTIONS"
+cp -a "$SOURCE_PLOT_OPTIONS" "$DEST_STATUS_DIR/plot-options.json"
 chmod 644 "$DEST_STATUS_DIR/plot-options.json"
 
 if cp -a "$SOURCE_DIR/RollingXYZ.png" "$DEST_ROLLING_DIR/" >> "$ERROR_LOG" 2>&1; then
