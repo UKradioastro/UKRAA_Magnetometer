@@ -332,6 +332,25 @@ def build_heartbeat_email_message(status, settings, now_utc):
     return subject, '\n'.join(lines)
 
 
+def build_heartbeat_test_email_message(settings, now_utc):
+    subject = '[UKRAA Magnetometer] Heartbeat smoke test successful'
+    lines = [
+        'UKRAA Magnetometer heartbeat smoke test',
+        '',
+        f'Sent at (UTC): {now_utc.isoformat()}',
+        'SMTP connection and email delivery completed successfully.',
+        '',
+        'Live magnetometer values are intentionally omitted because the rolling',
+        'data pipeline may not have produced its first status file during installation.',
+    ]
+
+    web_url = settings.get('web_url', '')
+    if web_url:
+        lines.extend(['', f'Web page: {web_url}'])
+
+    return subject, '\n'.join(lines)
+
+
 def build_heartbeat_mail_settings(settings):
     heartbeat_settings = dict(settings)
     heartbeat_settings['email_attach_plot'] = settings['heartbeat_attach_plot']
@@ -516,7 +535,7 @@ def main():
             log_msg('email_enabled is false in alerts.ini; sending heartbeat test email anyway because it was requested')
 
         heartbeat_settings = build_heartbeat_mail_settings(settings)
-        subject, body = build_heartbeat_email_message(status, settings, utc_now().replace(microsecond=0))
+        subject, body = build_heartbeat_test_email_message(settings, utc_now().replace(microsecond=0))
         success, error_text = send_email(heartbeat_settings, subject, body, activity_plot_path)
         if success:
             log_msg('Heartbeat test email sent successfully')

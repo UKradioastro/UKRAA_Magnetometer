@@ -141,14 +141,15 @@ def upload_files(mode, base_path, config_path):
 
     if mode == 'daily':
         yesterday_dir = os.path.join(base_path, 'temp', 'yesterday')
+        yesterday_remote_dir = posixpath.join(base_remote_dir, 'yesterday')
         upload_entries = [
-            ('Activity.png', os.path.join(yesterday_dir, 'Activity.png'), base_remote_dir),
-            ('XYZ.png', os.path.join(yesterday_dir, 'XYZ.png'), base_remote_dir),
+            ('Activity.png', os.path.join(yesterday_dir, 'Activity.png'), yesterday_remote_dir),
+            ('XYZ.png', os.path.join(yesterday_dir, 'XYZ.png'), yesterday_remote_dir),
         ]
 
         optional_daily_entries = [
-            ('HDZ.png', os.path.join(yesterday_dir, 'HDZ.png'), base_remote_dir),
-            ('BI.png', os.path.join(yesterday_dir, 'BI.png'), base_remote_dir),
+            ('HDZ.png', os.path.join(yesterday_dir, 'HDZ.png'), yesterday_remote_dir),
+            ('BI.png', os.path.join(yesterday_dir, 'BI.png'), yesterday_remote_dir),
         ]
 
         for file_name, local_path, remote_dir in optional_daily_entries:
@@ -158,10 +159,12 @@ def upload_files(mode, base_path, config_path):
                 print(f'INFO: Optional daily file not present, skipping: {file_name}')
     else:
         rolling_remote_dir = posixpath.join(base_remote_dir, 'rolling')
+        status_remote_dir = posixpath.join(base_remote_dir, 'status')
         plot_hdz, plot_bi, plot_noaa, noaa_hemisphere, plot_kp = get_plot_options(base_path)
         upload_entries = [
             ('RollingActivity.png', os.path.join(base_path, 'temp', 'rolling', 'RollingActivity.png'), rolling_remote_dir),
             ('RollingXYZ.png', os.path.join(base_path, 'temp', 'rolling', 'RollingXYZ.png'), rolling_remote_dir),
+            ('plot-options.json', os.path.join(base_path, 'data', 'status', 'plot-options.json'), status_remote_dir),
         ]
 
         if plot_hdz:
@@ -177,7 +180,6 @@ def upload_files(mode, base_path, config_path):
             print('INFO: Optional rolling BI upload disabled (plot_bi=false)')
 
         if upload_status_json:
-            status_remote_dir = posixpath.join(base_remote_dir, 'status')
             upload_entries.append(
                 ('current.json', os.path.join(base_path, 'data', 'status', 'current.json'), status_remote_dir))
 

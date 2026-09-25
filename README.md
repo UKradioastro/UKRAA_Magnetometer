@@ -735,9 +735,11 @@ upload_status_json = false
 Behavior:
 
 * Daily run (09:30 via `moveGraphs.sh`) uploads:
-	* `Activity.png`, `X.png`, `Y.png`, `Z.png` to `/data`
+	* `Activity.png`, `XYZ.png`, and enabled `HDZ.png`/`BI.png` to `/data/yesterday`
 * Rolling run (every 5 minutes via `processRollingData.sh`) uploads:
 	* `RollingActivity.png`, `RollingXYZ.png` to `/data/rolling`
+	* enabled rolling HDZ/BI and NOAA/Kp assets to their matching subfolders
+	* `plot-options.json` to `/data/status` so external webpage menus follow `plot.ini`
 * Optional rolling status JSON upload:
 	* set `upload_status_json = true`
 	* uploads `data/status/current.json` to `/data/status/current.json`
