@@ -20,6 +20,9 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Daily processing now generates the daily summary and eligible period plots after completing normal day processing.
 - Daily publish health checks now verify enabled, mature period plots while allowing incomplete windows to remain in placeholder state.
 
+### Fixed
+- Software updates now add missing options and sections from the current configuration templates to existing `alerts.ini`, `plot.ini`, and `remote-upload.ini` files without replacing configured values.
+
 ## [2026.09.3] - 2026-09-25
 
 ### Added

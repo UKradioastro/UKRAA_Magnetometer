@@ -83,32 +83,32 @@ chmod -v 664 /home/pi/UKRAA_Magnetometer/logfiles/*
 echo "UKRAA Magnetometer log files created"
 echo ""
 
-echo "Set up default rolling alert configuration..."
-if [ ! -f /home/pi/UKRAA_Magnetometer/config/alerts.ini ]; then
-	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/alerts.ini.example /home/pi/UKRAA_Magnetometer/config/alerts.ini
-	echo "Created /home/pi/UKRAA_Magnetometer/config/alerts.ini"
-else
-	echo "Existing /home/pi/UKRAA_Magnetometer/config/alerts.ini retained"
-fi
-echo ""
+set_up_configuration() {
+	local description=$1
+	local template_path=$2
+	local config_path=$3
 
-echo "Set up default remote upload configuration..."
-if [ ! -f /home/pi/UKRAA_Magnetometer/config/remote-upload.ini ]; then
-	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/remote-upload.ini.example /home/pi/UKRAA_Magnetometer/config/remote-upload.ini
-	echo "Created /home/pi/UKRAA_Magnetometer/config/remote-upload.ini"
-else
-	echo "Existing /home/pi/UKRAA_Magnetometer/config/remote-upload.ini retained"
-fi
-echo ""
+	echo "Set up $description configuration..."
+	if [ ! -f "$config_path" ]; then
+		sudo -u pi cp -v "$template_path" "$config_path"
+		echo "Created $config_path"
+	else
+		echo "Retaining existing values in $config_path"
+		sudo -u pi /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/MergeConfigACM0.py \
+			"$template_path" "$config_path"
+	fi
+	echo ""
+}
 
-echo "Set up default plot configuration..."
-if [ ! -f /home/pi/UKRAA_Magnetometer/config/plot.ini ]; then
-	sudo -u pi cp -v /home/pi/UKRAA_Magnetometer/install/plot.ini.example /home/pi/UKRAA_Magnetometer/config/plot.ini
-	echo "Created /home/pi/UKRAA_Magnetometer/config/plot.ini"
-else
-	echo "Existing /home/pi/UKRAA_Magnetometer/config/plot.ini retained"
-fi
-echo ""
+set_up_configuration "rolling alert" \
+	/home/pi/UKRAA_Magnetometer/install/alerts.ini.example \
+	/home/pi/UKRAA_Magnetometer/config/alerts.ini
+set_up_configuration "remote upload" \
+	/home/pi/UKRAA_Magnetometer/install/remote-upload.ini.example \
+	/home/pi/UKRAA_Magnetometer/config/remote-upload.ini
+set_up_configuration "plot" \
+	/home/pi/UKRAA_Magnetometer/install/plot.ini.example \
+	/home/pi/UKRAA_Magnetometer/config/plot.ini
 
 echo "Sort out UKRAA Magnetometer file permissions..."
 sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.py

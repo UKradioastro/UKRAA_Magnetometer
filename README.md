@@ -810,7 +810,7 @@ After a release has been published on GitHub, run the updater already installed 
 sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometerACM0.sh
 ```
 
-The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, configuration files, log files and temporary web files. It then runs `install.sh` to update the service, scheduled jobs and web files.
+The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, existing configuration values, log files and temporary web files. When a release adds options or sections to an `.ini.example` template, the installer adds those missing defaults to the corresponding file in `config` without replacing site-specific values. It then updates the service, scheduled jobs and web files.
 
 The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
 
