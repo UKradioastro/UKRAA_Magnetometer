@@ -7,6 +7,8 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+## [2026.09.6] - 2026-09-26
+
 ### Fixed
 - The updater now preserves retryability after a partial file-copy failure and reruns installation when the code version is current but the installed-version marker is stale.
 - Recovered the interrupted Raspberry Pi upgrade from `2026.09.4` to `2026.09.5` by rerunning installer mode; collector migration and all post-update checks passed.
