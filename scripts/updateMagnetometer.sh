@@ -2,7 +2,14 @@
 
 set -euo pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
+ENV_FILE="$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
+if [ -f "$ENV_FILE" ]; then
+	source "$ENV_FILE"
+else
+	BASE_PATH=${MAGNETOMETER_BASE_PATH:?MAGNETOMETER_BASE_PATH must be set}
+	FILE_OWNER=${MAGNETOMETER_FILE_OWNER:?MAGNETOMETER_FILE_OWNER must be set}
+	FILE_GROUP=$(id -gn "$FILE_OWNER")
+fi
 REPOSITORY=${MAGNETOMETER_GITHUB_REPOSITORY:-UKradioastro/UKRAA_Magnetometer}
 WORK_DIR=$(mktemp -d)
 SCRIPT_COPY="$WORK_DIR/updateMagnetometer.sh"

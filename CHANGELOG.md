@@ -7,6 +7,9 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+### Fixed
+- The updater's temporary installer handoff now works without a colocated `magnetometer-env.sh`, using the installation account and path already exported by the parent updater.
+
 ## [2026.09.6] - 2026-09-26
 
 ### Fixed
