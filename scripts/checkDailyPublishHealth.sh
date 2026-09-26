@@ -9,6 +9,27 @@ MARKER_FILE="$STATUS_DIR/daily-health.txt"
 
 mkdir -p "$STATUS_DIR"
 
+write_marker() {
+    local marker_content=$1
+    local marker_temp
+
+    marker_temp=$(mktemp "$STATUS_DIR/.daily-health.XXXXXX") || return 1
+    if ! printf '%s\n' "$marker_content" > "$marker_temp"; then
+        rm -f "$marker_temp"
+        return 1
+    fi
+    if [ "$(id -u)" -eq 0 ]; then
+        if ! chown "$FILE_OWNER:$FILE_GROUP" "$marker_temp"; then
+            rm -f "$marker_temp"
+            return 1
+        fi
+    fi
+    if ! chmod 644 "$marker_temp" || ! mv -f "$marker_temp" "$MARKER_FILE"; then
+        rm -f "$marker_temp"
+        return 1
+    fi
+}
+
 YESTERDAY=$(date -d yesterday +%Y-%m-%d)
 MINUTE_FILE="$BASE_PATH/data/minute/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
 RAW_FILE="$BASE_PATH/data/raw/$(date -d yesterday +%Y)/$(date -d yesterday +%Y-%m)/$YESTERDAY.csv"
@@ -17,7 +38,7 @@ WEB_TEMP_DIR="$WEB_ROOT/temp/yesterday"
 # No raw data for that date means there was nothing to process, not a pipeline fault
 # (fresh install, or the acquisition service was stopped all day).
 if [ ! -f "$RAW_FILE" ]; then
-    echo "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: PENDING : date=$YESTERDAY : no raw data recorded for that date: $RAW_FILE" > "$MARKER_FILE"
+    write_marker "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: PENDING : date=$YESTERDAY : no raw data recorded for that date: $RAW_FILE" || exit 1
     exit 0
 fi
 
@@ -115,9 +136,9 @@ fi
 
 # Write a short marker line that can be monitored externally.
 if [ "$status" = "PASS" ]; then
-    echo "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: PASS : date=$YESTERDAY" > "$MARKER_FILE"
+    write_marker "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: PASS : date=$YESTERDAY" || exit 1
     exit 0
 fi
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: FAIL : date=$YESTERDAY : $issues" > "$MARKER_FILE"
+write_marker "$(date '+%Y-%m-%d %H:%M:%S') : DAILY_HEALTH: FAIL : date=$YESTERDAY : $issues" || exit 1
 exit 1

@@ -68,6 +68,9 @@ printf '{"plot_hdz":%s,"plot_bi":%s,"plot_noaa":%s,"plot_kp":%s,"noaa_hemisphere
   > "$PLOT_OPTIONS_TEMP"
 mv -f "$PLOT_OPTIONS_TEMP" "$SOURCE_PLOT_OPTIONS"
 chmod 644 "$SOURCE_PLOT_OPTIONS"
+if [ "$(id -u)" -eq 0 ]; then
+  chown "$FILE_OWNER:$FILE_GROUP" "$SOURCE_PLOT_OPTIONS"
+fi
 cp -a "$SOURCE_PLOT_OPTIONS" "$DEST_STATUS_DIR/plot-options.json"
 chmod 644 "$DEST_STATUS_DIR/plot-options.json"
 
