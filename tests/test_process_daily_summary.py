@@ -9,8 +9,8 @@ import unittest
 SCRIPTS_PATH = os.path.join(os.path.dirname(__file__), '..', 'scripts')
 sys.path.insert(0, os.path.abspath(SCRIPTS_PATH))
 
-import ProcessDailySummaryACM0
-import GetPeriodPlotAvailabilityACM0
+import ProcessDailySummary
+import GetPeriodPlotAvailability
 import magnetometer_common
 
 
@@ -29,7 +29,7 @@ class ProcessDailySummaryTests(unittest.TestCase):
             'year': False,
         }
 
-        periods = GetPeriodPlotAvailabilityACM0.build_period_status(
+        periods = GetPeriodPlotAvailability.build_period_status(
             end_date, complete_dates, period_options)
 
         self.assertTrue(periods['week']['available'])
@@ -41,22 +41,22 @@ class ProcessDailySummaryTests(unittest.TestCase):
         end_date = datetime.date(2026, 9, 24)
         period_options = {
             period_name: True
-            for period_name in GetPeriodPlotAvailabilityACM0.PERIOD_DAY_COUNTS
+            for period_name in GetPeriodPlotAvailability.PERIOD_DAY_COUNTS
         }
 
-        for period_name, required_days in GetPeriodPlotAvailabilityACM0.PERIOD_DAY_COUNTS.items():
+        for period_name, required_days in GetPeriodPlotAvailability.PERIOD_DAY_COUNTS.items():
             complete_dates = {
                 end_date - datetime.timedelta(days=day_offset)
                 for day_offset in range(required_days)
             }
-            periods = GetPeriodPlotAvailabilityACM0.build_period_status(
+            periods = GetPeriodPlotAvailability.build_period_status(
                 end_date, complete_dates, period_options)
 
             self.assertTrue(periods[period_name]['available'])
             self.assertEqual(periods[period_name]['valid_days'], required_days)
 
             complete_dates.remove(end_date - datetime.timedelta(days=required_days - 1))
-            periods = GetPeriodPlotAvailabilityACM0.build_period_status(
+            periods = GetPeriodPlotAvailability.build_period_status(
                 end_date, complete_dates, period_options)
             self.assertFalse(periods[period_name]['available'])
             self.assertEqual(periods[period_name]['valid_days'], required_days - 1)
@@ -89,9 +89,9 @@ class ProcessDailySummaryTests(unittest.TestCase):
                     ['2026-09-24 00:02:00', '0', '0', '0', 'nan', '0', '0', '15', '2'],
                 ])
 
-            ProcessDailySummaryACM0.write_daily_summary(
+            ProcessDailySummary.write_daily_summary(
                 temporary_directory, target_date)
-            ProcessDailySummaryACM0.rebuild_combined_summary(temporary_directory)
+            ProcessDailySummary.rebuild_combined_summary(temporary_directory)
 
             summary_path = os.path.join(
                 temporary_directory, 'data', 'daily', '2026', '2026-09', '2026-09-24.csv')
@@ -111,7 +111,7 @@ class ProcessDailySummaryTests(unittest.TestCase):
             with open(combined_path, mode='r', encoding='UTF-8', newline='') as combined_file:
                 combined_rows = list(csv.reader(combined_file))
 
-            self.assertEqual(combined_rows[0], ProcessDailySummaryACM0.SUMMARY_HEADER)
+            self.assertEqual(combined_rows[0], ProcessDailySummary.SUMMARY_HEADER)
             self.assertEqual(combined_rows[1], summary_row)
 
 
