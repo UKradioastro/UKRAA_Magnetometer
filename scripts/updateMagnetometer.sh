@@ -53,9 +53,15 @@ if [ -z "$release_tag" ]; then
 fi
 
 current_version=$(tr -d '[:space:]' < "$BASE_PATH/VERSION" 2>/dev/null || true)
+installed_version=$(tr -d '[:space:]' < "$BASE_PATH/config/installed-version.txt" 2>/dev/null || true)
 if [ "$current_version" = "$release_tag" ]; then
-	echo "UKRAA Magnetometer is already up to date at $current_version."
-	exit 0
+	if [ "$installed_version" = "$release_tag" ]; then
+		echo "UKRAA Magnetometer is already up to date at $current_version."
+		exit 0
+	fi
+	echo "Code is already at $current_version; retrying installation..."
+	bash "$SCRIPT_COPY" --run-installer
+	exit $?
 fi
 
 archive_path="$WORK_DIR/release.zip"
@@ -76,7 +82,7 @@ if [ "$downloaded_version" != "$release_tag" ]; then
 fi
 
 echo "Updating code from $current_version to $downloaded_version..."
-for path in scripts install WWW docs images README.md VERSION CHANGELOG.md LICENSE; do
+for path in scripts install WWW docs images README.md CHANGELOG.md LICENSE; do
 	if [ -e "$source_dir/$path" ]; then
 		if [ -d "$source_dir/$path" ]; then
 			install -d -o "$FILE_OWNER" -g "$FILE_GROUP" "$BASE_PATH/$path"
@@ -87,6 +93,7 @@ for path in scripts install WWW docs images README.md VERSION CHANGELOG.md LICEN
 		fi
 	fi
 done
+install -o "$FILE_OWNER" -g "$FILE_GROUP" -m 644 "$source_dir/VERSION" "$BASE_PATH/VERSION"
 
 echo "Running installer for $downloaded_version..."
 bash "$SCRIPT_COPY" --run-installer
