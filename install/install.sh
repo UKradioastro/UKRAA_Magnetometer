@@ -1,13 +1,43 @@
 #!/bin/bash
 
+if [ "$(id -u)" -ne 0 ]; then
+	echo "Run the installer with sudo." >&2
+	exit 1
+fi
+
+FILE_OWNER=${MAGNETOMETER_FILE_OWNER:-${SUDO_USER:-}}
+if [ -z "$FILE_OWNER" ] || [ "$FILE_OWNER" = root ] || ! id "$FILE_OWNER" >/dev/null 2>&1; then
+	echo "Specify a non-root installation account with sudo or MAGNETOMETER_FILE_OWNER." >&2
+	exit 1
+fi
+
+USER_HOME=$(getent passwd "$FILE_OWNER" | cut -d: -f6)
+BASE_PATH="$USER_HOME/UKRAA_Magnetometer"
+SOURCE_PATH=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")
+if [ -z "$USER_HOME" ] || [ "$SOURCE_PATH" != "$BASE_PATH" ] || [[ ! "$BASE_PATH" =~ ^/[A-Za-z0-9_./-]+$ ]]; then
+	echo "Install from $BASE_PATH (only letters, digits, dots, underscores, hyphens and slashes are supported in paths)." >&2
+	exit 1
+fi
+if [ "$(stat -c %U "$BASE_PATH")" != "$FILE_OWNER" ]; then
+	echo "The installation directory must be owned by $FILE_OWNER." >&2
+	exit 1
+fi
+export MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_FILE_OWNER="$FILE_OWNER"
+FILE_GROUP=$(id -gn "$FILE_OWNER")
+SHORT_HOSTNAME=$(hostname -s)
+if [ "${#SHORT_HOSTNAME}" -gt 63 ] || [[ ! "$SHORT_HOSTNAME" =~ ^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?$ ]]; then
+	echo "Cannot create a .local URL from hostname: $SHORT_HOSTNAME" >&2
+	exit 1
+fi
+
 RUN_HEARTBEAT_SMOKE_CHECK=0
 
 if [ "${MAGNETOMETER_INSTALL_SMOKE_HEARTBEAT:-}" = "1" ]; then
 	RUN_HEARTBEAT_SMOKE_CHECK=1
 fi
 
-NEW_VERSION=$(cat /home/pi/UKRAA_Magnetometer/VERSION 2>/dev/null || echo "unknown")
-INSTALLED_VERSION_FILE=/home/pi/UKRAA_Magnetometer/config/installed-version.txt
+NEW_VERSION=$(cat "$BASE_PATH/VERSION" 2>/dev/null || echo "unknown")
+INSTALLED_VERSION_FILE="$BASE_PATH/config/installed-version.txt"
 OLD_VERSION=""
 if [ -f "$INSTALLED_VERSION_FILE" ]; then
 	OLD_VERSION=$(cat "$INSTALLED_VERSION_FILE")
@@ -42,44 +72,28 @@ echo "unzip software installed"
 echo ""
 
 echo "Provide RPi desktop wallpaper..."
-sudo -u pi cp -v  /home/pi/UKRAA_Magnetometer/images/wallpaperPicoMagnetometer.png /home/pi/Pictures/wallpaperPicoMagnetometer.png
+sudo -u "$FILE_OWNER" cp -v "$BASE_PATH/images/wallpaperPicoMagnetometer.png" "$USER_HOME/Pictures/wallpaperPicoMagnetometer.png"
 echo "RPi desktop wallpaper provided, ~/Pictures/wallpaperPicoMagnetometer.png"
 echo ""
 
 echo "Creating UKRAA Magnetometer directory structure..."
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/minute
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/hour
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/raw
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/logfiles
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/day/Activity
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/day/BI
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/day/HDZ
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/day/XYZ
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/rolling
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/plots/kp
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/kp
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/daily
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/rolling
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/data/status
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/config
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/kp
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/noaa
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/rolling
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/yesterday
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/temp/periods
-sudo -u pi mkdir -vp /home/pi/UKRAA_Magnetometer/WWW/temp
-chown -R pi:pi /home/pi/UKRAA_Magnetometer/data/kp /home/pi/UKRAA_Magnetometer/temp/kp /home/pi/UKRAA_Magnetometer/plots/kp
+for directory in data/{minute,hour,raw,kp,daily,rolling,status} \
+	logfiles plots/day/{Activity,BI,HDZ,XYZ} plots/{rolling,kp} \
+	config temp/{kp,noaa,rolling,yesterday,periods} WWW/temp; do
+	sudo -u "$FILE_OWNER" mkdir -vp "$BASE_PATH/$directory"
+done
+chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/data/kp" "$BASE_PATH/temp/kp" "$BASE_PATH/plots/kp"
 echo "UKRAA Magnetometer directory structure created"
 echo ""
 
 echo "Creating UKRAA Magnetometer log files..."
-# cron runs the wrapper scripts as root, but the work steps drop to user pi with su.
-# Pre-create the log files as pi so those redirections are not blocked by root ownership.
+# cron runs the wrapper scripts as root, but the work steps drop to the installation account.
+# Pre-create log files under that account so redirections do not become root-owned.
 for logFile in log-Magnetometer.txt log-error.txt dashboard-summary.log; do
-	sudo -u pi touch /home/pi/UKRAA_Magnetometer/logfiles/"$logFile"
+	sudo -u "$FILE_OWNER" touch "$BASE_PATH/logfiles/$logFile"
 done
-chown -v pi:pi /home/pi/UKRAA_Magnetometer/logfiles /home/pi/UKRAA_Magnetometer/logfiles/*
-chmod -v 664 /home/pi/UKRAA_Magnetometer/logfiles/*
+chown -v "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/logfiles" "$BASE_PATH"/logfiles/*
+chmod -v 664 "$BASE_PATH"/logfiles/*
 echo "UKRAA Magnetometer log files created"
 echo ""
 
@@ -90,47 +104,48 @@ set_up_configuration() {
 
 	echo "Set up $description configuration..."
 	if [ ! -f "$config_path" ]; then
-		sudo -u pi cp -v "$template_path" "$config_path"
+		sudo -u "$FILE_OWNER" cp -v "$template_path" "$config_path"
+		if [ "$description" = "rolling alert" ]; then
+			sudo -u "$FILE_OWNER" /usr/bin/python3 "$BASE_PATH/scripts/MergeConfig.py" \
+				--set-web-url "http://${SHORT_HOSTNAME,,}.local" "$template_path" "$config_path"
+		fi
 		echo "Created $config_path"
 	else
 		echo "Retaining existing values in $config_path"
-		sudo -u pi /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/MergeConfig.py \
+		sudo -u "$FILE_OWNER" /usr/bin/python3 "$BASE_PATH/scripts/MergeConfig.py" \
 			"$template_path" "$config_path"
 	fi
 	echo ""
 }
 
 set_up_configuration "rolling alert" \
-	/home/pi/UKRAA_Magnetometer/install/alerts.ini.example \
-	/home/pi/UKRAA_Magnetometer/config/alerts.ini
+	"$BASE_PATH/install/alerts.ini.example" \
+	"$BASE_PATH/config/alerts.ini"
 set_up_configuration "remote upload" \
-	/home/pi/UKRAA_Magnetometer/install/remote-upload.ini.example \
-	/home/pi/UKRAA_Magnetometer/config/remote-upload.ini
+	"$BASE_PATH/install/remote-upload.ini.example" \
+	"$BASE_PATH/config/remote-upload.ini"
 set_up_configuration "plot" \
-	/home/pi/UKRAA_Magnetometer/install/plot.ini.example \
-	/home/pi/UKRAA_Magnetometer/config/plot.ini
+	"$BASE_PATH/install/plot.ini.example" \
+	"$BASE_PATH/config/plot.ini"
 set_up_configuration "USB" \
-	/home/pi/UKRAA_Magnetometer/install/USB.ini.example \
-	/home/pi/UKRAA_Magnetometer/config/USB.ini
+	"$BASE_PATH/install/USB.ini.example" \
+	"$BASE_PATH/config/USB.ini"
 
 echo "Sort out UKRAA Magnetometer file permissions..."
-sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.py
-sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/*.sh
-sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testAlertEmail.sh
-sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmail.sh
-sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/uploadRemote.sh
-sudo -u pi chmod -v +x /home/pi/UKRAA_Magnetometer/scripts/testRemoteUpload.sh
+sudo -u "$FILE_OWNER" chmod -v +x "$BASE_PATH"/scripts/*.py
+sudo -u "$FILE_OWNER" chmod -v +x "$BASE_PATH"/scripts/*.sh
 echo "UKRAA Magnetometer file permissions sorted out"
 echo ""
 
 
 echo "Migrating the magnetometer collector service..."
-if ! /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/InstallMagnetometerService.py \
-	/home/pi/UKRAA_Magnetometer/install/PicoMagnetometer.service; then
+if ! /usr/bin/python3 "$BASE_PATH/scripts/InstallMagnetometerService.py" \
+	"$BASE_PATH/install/PicoMagnetometer.service" \
+	--account "$FILE_OWNER" --base-path "$BASE_PATH"; then
 	echo "Failed to install or start PicoMagnetometer.service"
 	exit 1
 fi
-if ! /bin/bash /home/pi/UKRAA_Magnetometer/scripts/testCollectorService.sh; then
+if ! /bin/bash "$BASE_PATH/scripts/testCollectorService.sh"; then
 	echo "Collector service validation failed"
 	exit 1
 fi
@@ -139,30 +154,31 @@ echo ""
 echo "Start installing UKRAA Magnetometer crontab entry..."
 echo "Updating current crontab entry..."
 tmpCronFile=$(mktemp)
-sudo crontab -u root -l 2>/dev/null | grep -v 'UKRAA_Magnetometer' > "$tmpCronFile"
-cat /home/pi/UKRAA_Magnetometer/install/crontabMagnetometer.cron >> "$tmpCronFile"
+sudo crontab -u root -l 2>/dev/null | grep -v 'UKRAA_Magnetometer' | grep -v '^MAGNETOMETER_\(BASE_PATH\|FILE_OWNER\)=' > "$tmpCronFile"
+printf 'MAGNETOMETER_BASE_PATH=%s\nMAGNETOMETER_FILE_OWNER=%s\n' "$BASE_PATH" "$FILE_OWNER" >> "$tmpCronFile"
+sed "s|@MAGNETOMETER_BASE_PATH@|$BASE_PATH|g" "$BASE_PATH/install/crontabMagnetometer.cron" >> "$tmpCronFile"
 sudo crontab -u root "$tmpCronFile"
 rm -f "$tmpCronFile"
-if ! /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/MigrateLegacyInstall.py \
-	--base-path /home/pi/UKRAA_Magnetometer; then
+if ! /usr/bin/python3 "$BASE_PATH/scripts/MigrateLegacyInstall.py" \
+	--base-path "$BASE_PATH"; then
 	echo "Failed to migrate legacy ACM0-named files and logs"
 	exit 1
 fi
-chown -v pi:pi /home/pi/UKRAA_Magnetometer/logfiles /home/pi/UKRAA_Magnetometer/logfiles/*
-chmod -v 664 /home/pi/UKRAA_Magnetometer/logfiles/*
+chown -v "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/logfiles" "$BASE_PATH"/logfiles/*
+chmod -v 664 "$BASE_PATH"/logfiles/*
 echo "UKRAA Magnetometer crontab entry installed"
 echo ""
 
 
 if [ "$RUN_HEARTBEAT_SMOKE_CHECK" -eq 1 ]; then
 	echo "Running optional heartbeat smoke check..."
-	if MAGNETOMETER_BASE_PATH=/home/pi/UKRAA_Magnetometer su pi -c "/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-heartbeat"; then
+	if su "$FILE_OWNER" -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlerts.py --test-heartbeat"; then
 		echo "HEARTBEAT_SMOKE_CHECK: PASS"
 	else
 		smoke_exit_code=$?
 		echo "HEARTBEAT_SMOKE_CHECK: FAIL (exit code $smoke_exit_code)"
-		echo "Check SMTP settings in /home/pi/UKRAA_Magnetometer/config/alerts.ini"
-		echo "Retry command: /bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmail.sh"
+		echo "Check SMTP settings in $BASE_PATH/config/alerts.ini"
+		echo "Retry command: /bin/bash $BASE_PATH/scripts/testHeartbeatEmail.sh"
 	fi
 else
 	echo "Skipping optional heartbeat smoke check (default)."
@@ -210,23 +226,20 @@ echo ""
 
 
 echo "Move files to /var/www/html..."
-cp -v  /home/pi/UKRAA_Magnetometer/WWW/index.html /var/www/html/index.html
-cp -vr /home/pi/UKRAA_Magnetometer/WWW/images /var/www/html/
-cp -vr /home/pi/UKRAA_Magnetometer/WWW/temp /var/www/html/
+cp -v "$BASE_PATH/WWW/index.html" /var/www/html/index.html
+cp -vr "$BASE_PATH/WWW/images" /var/www/html/
+cp -vr "$BASE_PATH/WWW/temp" /var/www/html/
 echo "Files moved to /var/www/html"
 echo ""
 
 
 echo "Final cleanup..."
-sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/docs
-sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/images
-sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/tests
-sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/WWW
-sudo -u pi rm -vf  /home/pi/UKRAA_Magnetometer/README.md
+sudo -u "$FILE_OWNER" rm -vrf "$BASE_PATH/docs" "$BASE_PATH/images" "$BASE_PATH/tests" "$BASE_PATH/WWW"
+sudo -u "$FILE_OWNER" rm -vf "$BASE_PATH/README.md"
 echo "Finished final cleanup"
 echo ""
 
-echo "$NEW_VERSION" | sudo -u pi tee /home/pi/UKRAA_Magnetometer/config/installed-version.txt > /dev/null
+echo "$NEW_VERSION" | sudo -u "$FILE_OWNER" tee "$INSTALLED_VERSION_FILE" > /dev/null
 
 echo "Completed installing UKRAA Magnetometer software."
 echo ""
@@ -234,8 +247,8 @@ sleep 10
 
 # if successful
 echo "Removing install directory and exiting..."
-cd /home/pi || cd /
-rm -vrf /home/pi/UKRAA_Magnetometer/install
+cd "$USER_HOME" || cd /
+rm -vrf "$BASE_PATH/install"
 echo ""
 
 echo "Finished installing UKRAA Magnetometer software..."

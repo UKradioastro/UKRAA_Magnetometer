@@ -157,9 +157,15 @@ def _replace_config(config_path, lines):
 def main():
     argument_parser = argparse.ArgumentParser(
         description='Add missing template options to an existing INI file.')
+    argument_parser.add_argument('--set-web-url')
     argument_parser.add_argument('template_path')
     argument_parser.add_argument('config_path')
     arguments = argument_parser.parse_args()
+
+    if arguments.set_web_url:
+        set_config_values(arguments.config_path, 'web', {'url': arguments.set_web_url})
+        print('Set fresh-install web URL: ' + arguments.set_web_url)
+        return
 
     additions = merge_missing_options(
         arguments.template_path, arguments.config_path)

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
@@ -13,7 +13,7 @@ log_msg() {
 
 log_msg "processRollingData.sh     : Started rolling processing and publishing" >> "$MAIN_LOG"
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessRolling.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessRolling.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling data processing" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -21,7 +21,7 @@ else
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingXYZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingXYZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling XYZ plot" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -29,7 +29,7 @@ else
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingActivity.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingActivity.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling activity plot" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -38,7 +38,7 @@ else
 fi
 
 # read HDZ and BI plot flags from plot.ini (defaults: true true)
-if ! PLOT_OPTIONS=$(su pi -c "/usr/bin/python3 $BASE_PATH/scripts/GetPlotOptions.py" 2>&1); then
+if ! PLOT_OPTIONS=$(su "$FILE_OWNER" -c "/usr/bin/python3 $BASE_PATH/scripts/GetPlotOptions.py" 2>&1); then
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
     log_msg "processRollingData.sh     : FAILED to read plot options: $PLOT_OPTIONS" >> "$ERROR_LOG"
     exit 1
@@ -53,7 +53,7 @@ if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] ||
 fi
 
 if [ "$PLOT_HDZ" = "true" ]; then
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingHDZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingHDZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "processRollingData.sh     : Completed rolling HDZ plot" >> "$MAIN_LOG"
     else
         log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -65,7 +65,7 @@ else
 fi
 
 if [ "$PLOT_BI" = "true" ]; then
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingBI.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingBI.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "processRollingData.sh     : Completed rolling BI plot" >> "$MAIN_LOG"
     else
         log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -100,7 +100,7 @@ if [ "$PLOT_KP" = "true" ] && [ ! -f "$BASE_PATH/temp/kp/PlanetaryKp.png" ]; the
     fi
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlerts.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlerts.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling alert evaluation" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 REPOSITORY=${MAGNETOMETER_GITHUB_REPOSITORY:-UKradioastro/UKRAA_Magnetometer}
 WORK_DIR=$(mktemp -d)
 SCRIPT_COPY="$WORK_DIR/updateMagnetometer.sh"
@@ -14,6 +14,10 @@ trap cleanup EXIT
 
 if [ "$(id -u)" -ne 0 ]; then
 	echo "Please run this updater with sudo."
+	exit 1
+fi
+if [ "$FILE_OWNER" = root ] || [ "$(stat -c %U "$BASE_PATH")" != "$FILE_OWNER" ]; then
+	echo "Specify the account that owns $BASE_PATH with MAGNETOMETER_FILE_OWNER." >&2
 	exit 1
 fi
 
@@ -75,11 +79,11 @@ echo "Updating code from $current_version to $downloaded_version..."
 for path in scripts install WWW docs images README.md VERSION CHANGELOG.md LICENSE; do
 	if [ -e "$source_dir/$path" ]; then
 		if [ -d "$source_dir/$path" ]; then
-			install -d -o pi -g pi "$BASE_PATH/$path"
+			install -d -o "$FILE_OWNER" -g "$FILE_GROUP" "$BASE_PATH/$path"
 			cp -a "$source_dir/$path/." "$BASE_PATH/$path/"
-			chown -R pi:pi "$BASE_PATH/$path"
+			chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/$path"
 		else
-			install -o pi -g pi -m 644 "$source_dir/$path" "$BASE_PATH/$path"
+			install -o "$FILE_OWNER" -g "$FILE_GROUP" -m 644 "$source_dir/$path" "$BASE_PATH/$path"
 		fi
 	fi
 done

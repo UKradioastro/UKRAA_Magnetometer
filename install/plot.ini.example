@@ -1,5 +1,5 @@
 # Copy this file to:
-#   /home/pi/UKRAA_Magnetometer/config/plot.ini
+#   ~/UKRAA_Magnetometer/config/plot.ini
 # and edit the values for your environment.
 #
 # Environment variables MAGNETOMETER_PLOT_HDZ and MAGNETOMETER_PLOT_BI

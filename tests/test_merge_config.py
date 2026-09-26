@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -68,6 +69,28 @@ class MergeConfigTests(unittest.TestCase):
         self.assertIn('serial_port = /dev/serial/by-id/pico-if00', result)
         self.assertIn('id_serial = Raspberry_Pi_Pico_new-id', result)
         self.assertIn('id_serial_short = new-id', result)
+
+    def test_fresh_hostname_url_does_not_replace_upgraded_url(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            template_path = os.path.join(temporary_directory, 'alerts.ini.example')
+            config_path = os.path.join(temporary_directory, 'alerts.ini')
+            with open(template_path, mode='w', encoding='UTF-8') as template:
+                template.write('[web]\nurl = http://example.local\n[alerts]\nemail_enabled = false\n')
+            with open(config_path, mode='w', encoding='UTF-8') as config:
+                config.write('[web]\nurl = http://example.local\n')
+
+            subprocess.run(
+                [sys.executable, os.path.join(SCRIPTS_PATH, 'MergeConfig.py'),
+                 '--set-web-url', 'http://my-pico.local', template_path, config_path],
+                check=True, capture_output=True)
+            with open(config_path, mode='r', encoding='UTF-8') as config:
+                self.assertIn('url = http://my-pico.local', config.read())
+
+            MergeConfig.merge_missing_options(template_path, config_path)
+            with open(config_path, mode='r', encoding='UTF-8') as config:
+                result = config.read()
+            self.assertIn('url = http://my-pico.local', result)
+            self.assertIn('email_enabled = false', result)
 
     def _merge(self, template_text, config_text):
         with tempfile.TemporaryDirectory() as temporary_directory:

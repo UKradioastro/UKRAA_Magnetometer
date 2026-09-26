@@ -22,10 +22,12 @@ def set_output_permissions(output_path):
     if grp is None or pwd is None or not hasattr(os, 'geteuid') or os.geteuid() != 0:
         return
 
-    owner_name = os.environ.get('MAGNETOMETER_FILE_OWNER', 'pi')
+    owner_name = os.environ.get('MAGNETOMETER_FILE_OWNER')
+    if owner_name is None:
+        owner_name = pwd.getpwuid(os.stat(os.path.dirname(output_path)).st_uid).pw_name
     try:
         owner = pwd.getpwnam(owner_name)
-        group = grp.getgrnam(owner_name)
+        group = grp.getgrgid(owner.pw_gid)
     except KeyError:
         print(f'INFO: File owner {owner_name} not found, leaving current ownership')
         return

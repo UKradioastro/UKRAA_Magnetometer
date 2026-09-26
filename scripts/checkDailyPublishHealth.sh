@@ -2,7 +2,7 @@
 
 set -u
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 WEB_ROOT=${MAGNETOMETER_WEB_ROOT:-/var/www/html}
 STATUS_DIR="$BASE_PATH/data/status"
 MARKER_FILE="$STATUS_DIR/daily-health.txt"

@@ -4,8 +4,8 @@ After=multi-user.target
 
 [Service]
 Type=idle
-User=pi
-ExecStart=/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/GetDataRaw.py
+User=@MAGNETOMETER_USER@
+ExecStart=/usr/bin/python3 @MAGNETOMETER_BASE_PATH@/scripts/GetDataRaw.py
 Restart=always
 RestartSec=10
 

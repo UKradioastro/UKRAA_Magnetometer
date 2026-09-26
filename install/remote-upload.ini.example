@@ -2,7 +2,7 @@
 # Set true to enable remote FTP uploads.
 enabled = false
 
-# Hostinger FTP settings
+# External FTP settings
 site = your-upload-ftp
 user = your-upload-user
 password = your-upload-password
@@ -20,6 +20,6 @@ create_dirs = true
 
 # Plot options are always uploaded to <directory>/status/plot-options.json.
 # Optional: when true, rolling uploads also send
-# /home/pi/UKRAA_Magnetometer/data/status/current.json
+# ~/UKRAA_Magnetometer/data/status/current.json
 # to <directory>/status/current.json
 upload_status_json = false

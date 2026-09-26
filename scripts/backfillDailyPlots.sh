@@ -5,7 +5,7 @@
 # have to wait for the next 4am cron run. Underlying minute data already exists
 # (ProcessDataRaw.py runs daily regardless of the plot flags).
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
@@ -32,7 +32,7 @@ fi
 
 if [ "$PLOT_HDZ" = "true" ] && [ ! -f "$BASE_PATH/temp/yesterday/HDZ.png" ]; then
     log_msg "backfillDailyPlots.sh : HDZ.png missing while plot_hdz=true, regenerating for yesterday" >> "$MAIN_LOG"
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataHDZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataHDZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "backfillDailyPlots.sh : Completed backfill HDZ plot" >> "$MAIN_LOG"
     else
         log_msg "backfillDailyPlots.sh : FAILED backfill HDZ plot" >> "$ERROR_LOG"
@@ -44,7 +44,7 @@ fi
 
 if [ "$PLOT_BI" = "true" ] && [ ! -f "$BASE_PATH/temp/yesterday/BI.png" ]; then
     log_msg "backfillDailyPlots.sh : BI.png missing while plot_bi=true, regenerating for yesterday" >> "$MAIN_LOG"
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataBI.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataBI.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "backfillDailyPlots.sh : Completed backfill BI plot" >> "$MAIN_LOG"
     else
         log_msg "backfillDailyPlots.sh : FAILED backfill BI plot" >> "$ERROR_LOG"

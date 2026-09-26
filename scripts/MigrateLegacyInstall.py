@@ -104,7 +104,7 @@ def main():
     argument_parser = argparse.ArgumentParser(
         description='Migrate legacy ACM0-named logs and files.')
     argument_parser.add_argument(
-        '--base-path', default='/home/pi/UKRAA_Magnetometer')
+        '--base-path', default=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     arguments = argument_parser.parse_args()
 
     migrated_logs, removed_files = migrate_legacy_install(arguments.base_path)
