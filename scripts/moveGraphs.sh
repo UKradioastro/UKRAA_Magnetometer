@@ -7,7 +7,7 @@ BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 WEB_ROOT=${MAGNETOMETER_WEB_ROOT:-/var/www/html}
 
 LOG_DIR="$BASE_PATH/logfiles"
-MAIN_LOG="$LOG_DIR/log-MagnetometerACM0.txt"
+MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 
 # logfile message function
@@ -48,7 +48,7 @@ for required_file in $REQUIRED_FILES; do
 done
 
 # read HDZ and BI plot flags from plot.ini (defaults: true true)
-if ! PLOT_OPTIONS=$(/usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptionsACM0.py" 2>&1); then
+if ! PLOT_OPTIONS=$(/usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptions.py" 2>&1); then
   log_msg "moveGraphs.sh             : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
   log_msg "moveGraphs.sh             : FAILED to read plot options: $PLOT_OPTIONS" >> "$ERROR_LOG"
   exit 1
@@ -131,7 +131,26 @@ then
 
   log_msg "moveGraphs.sh             : Completed moving graphs" >> "$MAIN_LOG"
 
-  if /bin/bash "$BASE_PATH/scripts/uploadRemoteACM0.sh" daily; then
+  PERIOD_STATUS_SOURCE="$BASE_PATH/data/status/period-plots.json"
+  if [ -f "$PERIOD_STATUS_SOURCE" ]; then
+    mkdir -p "$WEB_ROOT/status"
+    cp -a "$PERIOD_STATUS_SOURCE" "$WEB_ROOT/status/period-plots.json"
+    chmod 644 "$WEB_ROOT/status/period-plots.json"
+    log_msg "moveGraphs.sh             : Published period plot availability" >> "$MAIN_LOG"
+  else
+    log_msg "moveGraphs.sh             : Period plot availability not present" >> "$MAIN_LOG"
+  fi
+
+  if [ -d "$BASE_PATH/temp/periods" ]; then
+    rm -rf "$WEB_ROOT/temp/periods"
+    cp -a "$BASE_PATH/temp/periods" "$WEB_ROOT/temp/"
+    log_msg "moveGraphs.sh             : Published period plot images" >> "$MAIN_LOG"
+  else
+    rm -rf "$WEB_ROOT/temp/periods"
+    log_msg "moveGraphs.sh             : No period plot images to publish" >> "$MAIN_LOG"
+  fi
+
+  if /bin/bash "$BASE_PATH/scripts/uploadRemote.sh" daily; then
     log_msg "moveGraphs.sh             : Completed remote daily upload" >> "$MAIN_LOG"
   else
     log_msg "moveGraphs.sh             : FAILED remote daily upload (local publish kept)" >> "$ERROR_LOG"

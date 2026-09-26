@@ -2,7 +2,7 @@
 
 BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 LOG_DIR="$BASE_PATH/logfiles"
-MAIN_LOG="$LOG_DIR/log-MagnetometerACM0.txt"
+MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 
 log_msg() {
@@ -11,7 +11,7 @@ log_msg() {
 
 log_msg "processRollingData.sh     : Started rolling processing and publishing" >> "$MAIN_LOG"
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessRollingACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessRolling.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling data processing" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -19,7 +19,7 @@ else
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingXYZACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingXYZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling XYZ plot" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -27,7 +27,7 @@ else
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingActivityACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingActivity.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling activity plot" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -36,7 +36,7 @@ else
 fi
 
 # read HDZ and BI plot flags from plot.ini (defaults: true true)
-if ! PLOT_OPTIONS=$(su pi -c "/usr/bin/python3 $BASE_PATH/scripts/GetPlotOptionsACM0.py" 2>&1); then
+if ! PLOT_OPTIONS=$(su pi -c "/usr/bin/python3 $BASE_PATH/scripts/GetPlotOptions.py" 2>&1); then
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
     log_msg "processRollingData.sh     : FAILED to read plot options: $PLOT_OPTIONS" >> "$ERROR_LOG"
     exit 1
@@ -51,7 +51,7 @@ if [ -z "${PLOT_HDZ:-}" ] || [ -z "${PLOT_BI:-}" ] || [ -z "${PLOT_NOAA:-}" ] ||
 fi
 
 if [ "$PLOT_HDZ" = "true" ]; then
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingHDZACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingHDZ.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "processRollingData.sh     : Completed rolling HDZ plot" >> "$MAIN_LOG"
     else
         log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -63,7 +63,7 @@ else
 fi
 
 if [ "$PLOT_BI" = "true" ]; then
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingBIACM0.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotRollingBI.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
         log_msg "processRollingData.sh     : Completed rolling BI plot" >> "$MAIN_LOG"
     else
         log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -74,7 +74,7 @@ else
     log_msg "processRollingData.sh     : Skipping rolling BI plot (plot_bi = false in plot.ini)" >> "$MAIN_LOG"
 fi
 
-if ! PLOT_KP=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetKpOptionsACM0.py" 2>&1); then
+if ! PLOT_KP=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetKpOptions.py" 2>&1); then
     log_msg "processRollingData.sh     : FAILED to read Kp plot option: $PLOT_KP" >> "$ERROR_LOG"
     exit 1
 fi
@@ -93,12 +93,12 @@ fi
 
 if [ "$PLOT_KP" = "true" ] && [ ! -f "$BASE_PATH/temp/kp/PlanetaryKp.png" ]; then
     log_msg "processRollingData.sh     : Kp forecast enabled without cached data; refreshing now" >> "$MAIN_LOG"
-    if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/updateKpForecastACM0.sh"; then
+    if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/updateKpForecast.sh"; then
         log_msg "processRollingData.sh     : WARNING - immediate Kp forecast refresh failed; will retry next cycle" >> "$ERROR_LOG"
     fi
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlertsACM0.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/EvaluateAlerts.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "processRollingData.sh     : Completed rolling alert evaluation" >> "$MAIN_LOG"
 else
     log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"
@@ -106,10 +106,10 @@ else
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/publishWebACM0.sh"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/publishWeb.sh"; then
     log_msg "processRollingData.sh     : Completed rolling publish" >> "$MAIN_LOG"
 
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/uploadRemoteACM0.sh" rolling; then
+    if MAGNETOMETER_BASE_PATH="$BASE_PATH" /bin/bash "$BASE_PATH/scripts/uploadRemote.sh" rolling; then
         log_msg "processRollingData.sh     : Completed remote rolling upload" >> "$MAIN_LOG"
     else
         log_msg "processRollingData.sh     : FAILED - look in log-error.txt for details" >> "$MAIN_LOG"

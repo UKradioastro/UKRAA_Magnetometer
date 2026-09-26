@@ -29,7 +29,7 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [Installing the software onto your RPi](#installing-the-software-onto-your-RPi)
 - [What does the code do](#what-does-the-code-do)
 - [PicoMagnetometer webpage](#picomagnetometer-webpage)
-- [Check PicoMagnetometerACM0 service is running](#check-PicoMagnetometerACM0-service-is-running)
+- [Check PicoMagnetometer service is running](#check-PicoMagnetometer-service-is-running)
 - [Optional Post install operational checks](#Optional-Post-install-operational-checks)
 - [Optional NOAA aurora forecast panel](#Optional-NOAA-aurora-forecast-panel)
 - [Optional planetary Kp forecast panel](#Optional-planetary-Kp-forecast-panel)
@@ -52,11 +52,11 @@ The code assumes username is **pi**.
 
 If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in all the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
 
-The code assumes that your UKRAA PicoMagnetometer is connected to the RPi4/5 USB and that it will be connected via **/dev/ttyACM0**.
+The collector defaults to **/dev/ttyACM0**, configured in **config/USB.ini**. If your magnetometer appears at a different path, run **ConfigureUSB.py** and enter its device path. The setup tool records the USB identity so the collector can detect if that tty path later refers to a different device.
 
-If there are other devices connected to the RPi and your magnetometer is not **/dev/ttyACM0**, then you will need to change **/dev/ttyACM0** to **/dev/*ttyACMx*** in the **GetDataRaw.py** python script, where *ttyACMx* is the tty address of you connected magnetometer.
+The setup tool also offers the matching **/dev/serial/by-id/** path when available. Choosing that path is recommended if tty numbering may change after reconnecting or rebooting. You can also edit **serial_port** in **config/USB.ini** directly.
 
-**GetDataRawACM0.py** is run as a service.
+**GetDataRaw.py** is run as a service.
 
 Other scripts (Python and gnuplot) are run from **cron** using shell scripts.
 
@@ -92,7 +92,11 @@ ls /dev/tty*
 
 &nbsp;
 
-5. As long as you see **/dev/ttyACM0** then you do not have to make any changes to the python scripts, because they are looking for **ACM0**.
+5. Configure the selected device path and its USB identity by running:
+```
+sudo -u pi /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ConfigureUSB.py
+```
+Enter the matching **/dev/ttyACMx** path when prompted. If a by-id path is offered, choose it to keep selecting the same magnetometer when tty numbering changes.
 
 [Back to Contents...](#contents)
 
@@ -253,11 +257,11 @@ Code is also supplied that will enable the user to upload, via FTP, to their hos
 
 &nbsp;
 <!-- =============================================================================== --> 
-## Check PicoMagnetometerACM0 service is running
+## Check PicoMagnetometer service is running
 
 1. To check the **status** of your service, type the following command and press enter.
 ```
-sudo systemctl status PicoMagnetometerACM0.service
+sudo systemctl status PicoMagnetometer.service
 ```
 
 Two **GREEN enabled** and a **GREEN active (running)** indicates service running correctly.
@@ -268,14 +272,14 @@ Two **GREEN enabled** and a **GREEN active (running)** indicates service running
 
 2. To **start** your service, type the following command and press enter.
 ```
-sudo systemctl start PicoMagnetometerACM0.service
+sudo systemctl start PicoMagnetometer.service
 ```
 
 &nbsp;
 
 3. To **stop** your service, type the following command and press enter.
 ```
-sudo systemctl stop PicoMagnetometerACM0.service
+sudo systemctl stop PicoMagnetometer.service
 ```
 
 An enabled service that is stopped will only have two **GREEN enables** and an **inactive(dead)**
@@ -289,14 +293,14 @@ If this is the case you will need to:
 
 4. To **enable** your service, type the following command and press enter.
 ```
-sudo systemctl enable PicoMagnetometerACM0.service
+sudo systemctl enable PicoMagnetometer.service
 ```
 
 &nbsp;
 
 5. To **disable** your service, type the following command and press enter.
 ```
-sudo systemctl disable PicoMagnetometerACM0.service
+sudo systemctl disable PicoMagnetometer.service
 ```
 
 A disabled service will have a **YELLOW disabled**, a **GREEN enabled** and an **inactive (dead)**
@@ -318,23 +322,23 @@ If this is the case you will need to:
 <!-- =============================================================================== -->
 ## Optional Post install operational checks
 
-### runPostUpdateChecksACM0.sh
+### runPostUpdateChecks.sh
 
 After installing/updating scripts on your RPi, you can run:
 
 ```
-sudo bash /home/pi/UKRAA_Magnetometer/scripts/runPostUpdateChecksACM0.sh
+sudo bash /home/pi/UKRAA_Magnetometer/scripts/runPostUpdateChecks.sh
 ```
 
 This executes:
 - optional daily publish logic checks
 - optional HDZ/BI web visibility checks
 
-### checkDailyPublishHealthACM0.sh
+### checkDailyPublishHealth.sh
 For daily runtime monitoring, a health marker is written by:
 
 ```
-sudo bash /home/pi/UKRAA_Magnetometer/scripts/checkDailyPublishHealthACM0.sh
+sudo bash /home/pi/UKRAA_Magnetometer/scripts/checkDailyPublishHealth.sh
 ```
 
 Marker output file:
@@ -352,11 +356,11 @@ The marker reports one of three states:
 - `FAIL` - raw data existed but the minute data file or one or more published
   plots are missing. This is a real fault. Exit code 1.
 
-### showDashboardSummaryACM0.sh
+### showDashboardSummary.sh
 One-line dashboard summary on demand:
 
 ```
-sudo bash /home/pi/UKRAA_Magnetometer/scripts/showDashboardSummaryACM0.sh
+sudo bash /home/pi/UKRAA_Magnetometer/scripts/showDashboardSummary.sh
 ```
 
 If scheduled in cron, summary snapshots can be collected in:
@@ -468,7 +472,7 @@ plot_kp = true
 - `plot_kp = true` enables the panel.
 - `plot_kp = false` disables the panel and removes the locally cached and published Kp chart.
 
-The forecast is downloaded from NOAA's JSON feed, cached as `/home/pi/UKRAA_Magnetometer/data/kp/latest.csv`, and rendered to `/home/pi/UKRAA_Magnetometer/temp/kp/PlanetaryKp.png`. `updateKpForecastACM0.sh` refreshes the data and chart hourly.
+The forecast is downloaded from NOAA's JSON feed, cached as `/home/pi/UKRAA_Magnetometer/data/kp/latest.csv`, and rendered to `/home/pi/UKRAA_Magnetometer/temp/kp/PlanetaryKp.png`. `updateKpForecast.sh` refreshes the data and chart hourly.
 
 Forecast data source and G-scale definitions:
 
@@ -505,8 +509,8 @@ The alert evaluator runs as part of `processRollingData.sh` and only sends email
 
 The same threshold values are also used by:
 
-* Daily hourly Activity plot (`PlotDataActivityACM0.gp`)
-* Rolling Activity plot (`PlotRollingActivityACM0.gp`)
+* Daily hourly Activity plot (`PlotDataActivity.gp`)
+* Rolling Activity plot (`PlotRollingActivity.gp`)
 
 ### Configure via `.ini` file (recommended)
 
@@ -543,10 +547,10 @@ Notes:
 * When `email_enabled = false`, thresholds, alert levels, plots and the web status page all still work; only email sending is skipped.
 * Suppression is logged once per level transition, not on every run.
 * The daily heartbeat email is also skipped while `email_enabled = false`.
-* The manual test scripts (`testAlertEmailACM0.sh`, `testHeartbeatEmailACM0.sh`) still send, so you can verify SMTP before enabling.
+* The manual test scripts (`testAlertEmail.sh`, `testHeartbeatEmail.sh`) still send, so you can verify SMTP before enabling.
 * Environment variable override: `MAGNETOMETER_EMAIL_ENABLED`
 
-By default, `EvaluateAlertsACM0.py` reads:
+By default, `EvaluateAlerts.py` reads:
 `/home/pi/UKRAA_Magnetometer/config/alerts.ini`
 
 You can override the config path with:
@@ -616,17 +620,17 @@ Available environment variables are:
 You can regenerate the hourly Activity plot for any date without storing an archive copy by default:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlotACM0.sh YYYY-MM-DD
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlot.sh YYYY-MM-DD
 ```
 
 This updates only:
 
 * `/home/pi/UKRAA_Magnetometer/temp/yesterday/Activity.png`
 
-To also write the dated archive file in `plots/Activity/YYYY/YYYY-MM/`, add `--archive`:
+To also write the dated archive file in `plots/day/Activity/YYYY/YYYY-MM/`, add `--archive`:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlotACM0.sh YYYY-MM-DD --archive
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlot.sh YYYY-MM-DD --archive
 ```
 
 ### Send a one-off SMTP test email
@@ -634,13 +638,13 @@ To also write the dated archive file in `plots/Activity/YYYY/YYYY-MM/`, add `--a
 To verify SMTP settings without waiting for a threshold transition, run:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testAlertEmailACM0.sh
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testAlertEmail.sh
 ```
 
 Or run the Python script directly:
 
 ```
-/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-email
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-email
 ```
 
 The test email does not update transition state, so normal alert logic is unaffected.
@@ -678,13 +682,13 @@ Environment variable overrides are also available:
 To verify heartbeat email delivery without waiting for `heartbeat.hour_utc`, run:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmailACM0.sh
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmail.sh
 ```
 
 Or run the Python script directly:
 
 ```
-/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlertsACM0.py --test-heartbeat
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-heartbeat
 ```
 
 This immediate heartbeat test does not update daily heartbeat schedule/state tracking.
@@ -698,6 +702,41 @@ This immediate heartbeat test does not update daily heartbeat schedule/state tra
 
 &nbsp;
 <!-- =============================================================================== --> 
+## Optional week-to-year magnetic plots
+
+Long-period XYZ, HDZ, and BI plots use one aggregate value per complete UTC day.
+They are disabled by default. In `config/plot.ini`, enable any required period:
+
+```
+plot_week = true
+plot_month = true
+plot_3month = true
+plot_6month = true
+plot_year = true
+```
+
+Each period is a trailing window ending on yesterday. A graph appears after all
+required days have at least 95% valid minute data: 7, 30, 90, 183, or 365 days.
+Until then, the webpage displays a data-availability placeholder. XYZ is always
+included; HDZ and BI honour the existing `plot_hdz` and `plot_bi` options.
+
+Archives are stored as:
+
+```
+plots/day/XYZ/YYYY/YYYY-MM/YYYY-MM-DD.png
+plots/week/XYZ/YYYY/YYYY-MM/YYYY-MM-DD.png
+plots/month/XYZ/YYYY/YYYY-MM/YYYY-MM-DD.png
+```
+
+The other families follow the same layout. Current web assets are published to
+`temp/yesterday/` for day plots and `temp/periods/<period>/` for longer periods.
+
+To include already processed historical data after upgrading, run this once:
+
+```
+/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDailySummary.py --all
+```
+
 ## Optional Remote FTP upload
 
 Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **remote-upload.ini**.
@@ -749,14 +788,14 @@ Behavior:
 Manual test commands:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh daily
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemoteACM0.sh rolling
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemote.sh daily
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemote.sh rolling
 ```
 
 Combined test helper:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testRemoteUploadACM0.sh
+/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testRemoteUpload.sh
 ```
 
 [Back to Contents...](#contents)
@@ -772,10 +811,10 @@ Combined test helper:
 After a release has been published on GitHub, run the updater already installed on the RPi:
 
 ```
-sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometerACM0.sh
+sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometer.sh
 ```
 
-The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, configuration files, log files and temporary web files. It then runs `install.sh` to update the service, scheduled jobs and web files.
+The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, existing configuration values, log files and temporary web files. When a release adds options or sections to an `.ini.example` template, the installer adds those missing defaults to the corresponding file in `config` without replacing site-specific values. It then updates the service, scheduled jobs and web files.
 
 The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
 

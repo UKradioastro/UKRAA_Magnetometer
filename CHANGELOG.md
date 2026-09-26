@@ -5,6 +5,34 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses calendar versioning in the format `YYYY.MM.patch`.
 
+## [Unreleased]
+
+## [2026.09.4] - 2026-09-26
+
+### Added
+- USB serial-port configuration in `config/USB.ini`, defaulting to `/dev/ttyACM0`.
+- `ConfigureUSB.py` to capture a selected device's udev serial identifiers and optionally use its stable `/dev/serial/by-id/` path.
+- Collector-side USB identity checks when expected `ID_SERIAL` values are configured.
+- Optional week, month, 3-month, 6-month, and year magnetic plots, controlled by `plot_week`, `plot_month`, `plot_3month`, `plot_6month`, and `plot_year` in `plot.ini`.
+- Daily magnetic-summary processing for long-period plots, including data-coverage tracking and one-time historical backfill support.
+- Shared period plot renderers for XYZ, HDZ, and BI, plus readiness status in `status/period-plots.json`.
+- Local and FTP publication of available period plots and their readiness status.
+- Webpage long-period graph section with a per-period “Not enough data yet” placeholder until a complete window is available.
+- Automated tests for daily-summary values and all long-period availability thresholds.
+
+### Changed
+- Removed the `ACM0` suffix from script, cron, and service filenames and runtime log labels; `/dev/ttyACM0` remains the default device path.
+- Renamed the collector unit to `PicoMagnetometer.service`; installation now retires the legacy unit and obsolete filenames.
+- Updated user instructions to configure the USB device through `USB.ini` or `ConfigureUSB.py`.
+- Daily plot archives now use the symmetric `plots/day/<family>/YYYY/YYYY-MM/YYYY-MM-DD.png` layout; week-to-year archives use the same period-first structure.
+- Daily processing now generates the daily summary and eligible period plots after completing normal day processing.
+- Daily publish health checks now verify enabled, mature period plots while allowing incomplete windows to remain in placeholder state.
+
+### Fixed
+- Service migration now verifies that the replacement collector is enabled and active; post-update checks report service migration failures.
+- Existing ACM0-named current and rotated logs are migrated without discarding their contents.
+- Software updates now add missing options and sections from the current configuration templates to existing `alerts.ini`, `plot.ini`, and `remote-upload.ini` files without replacing configured values.
+
 ## [2026.09.3] - 2026-09-25
 
 ### Added

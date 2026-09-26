@@ -4,6 +4,7 @@ import configparser
 import datetime
 import math
 import os
+import subprocess
 
 
 RAW_FIELD_NAMES = [
@@ -137,6 +138,59 @@ def build_plot_ini_path(base_path):
     return os.path.join(base_path, 'config', 'plot.ini')
 
 
+def build_usb_ini_path(base_path):
+    configured_path = os.environ.get('MAGNETOMETER_USB_INI_PATH', '').strip()
+    if configured_path:
+        return configured_path
+
+    return os.path.join(base_path, 'config', 'USB.ini')
+
+
+def get_usb_options(base_path):
+    parser = _load_ini_parser(build_usb_ini_path(base_path))
+
+    return {
+        'serial_port': parser.get('usb', 'serial_port', fallback='/dev/ttyACM0').strip()
+            or '/dev/ttyACM0',
+        'id_serial': parser.get('usb', 'id_serial', fallback='').strip(),
+        'id_serial_short': parser.get('usb', 'id_serial_short', fallback='').strip(),
+    }
+
+
+def get_usb_identity(device_path):
+    try:
+        result = subprocess.run(
+            ['udevadm', 'info', '--query=property', '--name=' + device_path],
+            check=True, capture_output=True, text=True)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError(
+            f'Unable to read USB identity for {device_path}: {exc}') from exc
+
+    return dict(
+        line.split('=', 1)
+        for line in result.stdout.splitlines()
+        if '=' in line)
+
+
+def verify_usb_identity(device_path, usb_options):
+    expected_values = (
+        ('ID_SERIAL', usb_options.get('id_serial', '')),
+        ('ID_SERIAL_SHORT', usb_options.get('id_serial_short', '')),
+    )
+    if not any(expected_value for _, expected_value in expected_values):
+        return {}
+
+    actual_values = get_usb_identity(device_path)
+    for property_name, expected_value in expected_values:
+        if expected_value and actual_values.get(property_name) != expected_value:
+            actual_value = actual_values.get(property_name, '<missing>')
+            raise RuntimeError(
+                f'USB identity mismatch for {device_path}: expected '
+                f'{property_name}={expected_value}, got {actual_value}')
+
+    return actual_values
+
+
 def _parse_bool(value_text, default_value):
     if value_text is None:
         return default_value
@@ -194,6 +248,21 @@ def get_kp_options(base_path):
         os.environ.get('MAGNETOMETER_PLOT_KP',
                        parser.get('plots', 'plot_kp', fallback='true')),
         True)
+
+
+def get_period_plot_options(base_path):
+    plot_ini_path = build_plot_ini_path(base_path)
+    parser = _load_ini_parser(plot_ini_path)
+    period_names = ('week', 'month', '3month', '6month', 'year')
+
+    return {
+        period_name: _parse_bool(
+            os.environ.get(
+                'MAGNETOMETER_PLOT_' + period_name.upper(),
+                parser.get('plots', 'plot_' + period_name, fallback='false')),
+            False)
+        for period_name in period_names
+    }
 
 
 def _load_ini_parser(config_path):

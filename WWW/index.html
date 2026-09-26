@@ -29,6 +29,8 @@ body {font-family: "Lato", sans-serif}
 .graph-frame img {display: block; margin-left: auto; margin-right: auto; max-width: 800px}
 .optional-graph-section {display: none}
 .optional-graph-card {display: none}
+.period-placeholder {border: 1px solid #777; margin: 16px auto; max-width: 800px; padding: 24px; text-align: center}
+.period-plot-title {margin: 32px 0 8px}
 </style>
 <!-- End of Style -->
 </head>
@@ -54,6 +56,7 @@ body {font-family: "Lato", sans-serif}
         <a href="#XYZ" class="w3-bar-item w3-button">XYZ GRAPHS</a>
         <a href="#HDZ" class="w3-bar-item w3-button" id="navHdz" style="display:none">HDZ GRAPHS</a>
         <a href="#BI" class="w3-bar-item w3-button" id="navBi" style="display:none">BI GRAPHS</a>
+        <a href="#periods" class="w3-bar-item w3-button" id="navPeriods" style="display:none">LONG PERIOD GRAPHS</a>
       </div>
     </div>
     <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">CONTACT</a>
@@ -71,6 +74,7 @@ body {font-family: "Lato", sans-serif}
   <a href="#XYZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">XYZ GRAPHS</a>
   <a href="#HDZ" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoHdz" style="display:none">HDZ GRAPHS</a>
   <a href="#BI" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoBi" style="display:none">BI GRAPHS</a>
+  <a href="#periods" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()" id="navDemoPeriods" style="display:none">LONG PERIOD GRAPHS</a>
 </div>
 <!-- End of Navbar -->
 
@@ -242,6 +246,15 @@ body {font-family: "Lato", sans-serif}
           <img src="./temp/yesterday/BI.png" data-refresh-src="./temp/yesterday/BI.png" onerror="showDefaultImage(this)" class="w3-round w3-margin-bottom" alt="daily BI variation plot" style="width:100%">
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Optional week-to-year magnetic plots -->
+  <div class="w3-white optional-graph-section" id="periods">
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:960px">
+      <h2 class="w3-wide">LONG PERIOD MAGNETIC RESULTS</h2>
+      <p class="w3-center">Daily aggregates shown across completed UTC days.</p>
+      <div id="periodPlotCards"></div>
     </div>
   </div>
 
@@ -506,9 +519,98 @@ function refreshOptionalGraphs() {
     });
 }
 
+function periodLabel(periodName) {
+  var labels = {
+    week: "WEEK",
+    month: "MONTH",
+    "3month": "3 MONTH",
+    "6month": "6 MONTH",
+    year: "YEAR"
+  };
+
+  return labels[periodName] || periodName;
+}
+
+function refreshPeriodPlots() {
+  var statusCandidates = [
+    "./status/period-plots.json",
+    "./temp/status/period-plots.json"
+  ];
+
+  function fetchNextStatus(index) {
+    if (index >= statusCandidates.length) {
+      throw new Error("period plot status fetch failed");
+    }
+
+    return fetch(statusCandidates[index] + "?t=" + Date.now(), { cache: "no-store" })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error("period plot status fetch failed");
+        }
+        return response.json();
+      })
+      .catch(function() {
+        return fetchNextStatus(index + 1);
+      });
+  }
+
+  fetchNextStatus(0)
+    .then(function(status) {
+      var sectionVisible = false;
+      var cards = document.getElementById("periodPlotCards");
+      cards.innerHTML = "";
+
+      Object.keys(status.periods).forEach(function(periodName) {
+        var period = status.periods[periodName];
+        if (!period.enabled) {
+          return;
+        }
+
+        sectionVisible = true;
+        ["XYZ", "HDZ", "BI"].forEach(function(familyName) {
+          var familyEnabled = status.families[familyName.toLowerCase()] === true;
+          if (!familyEnabled) {
+            return;
+          }
+
+          var title = document.createElement("h3");
+          title.className = "period-plot-title";
+          title.textContent = periodLabel(periodName) + " " + familyName;
+          cards.appendChild(title);
+
+          if (period.available) {
+            var frame = document.createElement("div");
+            frame.className = "w3-row w3-padding-16";
+            var image = document.createElement("img");
+            image.className = "w3-round w3-margin-bottom";
+            image.alt = periodName + " " + familyName + " magnetic plot";
+            image.style.width = "100%";
+            image.src = "./temp/periods/" + periodName + "/" + familyName + ".png?t=" + Date.now();
+            image.onerror = function() { showDefaultImage(this); };
+            frame.appendChild(image);
+            cards.appendChild(frame);
+          } else {
+            var placeholder = document.createElement("div");
+            placeholder.className = "period-placeholder";
+            placeholder.textContent = "Not enough data yet: " + period.valid_days + " of "
+              + period.required_days + " complete UTC days available (" + period.start_date
+              + " to " + period.end_date + ").";
+            cards.appendChild(placeholder);
+          }
+        });
+      });
+
+      setGroupVisibility("periods", sectionVisible, "navPeriods", "navDemoPeriods");
+    })
+    .catch(function() {
+      setGroupVisibility("periods", false, "navPeriods", "navDemoPeriods");
+    });
+}
+
 function refreshPageData() {
   refreshRollingStatus();
   refreshOptionalGraphs();
+  refreshPeriodPlots();
   refreshPlotImages();
 }
 
