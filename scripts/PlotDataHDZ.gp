@@ -19,7 +19,7 @@ fileData = pathData."/" \
 is_missing = system("sudo /bin/bash ".basePath."/scripts/isMissing.sh ".fileData)
 if (is_missing == 1) {
     print system("date +'%Y-%m-%d %H:%M:%S'") \
-          ." : PlotDataHDZ.gp        : FAILED - data file missing"
+          ." : ".sprintf("%-27s", "PlotDataHDZ.gp")." : FAILED - data file missing"
     exit
 }
 
@@ -34,7 +34,7 @@ tempPlot = basePath."/temp/yesterday/HDZ.png"
 dirCreated = system("sh -lc 'if [ -d \"".plotMonthDir."\" ]; then echo 0; else mkdir -p \"".plotMonthDir."\"; echo 1; fi'")
 if (dirCreated == 1) {
     print system("date +'%Y-%m-%d %H:%M:%S'") \
-          ." : PlotDataHDZ.gp        : New directory created : ".plotMonthDir
+          ." : ".sprintf("%-27s", "PlotDataHDZ.gp")." : New directory created : ".plotMonthDir
 }
 system("sh -lc 'mkdir -p \"".basePath."/temp/yesterday\"'")
 
@@ -83,7 +83,7 @@ plotTitle = sprintf("HDZ magnetic field for %s\nGraph is updated every day at 9.
 set xrange [startX:endX]
 
 print system("date +'%Y-%m-%d %H:%M:%S'") \
-      ." : PlotDataHDZ.gp        : Started HDZ plot for " \
+      ." : ".sprintf("%-27s", "PlotDataHDZ.gp")." : Started HDZ plot for " \
       .dateTag
 
 set output archivePlot
@@ -267,5 +267,5 @@ unset multiplot
 set output
 
 print system("date +'%Y-%m-%d %H:%M:%S'") \
-      ." : PlotDataHDZ.gp        : Completed HDZ plot for " \
+      ." : ".sprintf("%-27s", "PlotDataHDZ.gp")." : Completed HDZ plot for " \
       .dateTag

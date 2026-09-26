@@ -7,6 +7,10 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+### Changed
+- Timestamped Python, shell, and plot log entries now use a 27-character source field so the second colon aligns.
+- USB setup instructions now run after installation and include restarting the collector to apply the selected port.
+
 ## [2026.09.4] - 2026-09-26
 
 ### Added

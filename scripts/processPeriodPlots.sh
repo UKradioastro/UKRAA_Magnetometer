@@ -6,8 +6,10 @@ MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 STATUS_FILE="$BASE_PATH/data/status/period-plots.json"
 
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
 log_msg() {
-    printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
+    write_log_entry "$1"
 }
 
 if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPeriodPlotAvailability.py" --write-status >> "$MAIN_LOG" 2>> "$ERROR_LOG"; then

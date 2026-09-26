@@ -8,8 +8,10 @@ MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
 
 # logfile message function
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
 log_msg() {
-    printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
+    write_log_entry "$1"
 }
 
 # log message to main logfile

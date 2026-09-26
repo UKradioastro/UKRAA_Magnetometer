@@ -8,7 +8,7 @@ ERROR_LOG="$BASE_PATH/logfiles/log-error.txt"
 mkdir -p "$BASE_PATH/logfiles"
 
 if [ "$#" -eq 0 ]; then
-    printf '%s : runCronJob.sh       : FAILED - command is required\n' "$(date '+%Y-%m-%d %H:%M:%S')" >> "$ERROR_LOG"
+    printf '%s : %-34s : FAILED - command is required\n' "$(date '+%Y-%m-%d %H:%M:%S')" 'runCronJob.sh' >> "$ERROR_LOG"
     exit 2
 fi
 
@@ -21,7 +21,7 @@ COMMAND_NAME=$(basename "${2:-$1}")
 
 while IFS= read -r line; do
     if [ -n "$line" ]; then
-        printf '%s : %-27s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$COMMAND_NAME stderr" "$line" >> "$ERROR_LOG"
+        printf '%s : %-34s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$COMMAND_NAME stderr" "$line" >> "$ERROR_LOG"
     fi
 done < "$STDERR_FILE"
 

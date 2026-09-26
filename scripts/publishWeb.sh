@@ -14,8 +14,10 @@ DEST_STATUS_DIR=/var/www/html/status
 DEST_NOAA_DIR=/var/www/html/temp/noaa
 DEST_KP_DIR=/var/www/html/temp/kp
 
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
 log_msg() {
-    printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
+    write_log_entry "$1"
 }
 
 log_msg "publishWeb.sh         : Started publishing rolling web assets" >> "$MAIN_LOG"
