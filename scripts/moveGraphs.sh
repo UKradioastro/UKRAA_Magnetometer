@@ -3,7 +3,7 @@
 # script moveGraphs.sh to move yesterdays graphs to /var/www/html.
 # runs once per day (09:30) via cron
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 WEB_ROOT=${MAGNETOMETER_WEB_ROOT:-/var/www/html}
 
 LOG_DIR="$BASE_PATH/logfiles"

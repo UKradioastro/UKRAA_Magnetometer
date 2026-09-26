@@ -2,12 +2,11 @@
 
 set -u
 
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
+
 # The installer deletes the source WWW folder, so run from a directory that always exists.
 cd / || exit 1
-
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 WEB_ROOT=${MAGNETOMETER_WEB_ROOT:-/var/www/html}
-FILE_OWNER=${MAGNETOMETER_FILE_OWNER:-pi}
 
 # Prefer the source copy (development checkout); fall back to the deployed copy (installed system).
 if [ -f "$BASE_PATH/WWW/index.html" ]; then
@@ -104,7 +103,7 @@ mkdir -p "$TEST_ROOT"
 
 # Chown the shared tests/ parent too, since mkdir -p creates it as root when invoked via sudo.
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
+    chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/data/tests"
 fi
 
 # Contract cases: configuration controls visibility even before an image exists.
@@ -114,6 +113,6 @@ run_case "period_enabled_without_image" "true" "show"
 
 log "All optional web visibility checks passed."
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
+    chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/data/tests"
 fi
 log "Test root: $TEST_ROOT"

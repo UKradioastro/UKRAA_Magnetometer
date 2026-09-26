@@ -2,7 +2,7 @@
 
 reset
 
-basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
+basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-$HOME/UKRAA_Magnetometer}\"'")
 kpData = basePath."/data/kp/latest.csv"
 archivePlot = basePath."/plots/kp/PlanetaryKp.png"
 tempPlot = basePath."/temp/kp/PlanetaryKp.png"

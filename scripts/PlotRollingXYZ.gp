@@ -2,7 +2,7 @@
 
 reset
 
-basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
+basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-$HOME/UKRAA_Magnetometer}\"'")
 rollingData = basePath."/data/rolling/latest-24h.csv"
 archivePlot = basePath."/plots/rolling/RollingXYZ.png"
 tempPlot = basePath."/temp/rolling/RollingXYZ.png"

@@ -2,7 +2,7 @@
 
 set -u
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 STATUS_FILE="$BASE_PATH/data/status/daily-health.txt"
 MAIN_LOG="$BASE_PATH/logfiles/log-Magnetometer.txt"
 ERROR_LOG="$BASE_PATH/logfiles/log-error.txt"

@@ -26,7 +26,7 @@ set terminal pngcairo \
 # Set print to <stdout>
 set print "-"
 
-basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
+basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-$HOME/UKRAA_Magnetometer}\"'")
 targetDate = system("sh -lc 'if [ -n \"${MAGNETOMETER_TARGET_DATE:-}\" ]; then printf %s \"$MAGNETOMETER_TARGET_DATE\"; else date -d yesterday +%Y-%m-%d; fi'")
 targetDatePretty = system("sh -lc 'date -d \"".targetDate."\" +\"%A %d %B %Y\"'")
 nextDate = system("sh -lc 'date -d \"".targetDate." +1 day\" +%Y-%m-%d'")

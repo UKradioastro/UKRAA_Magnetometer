@@ -2,7 +2,7 @@
 
 set -u
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
@@ -64,10 +64,10 @@ def set_output_permissions(output_path):
     if not hasattr(os, 'geteuid') or os.geteuid() != 0:
         return
 
-    owner_name = os.environ.get('MAGNETOMETER_FILE_OWNER', 'pi')
+    owner_name = os.environ['MAGNETOMETER_FILE_OWNER']
     try:
         owner = pwd.getpwnam(owner_name)
-        group = grp.getgrnam(owner_name)
+        group = grp.getgrgid(owner.pw_gid)
     except KeyError:
         print(f'INFO: File owner {owner_name} not found, leaving current ownership')
         return

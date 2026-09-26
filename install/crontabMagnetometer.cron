@@ -1,27 +1,27 @@
 
 # UKRAA Magnetometer crontab entry
 
-# cron entry to process yesterdays raw magnetometer data (run as user pi)
-00 04 * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/processData.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt
+# cron entry to process yesterdays raw magnetometer data
+00 04 * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/processData.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/log-Magnetometer.txt
 
 # cron entry to refresh rolling data, rolling plots and rolling web assets every 5 minutes
-*/5 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/processRollingData.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt
+*/5 * * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/processRollingData.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/log-Magnetometer.txt
 
 # cron entry to cache the NOAA 30-minute aurora forecast image
-*/30 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/updateNoaaAuroraForecast.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt
+*/30 * * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/updateNoaaAuroraForecast.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/log-Magnetometer.txt
 
 # cron entry to download and plot the NOAA planetary Kp forecast
-15 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/updateKpForecast.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt
+15 * * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/updateKpForecast.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/log-Magnetometer.txt
 
 # cron entry to manage logfiles - on a Sunday 00:00 each week
-00 00 * * 00 /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/manageLogfiles.sh
+00 00 * * 00 /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/manageLogfiles.sh
 
 # cron entry to upload plot files to www
-30 09 * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/moveGraphs.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt
+30 09 * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/moveGraphs.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/log-Magnetometer.txt
 
 # cron entry to write daily health marker after processing + publish should be complete
-15 10 * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/checkDailyPublishHealth.sh >> /home/pi/UKRAA_Magnetometer/logfiles/log-Magnetometer.txt
+15 10 * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/checkDailyPublishHealth.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/log-Magnetometer.txt
 
 # cron entry to append one-line dashboard summary every 15 minutes
-*/15 * * * * /bin/bash /home/pi/UKRAA_Magnetometer/scripts/runCronJob.sh /bin/bash /home/pi/UKRAA_Magnetometer/scripts/showDashboardSummary.sh >> /home/pi/UKRAA_Magnetometer/logfiles/dashboard-summary.log
+*/15 * * * * /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/runCronJob.sh /bin/bash @MAGNETOMETER_BASE_PATH@/scripts/showDashboardSummary.sh >> @MAGNETOMETER_BASE_PATH@/logfiles/dashboard-summary.log
 

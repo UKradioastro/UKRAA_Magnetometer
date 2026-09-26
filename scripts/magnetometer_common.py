@@ -38,7 +38,8 @@ def get_target_date(default_days_ago=1):
 
 
 def get_base_path():
-    return os.environ.get('MAGNETOMETER_BASE_PATH', '/home/pi/UKRAA_Magnetometer')
+    return os.environ.get(
+        'MAGNETOMETER_BASE_PATH', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def get_version(base_path):

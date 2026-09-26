@@ -2,7 +2,7 @@
 
 set -u
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
@@ -18,10 +18,10 @@ log_msg() {
 
 mkdir -p "$LOG_DIR"
 
-# Repair output paths created by earlier root-run versions before switching to pi.
+# Repair output paths created by earlier root-run versions before switching accounts.
 if [ "$(id -u)" -eq 0 ]; then
     mkdir -p "$BASE_PATH/data/kp" "$BASE_PATH/temp/kp" "$BASE_PATH/plots/kp"
-    chown -R pi:pi "$BASE_PATH/data/kp" "$BASE_PATH/temp/kp" "$BASE_PATH/plots/kp"
+    chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/data/kp" "$BASE_PATH/temp/kp" "$BASE_PATH/plots/kp"
 fi
 
 if ! PLOT_KP=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetKpOptions.py" 2>&1); then
@@ -41,12 +41,12 @@ if [ "$PLOT_KP" = "false" ]; then
 fi
 
 log_msg "updateKpForecast.sh    : Started NOAA planetary Kp forecast update" >> "$MAIN_LOG"
-if ! DOWNLOAD_OUTPUT=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/UpdateKpForecast.py $KP_URL $KP_DATA" 2>&1); then
+if ! DOWNLOAD_OUTPUT=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/python3 $BASE_PATH/scripts/UpdateKpForecast.py $KP_URL $KP_DATA" 2>&1); then
     log_msg "updateKpForecast.sh    : FAILED - $DOWNLOAD_OUTPUT" >> "$ERROR_LOG"
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotKpForecast.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotKpForecast.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "updateKpForecast.sh    : $DOWNLOAD_OUTPUT" >> "$MAIN_LOG"
     log_msg "updateKpForecast.sh    : Completed NOAA planetary Kp forecast update" >> "$MAIN_LOG"
     exit 0

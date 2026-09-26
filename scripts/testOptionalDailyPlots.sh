@@ -2,14 +2,13 @@
 
 set -u
 
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
+
 # The installer deletes its own directory, so a leftover cwd can break child shells.
 cd / || exit 1
-
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
 # Kept under data/ so validation sandboxes are treated like project data, not root-level clutter.
 TEST_ROOT=${1:-"$BASE_PATH/data/tests/optional-daily-plots"}
 TEST_BASE_PATH="$TEST_ROOT/UKRAA_Magnetometer"
-FILE_OWNER=${MAGNETOMETER_FILE_OWNER:-pi}
 
 if [ "${1:-}" = "--help" ]; then
     echo "Usage: $0 [TEST_ROOT]"
@@ -44,6 +43,7 @@ run_case() {
     mkdir -p "$scripts_dir" "$temp_dir" "$config_dir"
 
     sed 's/\r$//' "$BASE_PATH/scripts/moveGraphs.sh" > "$scripts_dir/moveGraphs.sh"
+    cp "$BASE_PATH/scripts/magnetometer-env.sh" "$scripts_dir/magnetometer-env.sh"
     chmod +x "$scripts_dir/moveGraphs.sh"
 
     if ! /bin/bash -n "$scripts_dir/moveGraphs.sh"; then
@@ -68,6 +68,7 @@ PY
 
     mkdir -p "$TEST_BASE_PATH/logfiles" "$TEST_BASE_PATH/scripts" "$TEST_BASE_PATH/temp/yesterday"
     cp "$scripts_dir/moveGraphs.sh" "$TEST_BASE_PATH/scripts/moveGraphs.sh"
+    cp "$scripts_dir/magnetometer-env.sh" "$TEST_BASE_PATH/scripts/magnetometer-env.sh"
     cp "$scripts_dir/GetPlotOptions.py" "$TEST_BASE_PATH/scripts/GetPlotOptions.py"
 
     rm -rf "$TEST_BASE_PATH/temp/yesterday"
@@ -105,7 +106,7 @@ mkdir -p "$TEST_ROOT"
 
 # Chown the shared tests/ parent too, since mkdir -p creates it as root when invoked via sudo.
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
+    chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/data/tests"
 fi
 
 run_case "hdz_on_bi_on_all_present" "true" "true" "true" "true" 0
@@ -117,6 +118,6 @@ run_case "hdz_on_hdz_missing" "true" "false" "false" "false" 1
 
 log "All optional daily plot publish tests passed."
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R "$FILE_OWNER:$FILE_OWNER" "$BASE_PATH/data/tests"
+    chown -R "$FILE_OWNER:$FILE_GROUP" "$BASE_PATH/data/tests"
 fi
 log "Test root: $TEST_ROOT"

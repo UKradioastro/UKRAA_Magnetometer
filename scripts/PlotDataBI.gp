@@ -5,7 +5,7 @@ reset
 # Send print output to stdout so progress lines land in the main log, not log-error.txt
 set print "-"
 
-basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}\"'")
+basePath = system("sh -lc 'printf %s \"${MAGNETOMETER_BASE_PATH:-$HOME/UKRAA_Magnetometer}\"'")
 pathData = basePath."/data/minute"
 
 fileData = pathData."/" \

@@ -2,7 +2,7 @@
 
 set -u
 
-BASE_PATH=${MAGNETOMETER_BASE_PATH:-/home/pi/UKRAA_Magnetometer}
+source "$(dirname "${BASH_SOURCE[0]}")/magnetometer-env.sh"
 LOG_DIR="$BASE_PATH/logfiles"
 MAIN_LOG="$LOG_DIR/log-Magnetometer.txt"
 ERROR_LOG="$LOG_DIR/log-error.txt"
@@ -39,14 +39,14 @@ fi
 
 log_msg "testActivityPlot.sh   : Regenerating Activity plot for $TARGET_DATE (archive=$ARCHIVE_MODE)" >> "$MAIN_LOG"
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_TARGET_DATE="$TARGET_DATE" su pi -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessDataHour.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_TARGET_DATE="$TARGET_DATE" su "$FILE_OWNER" -c "/usr/bin/python3 $BASE_PATH/scripts/ProcessDataHour.py >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "testActivityPlot.sh   : Completed hourly processing for $TARGET_DATE" >> "$MAIN_LOG"
 else
     log_msg "testActivityPlot.sh   : FAILED hourly processing for $TARGET_DATE" >> "$ERROR_LOG"
     exit 1
 fi
 
-if MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_TARGET_DATE="$TARGET_DATE" MAGNETOMETER_ACTIVITY_PLOT_ARCHIVE="$ARCHIVE_MODE" su pi -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataActivity.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
+if MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_TARGET_DATE="$TARGET_DATE" MAGNETOMETER_ACTIVITY_PLOT_ARCHIVE="$ARCHIVE_MODE" su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/PlotDataActivity.gp >> $MAIN_LOG 2>> $ERROR_LOG"; then
     log_msg "testActivityPlot.sh   : Completed Activity plot for $TARGET_DATE" >> "$MAIN_LOG"
 else
     log_msg "testActivityPlot.sh   : FAILED Activity plot for $TARGET_DATE" >> "$ERROR_LOG"

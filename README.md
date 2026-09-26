@@ -48,9 +48,7 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 <!-- =============================================================================== --> 
 ## Using the code
 
-The code assumes username is **pi**. 
-
-If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in all the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
+The installer uses the account that invoked `sudo`; the username does not have to be **pi**. Clone into `~/UKRAA_Magnetometer` as that account, then run the installer with `sudo`. Do not run it from a root login unless you set `MAGNETOMETER_FILE_OWNER` to the account that owns the checkout. Moving an existing installation to another account is not supported.
 
 The collector defaults to **/dev/ttyACM0**, configured in **config/USB.ini**. After installing the software, you can run **ConfigureUSB.py** to select a different path and record the USB identity, so the collector can detect if that tty path later refers to a different device.
 
@@ -113,7 +111,7 @@ git clone https://github.com/UKradioastro/UKRAA_Magnetometer.git
 
 ![img_01](images/RPi_imager_01.PNG)
 
-This will download all of the code to the directory **UKRAA_Magnetometer** inside `/home/pi`.
+This downloads the code to **UKRAA_Magnetometer** inside your home directory.
 
 [Back to Contents...](#contents)
 
@@ -146,6 +144,8 @@ sudo bash ~/UKRAA_Magnetometer/install/install.sh
 
 This will run the install script.
 
+For a direct root session or unattended install, specify the owning account explicitly, for example `MAGNETOMETER_FILE_OWNER=maguser bash /home/maguser/UKRAA_Magnetometer/install/install.sh`. The installer verifies the checkout belongs to that account. Installation paths may contain only letters, digits, dots, underscores, hyphens and slashes.
+
 There may be occasions during the running of the install script that require you to make a keyboard entry.
 
 When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **enter** 
@@ -156,7 +156,7 @@ The code is now set up to run automatically; it will record the data from the Pi
 
 After installation, configure the magnetometer's USB path and identity if needed:
 ```
-sudo -u pi /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ConfigureUSB.py
+/usr/bin/python3 ~/UKRAA_Magnetometer/scripts/ConfigureUSB.py
 ```
 Enter the current **/dev/ttyACMx** path when prompted. If a matching by-id path is offered, you can choose it to keep selecting the same magnetometer when tty numbering changes. Restart the collector to apply the selected path:
 ```
@@ -234,9 +234,9 @@ To access the PicoMagnetometer webpage on your desktop PC or your smart phone…
 
 1.	Open your preferred web application (Safari, Chrome, Firefox, etc.).
 
-2.	In the search bar type the following and press enter
+2.	In the address bar, replace `<hostname>` with your Raspberry Pi's hostname and press Enter:
 ```
-http://TEST-MAG.local
+http://<hostname>.local
 ```
 
 ![img_05](images/RPi_imager_05.PNG)
@@ -244,11 +244,7 @@ http://TEST-MAG.local
 
 This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s plots.
 
-NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
-
-**http://_hostname_.local**
-
-Where *hostname* is the hostname for your RPi setup.
+On a fresh install, the same hostname is placed in `config/alerts.ini` as the link in alert emails. Reinstalling or updating preserves any URL you have set there. The `.local` address requires working mDNS (such as Avahi on the Pi and mDNS support on the device opening the page); otherwise use the Pi's IP address or a resolvable domain instead.
 
 Code is also supplied that will enable the user to upload, via FTP, to their host website, should they have one - see **User Manual: FTP service** for more details.
 
@@ -330,7 +326,7 @@ If this is the case you will need to:
 After installing/updating scripts on your RPi, you can run:
 
 ```
-sudo bash /home/pi/UKRAA_Magnetometer/scripts/runPostUpdateChecks.sh
+sudo bash ~/UKRAA_Magnetometer/scripts/runPostUpdateChecks.sh
 ```
 
 This executes:
@@ -341,13 +337,13 @@ This executes:
 For daily runtime monitoring, a health marker is written by:
 
 ```
-sudo bash /home/pi/UKRAA_Magnetometer/scripts/checkDailyPublishHealth.sh
+sudo bash ~/UKRAA_Magnetometer/scripts/checkDailyPublishHealth.sh
 ```
 
 Marker output file:
 
 ```
-/home/pi/UKRAA_Magnetometer/data/status/daily-health.txt
+~/UKRAA_Magnetometer/data/status/daily-health.txt
 ```
 
 The marker reports one of three states:
@@ -363,13 +359,13 @@ The marker reports one of three states:
 One-line dashboard summary on demand:
 
 ```
-sudo bash /home/pi/UKRAA_Magnetometer/scripts/showDashboardSummary.sh
+sudo bash ~/UKRAA_Magnetometer/scripts/showDashboardSummary.sh
 ```
 
 If scheduled in cron, summary snapshots can be collected in:
 
 ```
-/home/pi/UKRAA_Magnetometer/logfiles/dashboard-summary.log
+~/UKRAA_Magnetometer/logfiles/dashboard-summary.log
 ```
 
 [Back to Contents...](#contents)
@@ -382,7 +378,7 @@ If scheduled in cron, summary snapshots can be collected in:
 <!-- =============================================================================== --> 
 ## Optional HDZ and/or BI plots
 
-Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**.
+Within the **~/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**.
 
 By default the option of producing HDZ and/or BI plots is turned off (**false**), and the plots do not appear as an option from the intranet webpage.
 
@@ -410,7 +406,7 @@ These plots will automatically be added to the intranet webpage if selected; wit
 
 The webpage can show the latest NOAA Space Weather Prediction Center 30-minute aurora forecast image below the rolling magnetometer status, and this can now be enabled or disabled per installation.
 
-Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**.
+Within the **~/UKRAA_Magnetometer/config** folder there is a file named **plot.ini**.
 
 By default the option of producing NOAA aurora forecast images is turned off (**false**), and the images do not appear as an option from the intranet webpage.
 
@@ -442,7 +438,7 @@ https://services.swpc.noaa.gov/images/animations/ovation/south/latest.jpg
 and cached locally as:
 
 ```
-/home/pi/UKRAA_Magnetometer/temp/noaa/latest.jpg
+~/UKRAA_Magnetometer/temp/noaa/latest.jpg
 ```
 
 The forecast image is updated every 30 minutes by `updateNoaaAuroraForecast.sh`. If the NOAA download fails, the magnetometer data processing, plotting, alerts and web publishing continue to run.
@@ -465,7 +461,7 @@ https://www.spaceweather.gov/products/aurora-30-minute-forecast
 
 The webpage can show a NOAA planetary Kp forecast chart, updated hourly. It includes a colour key for the NOAA G-scale: quiet conditions below Kp 5, then G1 through G5 for Kp 5 through 9.
 
-Within `/home/pi/UKRAA_Magnetometer/config/plot.ini`, add or edit:
+Within `~/UKRAA_Magnetometer/config/plot.ini`, add or edit:
 
 ```ini
 [plots]
@@ -475,7 +471,7 @@ plot_kp = true
 - `plot_kp = true` enables the panel.
 - `plot_kp = false` disables the panel and removes the locally cached and published Kp chart.
 
-The forecast is downloaded from NOAA's JSON feed, cached as `/home/pi/UKRAA_Magnetometer/data/kp/latest.csv`, and rendered to `/home/pi/UKRAA_Magnetometer/temp/kp/PlanetaryKp.png`. `updateKpForecast.sh` refreshes the data and chart hourly.
+The forecast is downloaded from NOAA's JSON feed, cached as `~/UKRAA_Magnetometer/data/kp/latest.csv`, and rendered to `~/UKRAA_Magnetometer/temp/kp/PlanetaryKp.png`. `updateKpForecast.sh` refreshes the data and chart hourly.
 
 Forecast data source and G-scale definitions:
 
@@ -493,7 +489,7 @@ https://www.spaceweather.gov/products/planetary-k-index
 <!-- =============================================================================== --> 
 ## Optional Rolling alert Emails
 
-Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **alert.ini**.
+Within the **~/UKRAA_Magnetometer/config** folder there is a file named **alerts.ini**.
 
 By default the option of producing rolling email alerts is turned off (**false**).
 
@@ -506,7 +502,7 @@ Rolling alert evaluation supports user defined activity thresholds:
 * **Red** at **200 nT**
 
 
-The user can define their own alert values by modifying lines 18, 19 and 20 of **alert.ini**.
+To change the alert values, edit `yellow_threshold_nt`, `amber_threshold_nt`, and `red_threshold_nt` in `~/UKRAA_Magnetometer/config/alerts.ini`.
 
 The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
 
@@ -517,15 +513,7 @@ The same threshold values are also used by:
 
 ### Configure via `.ini` file (recommended)
 
-1. Copy the example file:
-	`install/alerts.ini.example`
-
-2. Place it on the Pi as:
-	`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
-
-3. Edit the values for your SMTP service and recipients.  **DO THIS BEFORE CHANGING THE STATE OF email_enabled**
-
-4. Set activity thresholds in the same file under `[alerts]`:
+The installer creates `~/UKRAA_Magnetometer/config/alerts.ini` on a fresh install. Edit its SMTP settings and recipients before setting `email_enabled = true`. Set activity thresholds under `[alerts]`:
 
 ```
 [alerts]
@@ -554,7 +542,7 @@ Notes:
 * Environment variable override: `MAGNETOMETER_EMAIL_ENABLED`
 
 By default, `EvaluateAlerts.py` reads:
-`/home/pi/UKRAA_Magnetometer/config/alerts.ini`
+`~/UKRAA_Magnetometer/config/alerts.ini`
 
 You can override the config path with:
 `MAGNETOMETER_ALERTS_INI_PATH=/path/to/alerts.ini`
@@ -623,17 +611,17 @@ Available environment variables are:
 You can regenerate the hourly Activity plot for any date without storing an archive copy by default:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlot.sh YYYY-MM-DD
+/bin/bash ~/UKRAA_Magnetometer/scripts/testActivityPlot.sh YYYY-MM-DD
 ```
 
 This updates only:
 
-* `/home/pi/UKRAA_Magnetometer/temp/yesterday/Activity.png`
+* `~/UKRAA_Magnetometer/temp/yesterday/Activity.png`
 
 To also write the dated archive file in `plots/day/Activity/YYYY/YYYY-MM/`, add `--archive`:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testActivityPlot.sh YYYY-MM-DD --archive
+/bin/bash ~/UKRAA_Magnetometer/scripts/testActivityPlot.sh YYYY-MM-DD --archive
 ```
 
 ### Send a one-off SMTP test email
@@ -641,13 +629,13 @@ To also write the dated archive file in `plots/day/Activity/YYYY/YYYY-MM/`, add 
 To verify SMTP settings without waiting for a threshold transition, run:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testAlertEmail.sh
+/bin/bash ~/UKRAA_Magnetometer/scripts/testAlertEmail.sh
 ```
 
 Or run the Python script directly:
 
 ```
-/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-email
+/usr/bin/python3 ~/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-email
 ```
 
 The test email does not update transition state, so normal alert logic is unaffected.
@@ -685,13 +673,13 @@ Environment variable overrides are also available:
 To verify heartbeat email delivery without waiting for `heartbeat.hour_utc`, run:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testHeartbeatEmail.sh
+/bin/bash ~/UKRAA_Magnetometer/scripts/testHeartbeatEmail.sh
 ```
 
 Or run the Python script directly:
 
 ```
-/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-heartbeat
+/usr/bin/python3 ~/UKRAA_Magnetometer/scripts/EvaluateAlerts.py --test-heartbeat
 ```
 
 This immediate heartbeat test does not update daily heartbeat schedule/state tracking.
@@ -737,12 +725,12 @@ The other families follow the same layout. Current web assets are published to
 To include already processed historical data after upgrading, run this once:
 
 ```
-/usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ProcessDailySummary.py --all
+/usr/bin/python3 ~/UKRAA_Magnetometer/scripts/ProcessDailySummary.py --all
 ```
 
 ## Optional Remote FTP upload
 
-Within the **/home/pi/UKRAA_Magnetometer/config** folder there is a file named **remote-upload.ini**.
+Within the **~/UKRAA_Magnetometer/config** folder there is a file named **remote-upload.ini**.
 
 By default the option of uploading plot PNG files is turned off (**false**).
 
@@ -752,7 +740,7 @@ You can upload plot PNG files to an external hosting site while keeping local we
 
 Remote upload config file:
 
-* `/home/pi/UKRAA_Magnetometer/config/remote-upload.ini`
+* `~/UKRAA_Magnetometer/config/remote-upload.ini`
 
 Template created by installer:
 
@@ -791,14 +779,14 @@ Behavior:
 Manual test commands:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemote.sh daily
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/uploadRemote.sh rolling
+/bin/bash ~/UKRAA_Magnetometer/scripts/uploadRemote.sh daily
+/bin/bash ~/UKRAA_Magnetometer/scripts/uploadRemote.sh rolling
 ```
 
 Combined test helper:
 
 ```
-/bin/bash /home/pi/UKRAA_Magnetometer/scripts/testRemoteUpload.sh
+/bin/bash ~/UKRAA_Magnetometer/scripts/testRemoteUpload.sh
 ```
 
 [Back to Contents...](#contents)
