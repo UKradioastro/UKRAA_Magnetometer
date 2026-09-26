@@ -234,21 +234,15 @@ To access the PicoMagnetometer webpage on your desktop PC or your smart phone…
 
 1.	Open your preferred web application (Safari, Chrome, Firefox, etc.).
 
-2.	In the search bar type the following and press enter
+2.	In the address bar, replace `<hostname>` with your Raspberry Pi's hostname and press Enter:
 ```
-http://TEST-MAG.local
+http://<hostname>.local
 ```
 
 ![img_05](images/RPi_imager_05.PNG)
 
 
 This will take you to the web page for your magnetometer, displaying both the rolling 24 hour plots and yesterday’s plots.
-
-NOTE: if you have a different **hostname** for your RPi, change the search bar entry to…
-
-**http://_hostname_.local**
-
-Where *hostname* is the hostname for your RPi setup.
 
 On a fresh install, the same hostname is placed in `config/alerts.ini` as the link in alert emails. Reinstalling or updating preserves any URL you have set there. The `.local` address requires working mDNS (such as Avahi on the Pi and mDNS support on the device opening the page); otherwise use the Pi's IP address or a resolvable domain instead.
 
@@ -508,7 +502,7 @@ Rolling alert evaluation supports user defined activity thresholds:
 * **Red** at **200 nT**
 
 
-The user can define their own alert values by modifying lines 18, 19 and 20 of **alert.ini**.
+To change the alert values, edit `yellow_threshold_nt`, `amber_threshold_nt`, and `red_threshold_nt` in `~/UKRAA_Magnetometer/config/alerts.ini`.
 
 The alert evaluator runs as part of `processRollingData.sh` and only sends email on threshold transitions to levels you choose.
 
@@ -519,15 +513,7 @@ The same threshold values are also used by:
 
 ### Configure via `.ini` file (recommended)
 
-1. Copy the example file:
-	`install/alerts.ini.example`
-
-2. Place it on the Pi as:
-	`~/UKRAA_Magnetometer/config/alerts.ini`
-
-3. Edit the values for your SMTP service and recipients.  **DO THIS BEFORE CHANGING THE STATE OF email_enabled**
-
-4. Set activity thresholds in the same file under `[alerts]`:
+The installer creates `~/UKRAA_Magnetometer/config/alerts.ini` on a fresh install. Edit its SMTP settings and recipients before setting `email_enabled = true`. Set activity thresholds under `[alerts]`:
 
 ```
 [alerts]

@@ -7,9 +7,13 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+## [2026.09.5] - 2026-09-26
+
 ### Changed
 - Timestamped Python, shell, and plot log entries now use a 27-character source field so the second colon aligns.
 - USB setup instructions now run after installation and include restarting the collector to apply the selected port.
+- Installation and same-account updates now support usernames other than `pi`; the installer uses the invoking `sudo` account (or an explicit account override) for paths, ownership, the collector service, cron jobs, and processing scripts.
+- Fresh installs set the alert email web link to `http://<hostname>.local`; reinstalling or updating preserves any existing configured URL.
 
 ## [2026.09.4] - 2026-09-26
 
