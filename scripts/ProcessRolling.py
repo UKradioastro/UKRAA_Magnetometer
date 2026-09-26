@@ -15,14 +15,12 @@ from magnetometer_common import format_fixed
 from magnetometer_common import get_alert_thresholds
 from magnetometer_common import get_base_path
 from magnetometer_common import parse_raw_datetime
+from magnetometer_common import log_message
 from magnetometer_common import utc_now
 
 
 def log_msg(message):
-    print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
-        ':',
-        'ProcessRolling.py     :',
-        message)
+    log_message('ProcessRolling.py', message)
 
 
 def get_window_end_exclusive():

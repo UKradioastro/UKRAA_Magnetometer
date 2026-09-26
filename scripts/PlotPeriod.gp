@@ -20,14 +20,14 @@ if (plotPeriod eq "3month") periodDays = 90
 if (plotPeriod eq "6month") periodDays = 183
 if (plotPeriod eq "year") periodDays = 365
 if (periodDays == 0) {
-    print "PlotPeriod.gp : FAILED - unknown period ".plotPeriod
+    print system("date +'%Y-%m-%d %H:%M:%S'")." : ".sprintf("%-27s", "PlotPeriod.gp")." : FAILED - unknown period ".plotPeriod
     exit
 }
 
 summaryFile = basePath."/data/daily/summary.csv"
 isMissing = system("/bin/bash ".basePath."/scripts/isMissing.sh ".summaryFile)
 if (isMissing == 1) {
-    print "PlotPeriod.gp : FAILED - daily summary file missing"
+    print system("date +'%Y-%m-%d %H:%M:%S'")." : ".sprintf("%-27s", "PlotPeriod.gp")." : FAILED - daily summary file missing"
     exit
 }
 
@@ -57,7 +57,7 @@ set ytics nomirror
 set xlabel "Date (UTC)"
 
 plotTitle = sprintf("%s magnetic field: %s to %s\nDaily aggregates from complete UTC days", plotFamily, startDate, endDate)
-print system("date +'%Y-%m-%d %H:%M:%S'")." : PlotPeriod".plotFamily.".gp : Started ".plotPeriod." plot"
+print system("date +'%Y-%m-%d %H:%M:%S'")." : ".sprintf("%-27s", "PlotPeriod".plotFamily.".gp")." : Started ".plotPeriod." plot"
 
 set output archivePlot
 if (plotFamily eq "XYZ") {
@@ -91,4 +91,4 @@ if (plotFamily eq "BI") {
 set output
 
 system("sh -lc 'cp \"".archivePlot."\" \"".tempPlot."\"'")
-print system("date +'%Y-%m-%d %H:%M:%S'")." : PlotPeriod".plotFamily.".gp : Completed ".plotPeriod." plot"
+print system("date +'%Y-%m-%d %H:%M:%S'")." : ".sprintf("%-27s", "PlotPeriod".plotFamily.".gp")." : Completed ".plotPeriod." plot"

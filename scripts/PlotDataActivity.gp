@@ -39,7 +39,7 @@ redThreshold = real(word(thresholdValues, 3))
 
 # print to log file
 print system("date +'%Y-%m-%d %H:%M:%S'")\
-      ." : PlotDataActivity.gp   : Started Activity plot for "\
+      ." : ".sprintf("%-27s", "PlotDataActivity.gp")." : Started Activity plot for "\
       .targetDate
 
 # Path to data file for graphing
@@ -57,9 +57,9 @@ is_missing = system("/bin/bash ".basePath."/scripts/isMissing.sh ".FileData)
 if (is_missing == 1) \
            {
            print system("date +'%Y-%m-%d %H:%M:%S'")\
-                 ." : PlotDataActivity.gp   : FAILED - data file missing, so..."; 
+                 ." : ".sprintf("%-27s", "PlotDataActivity.gp")." : FAILED - data file missing, so...";
            print system("date +'%Y-%m-%d %H:%M:%S'")\
-                 ." : PlotDataActivity.gp   : **FAILED** to complete Activity plot for "\
+                 ." : ".sprintf("%-27s", "PlotDataActivity.gp")." : **FAILED** to complete Activity plot for "\
                  .targetDate
            exit
            }
@@ -91,7 +91,7 @@ pathTemp1 = basePath."/temp/yesterday/Activity.png"
 dirCreated = system("sh -lc 'if [ -d \"".plotMonthDir."\" ]; then echo 0; else mkdir -p \"".plotMonthDir."\"; echo 1; fi'")
 if (dirCreated == 1) {
     print system("date +'%Y-%m-%d %H:%M:%S'")\
-          ." : PlotDataActivity.gp   : New directory created : ".plotMonthDir
+          ." : ".sprintf("%-27s", "PlotDataActivity.gp")." : New directory created : ".plotMonthDir
 }
 system("sh -lc 'mkdir -p \"".basePath."/temp/yesterday\"'")
 
@@ -205,7 +205,7 @@ set output
 
 # print to log file
 print system("date +'%Y-%m-%d %H:%M:%S'")\
-      ." : PlotDataActivity.gp   : Completed Activity plot for "\
+      ." : ".sprintf("%-27s", "PlotDataActivity.gp")." : Completed Activity plot for "\
       .targetDate
 
 # EOF

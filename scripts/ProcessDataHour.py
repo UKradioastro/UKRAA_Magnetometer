@@ -16,13 +16,11 @@ from magnetometer_common import format_fixed
 from magnetometer_common import get_base_path
 from magnetometer_common import get_target_date
 from magnetometer_common import parse_raw_datetime
+from magnetometer_common import log_message
 
 # logfile message helper
 def log_msg(message):
-    print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
-        ':',
-        'ProcessDataHour.py    :',
-        message)
+    log_message('ProcessDataHour.py', message)
 
 def create_empty_hour_bins(total_hours):
     return [

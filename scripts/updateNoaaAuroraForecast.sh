@@ -9,8 +9,10 @@ ERROR_LOG="$LOG_DIR/log-error.txt"
 NOAA_DIR="$BASE_PATH/temp/noaa"
 NOAA_IMAGE="$NOAA_DIR/latest.jpg"
 
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
 log_msg() {
-    printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
+    write_log_entry "$1"
 }
 
 if ! PLOT_OPTIONS=$(MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPlotOptions.py" 2>&1); then

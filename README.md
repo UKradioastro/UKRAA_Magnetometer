@@ -52,7 +52,7 @@ The code assumes username is **pi**.
 
 If **pi** is not the username, then you will need to change all occurances of '/home/pi' to '/home/*username*' in all the python, gnuplot and shell scripts prior to installing the software; where *username* is the username you have selected for your RPi4/5.
 
-The collector defaults to **/dev/ttyACM0**, configured in **config/USB.ini**. If your magnetometer appears at a different path, run **ConfigureUSB.py** and enter its device path. The setup tool records the USB identity so the collector can detect if that tty path later refers to a different device.
+The collector defaults to **/dev/ttyACM0**, configured in **config/USB.ini**. After installing the software, you can run **ConfigureUSB.py** to select a different path and record the USB identity, so the collector can detect if that tty path later refers to a different device.
 
 The setup tool also offers the matching **/dev/serial/by-id/** path when available. Choosing that path is recommended if tty numbering may change after reconnecting or rebooting. You can also edit **serial_port** in **config/USB.ini** directly.
 
@@ -91,12 +91,6 @@ ls /dev/tty*
 4. If you do not see **/dev/ttyACM0**, then unplug and plug the PicoMagnetometer back in and try again.
 
 &nbsp;
-
-5. Configure the selected device path and its USB identity by running:
-```
-sudo -u pi /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ConfigureUSB.py
-```
-Enter the matching **/dev/ttyACMx** path when prompted. If a by-id path is offered, choose it to keep selecting the same magnetometer when tty numbering changes.
 
 [Back to Contents...](#contents)
 
@@ -159,6 +153,15 @@ When asked **Do you want to continue? [Y/n]** - type **Y** or **y** and press **
 That's it!
 
 The code is now set up to run automatically; it will record the data from the PicoMagnetometer, process the data, plot the data and post the plots to your intranet web page.
+
+After installation, configure the magnetometer's USB path and identity if needed:
+```
+sudo -u pi /usr/bin/python3 /home/pi/UKRAA_Magnetometer/scripts/ConfigureUSB.py
+```
+Enter the current **/dev/ttyACMx** path when prompted. If a matching by-id path is offered, you can choose it to keep selecting the same magnetometer when tty numbering changes. Restart the collector to apply the selected path:
+```
+sudo systemctl restart PicoMagnetometer.service
+```
 
 There are other functions that are customisable by the user, such as **email alerts** and **FTP service** to users’ external website, that are covered in the **User Manual**.
 

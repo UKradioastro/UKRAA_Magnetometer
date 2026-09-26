@@ -10,6 +10,7 @@ from email.message import EmailMessage
 
 from magnetometer_common import ensure_directory
 from magnetometer_common import get_base_path
+from magnetometer_common import log_message
 from magnetometer_common import utc_now
 
 LEVEL_RANK = {
@@ -22,10 +23,7 @@ LEVEL_RANK = {
 
 
 def log_msg(message):
-    print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
-          ':',
-          'EvaluateAlerts.py     :',
-          message)
+    log_message('EvaluateAlerts.py', message)
 
 
 def build_status_json_path(base_path):

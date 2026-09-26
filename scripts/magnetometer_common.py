@@ -103,6 +103,16 @@ def utc_now():
     return datetime.datetime.now(datetime.timezone.utc)
 
 
+def format_log_entry(timestamp, source_name, message):
+    return (
+        f'{timestamp:%Y-%m-%d %H:%M:%S} : '
+        f'{source_name:<27} : {message}')
+
+
+def log_message(source_name, message):
+    print(format_log_entry(datetime.datetime.now(), source_name, message))
+
+
 def build_raw_day_path(base_path, current_time):
     return os.path.join(
         base_path,

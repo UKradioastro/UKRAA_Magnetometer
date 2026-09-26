@@ -7,8 +7,10 @@ ERROR_LOG="$LOG_DIR/log-error.txt"
 CONFIG_PATH=${MAGNETOMETER_REMOTE_UPLOAD_CONFIG:-$BASE_PATH/config/remote-upload.ini}
 MODE=$1
 
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
 log_msg() {
-    printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
+    write_log_entry "$1"
 }
 
 if [ -z "$MODE" ]; then

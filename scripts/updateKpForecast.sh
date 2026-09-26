@@ -10,8 +10,10 @@ KP_DATA="$BASE_PATH/data/kp/latest.csv"
 KP_TEMP="$BASE_PATH/temp/kp/PlanetaryKp.png"
 KP_URL=${MAGNETOMETER_KP_FORECAST_URL:-https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json}
 
+source "$(dirname "${BASH_SOURCE[0]}")/logging.sh"
+
 log_msg() {
-    printf '%s : %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
+    write_log_entry "$1"
 }
 
 mkdir -p "$LOG_DIR"

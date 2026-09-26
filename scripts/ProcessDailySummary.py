@@ -14,6 +14,7 @@ from magnetometer_common import ensure_directory
 from magnetometer_common import format_fixed
 from magnetometer_common import get_base_path
 from magnetometer_common import get_target_date
+from magnetometer_common import log_message
 
 
 SUMMARY_FIELD_COUNT = 12
@@ -35,10 +36,7 @@ SUMMARY_HEADER = [
 
 
 def log_msg(message):
-    print(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
-          ':',
-          'ProcessDailySummary.py :',
-          message)
+    log_message('ProcessDailySummary.py', message)
 
 
 def numeric_value(row, index):
