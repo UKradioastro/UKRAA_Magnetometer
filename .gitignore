@@ -1,7 +1,6 @@
 # Local temporary validation output
 .tmp_*/
 examples/
-tests/
 
 # Python bytecode and cache files
 __pycache__/

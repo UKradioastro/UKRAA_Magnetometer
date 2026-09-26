@@ -220,6 +220,7 @@ echo ""
 echo "Final cleanup..."
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/docs
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/images
+sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/tests
 sudo -u pi rm -vrf /home/pi/UKRAA_Magnetometer/WWW
 sudo -u pi rm -vf  /home/pi/UKRAA_Magnetometer/README.md
 echo "Finished final cleanup"
