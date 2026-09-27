@@ -41,3 +41,8 @@ plot_month = false
 plot_3month = false
 plot_6month = false
 plot_year = false
+
+# Percentage of days in each period window that must be complete (at least
+# 95% of minutes recorded) before that period plot is produced. Missing days
+# are shown as gaps. For example 90 means 27 of 30 days for the month plot.
+period_min_valid_days_percent = 90

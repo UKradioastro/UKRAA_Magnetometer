@@ -50,16 +50,80 @@ class ProcessDailySummaryTests(unittest.TestCase):
                 for day_offset in range(required_days)
             }
             periods = GetPeriodPlotAvailability.build_period_status(
-                end_date, complete_dates, period_options)
+                end_date, complete_dates, period_options, 100.0)
 
             self.assertTrue(periods[period_name]['available'])
             self.assertEqual(periods[period_name]['valid_days'], required_days)
 
             complete_dates.remove(end_date - datetime.timedelta(days=required_days - 1))
             periods = GetPeriodPlotAvailability.build_period_status(
-                end_date, complete_dates, period_options)
+                end_date, complete_dates, period_options, 100.0)
             self.assertFalse(periods[period_name]['available'])
             self.assertEqual(periods[period_name]['valid_days'], required_days - 1)
+
+    def test_period_availability_uses_minimum_percent(self):
+        end_date = datetime.date(2026, 9, 24)
+        period_options = {
+            period_name: True
+            for period_name in GetPeriodPlotAvailability.PERIOD_DAY_COUNTS
+        }
+        expected_minimums = {'week': 7, 'month': 27, '3month': 81, '6month': 165, 'year': 329}
+
+        for period_name, minimum_days in expected_minimums.items():
+            complete_dates = {
+                end_date - datetime.timedelta(days=day_offset)
+                for day_offset in range(minimum_days)
+            }
+            periods = GetPeriodPlotAvailability.build_period_status(
+                end_date, complete_dates, period_options, 90.0)
+            self.assertEqual(periods[period_name]['minimum_days'], minimum_days)
+            self.assertTrue(periods[period_name]['available'])
+
+            complete_dates.remove(end_date)
+            periods = GetPeriodPlotAvailability.build_period_status(
+                end_date, complete_dates, period_options, 90.0)
+            self.assertFalse(periods[period_name]['available'])
+
+    def test_reads_period_min_valid_days_percent(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            self.assertEqual(
+                magnetometer_common.get_period_min_valid_days_percent(temporary_directory), 90.0)
+
+            config_directory = os.path.join(temporary_directory, 'config')
+            os.makedirs(config_directory)
+            config_path = os.path.join(config_directory, 'plot.ini')
+            with open(config_path, mode='w', encoding='UTF-8') as config_file:
+                config_file.write('[plots]\nperiod_min_valid_days_percent = 75\n')
+            self.assertEqual(
+                magnetometer_common.get_period_min_valid_days_percent(temporary_directory), 75.0)
+
+            with open(config_path, mode='w', encoding='UTF-8') as config_file:
+                config_file.write('[plots]\nperiod_min_valid_days_percent = 150\n')
+            self.assertEqual(
+                magnetometer_common.get_period_min_valid_days_percent(temporary_directory), 90.0)
+
+    def test_combined_summary_marks_missing_days_as_nan(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            daily_directory = os.path.join(
+                temporary_directory, 'data', 'daily', '2026', '2026-09')
+            os.makedirs(daily_directory)
+            for day in ('2026-09-20', '2026-09-23'):
+                with open(os.path.join(daily_directory, day + '.csv'), mode='w',
+                          encoding='UTF-8', newline='') as daily_file:
+                    csv.writer(daily_file).writerow(
+                        [day + ' 12:00:00'] + ['1.0'] * 9 + ['1440', '100.0'])
+
+            ProcessDailySummary.rebuild_combined_summary(temporary_directory)
+
+            combined_path = os.path.join(temporary_directory, 'data', 'daily', 'summary.csv')
+            with open(combined_path, mode='r', encoding='UTF-8', newline='') as combined_file:
+                combined_rows = list(csv.reader(combined_file))[1:]
+
+            self.assertEqual([row[0][:10] for row in combined_rows],
+                             ['2026-09-20', '2026-09-21', '2026-09-22', '2026-09-23'])
+            self.assertEqual(combined_rows[1],
+                             ['2026-09-21 12:00:00'] + ['nan'] * 9 + ['0', '0.0'])
+            self.assertEqual(combined_rows[3][10], '1440')
 
     def test_reads_period_plot_options(self):
         with tempfile.TemporaryDirectory() as temporary_directory:

@@ -593,9 +593,10 @@ function refreshPeriodPlots() {
           } else {
             var placeholder = document.createElement("div");
             placeholder.className = "period-placeholder";
+            var neededDays = period.minimum_days || period.required_days;
             placeholder.textContent = "Not enough data yet: " + period.valid_days + " of "
-              + period.required_days + " complete UTC days available (" + period.start_date
-              + " to " + period.end_date + ").";
+              + neededDays + " required complete UTC days in the " + period.required_days
+              + "-day window (" + period.start_date + " to " + period.end_date + ").";
             cards.appendChild(placeholder);
           }
         });

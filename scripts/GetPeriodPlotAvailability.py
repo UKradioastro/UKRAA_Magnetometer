@@ -4,9 +4,12 @@ import argparse
 import csv
 import datetime
 import json
+import math
 import os
 
+from magnetometer_common import DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT
 from magnetometer_common import get_base_path
+from magnetometer_common import get_period_min_valid_days_percent
 from magnetometer_common import get_period_plot_options
 from magnetometer_common import get_plot_options
 from magnetometer_common import get_target_date
@@ -52,7 +55,13 @@ def load_complete_dates(base_path):
     return complete_dates
 
 
-def build_period_status(end_date, complete_dates, period_options):
+def minimum_days_for(window_days, min_valid_days_percent):
+    # small epsilon stops float error turning e.g. exactly 27.0 into 28
+    return math.ceil(window_days * min_valid_days_percent / 100.0 - 1e-9)
+
+
+def build_period_status(end_date, complete_dates, period_options,
+                        min_valid_days_percent=DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT):
     periods = {}
     for period_name, required_days in PERIOD_DAY_COUNTS.items():
         start_date = end_date - datetime.timedelta(days=required_days - 1)
@@ -61,11 +70,13 @@ def build_period_status(end_date, complete_dates, period_options):
             for day_offset in range(required_days)
         }
         valid_days = len(expected_dates.intersection(complete_dates))
+        minimum_days = minimum_days_for(required_days, min_valid_days_percent)
         enabled = period_options[period_name]
         periods[period_name] = {
             'enabled': enabled,
-            'available': enabled and valid_days == required_days,
+            'available': enabled and valid_days >= minimum_days,
             'required_days': required_days,
+            'minimum_days': minimum_days,
             'valid_days': valid_days,
             'start_date': start_date.isoformat(),
             'end_date': end_date.isoformat(),
@@ -77,18 +88,21 @@ def build_period_status(end_date, complete_dates, period_options):
 def build_status(base_path, end_date):
     plot_hdz, plot_bi, _, _ = get_plot_options(base_path)
     period_options = get_period_plot_options(base_path)
+    min_valid_days_percent = get_period_min_valid_days_percent(base_path)
     complete_dates = load_complete_dates(base_path)
 
     return {
         'generated_at_utc': datetime.datetime.now(
             datetime.timezone.utc).replace(microsecond=0).isoformat(),
         'minimum_daily_coverage_percent': MINIMUM_DAILY_COVERAGE_PERCENT,
+        'minimum_valid_days_percent': min_valid_days_percent,
         'families': {
             'xyz': True,
             'hdz': plot_hdz,
             'bi': plot_bi,
         },
-        'periods': build_period_status(end_date, complete_dates, period_options),
+        'periods': build_period_status(
+            end_date, complete_dates, period_options, min_valid_days_percent),
     }
 
 

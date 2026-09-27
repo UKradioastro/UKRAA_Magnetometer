@@ -170,13 +170,49 @@ def rebuild_combined_summary(base_path):
                         summary_rows.append(row)
 
     summary_rows.sort(key=lambda row: row[0])
+    output_rows, gap_days = fill_missing_days(summary_rows)
     ensure_directory(daily_root)
     temporary_path = summary_path + '.tmp'
     with open(temporary_path, mode='w', encoding='UTF-8', newline='') as summary_file:
         csv.writer(summary_file).writerow(SUMMARY_HEADER)
-        csv.writer(summary_file).writerows(summary_rows)
+        csv.writer(summary_file).writerows(output_rows)
     os.replace(temporary_path, summary_path)
-    log_msg('Rebuilt combined daily summary with ' + str(len(summary_rows)) + ' days')
+    message = 'Rebuilt combined daily summary with ' + str(len(summary_rows)) + ' days'
+    if gap_days:
+        message += ' and ' + str(gap_days) + ' missing days marked as nan'
+    log_msg(message)
+
+
+def gap_row(gap_date):
+    return ([gap_date.strftime('%Y-%m-%d 12:00:00')]
+            + ['nan'] * (SUMMARY_FIELD_COUNT - 3)
+            + ['0', '0.0'])
+
+
+def fill_missing_days(summary_rows):
+    # nan rows make gnuplot break the line across missing days instead of joining them
+    output_rows = []
+    gap_days = 0
+    previous_date = None
+
+    for row in summary_rows:
+        try:
+            row_date = datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').date()
+        except ValueError:
+            output_rows.append(row)
+            continue
+
+        if previous_date is not None:
+            gap_date = previous_date + datetime.timedelta(days=1)
+            while gap_date < row_date:
+                output_rows.append(gap_row(gap_date))
+                gap_days += 1
+                gap_date += datetime.timedelta(days=1)
+
+        output_rows.append(row)
+        previous_date = row_date
+
+    return output_rows, gap_days
 
 
 def parse_arguments():

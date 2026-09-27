@@ -276,6 +276,21 @@ def get_period_plot_options(base_path):
     }
 
 
+DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT = 90.0
+
+
+def get_period_min_valid_days_percent(base_path):
+    parser = _load_ini_parser(build_plot_ini_path(base_path))
+    value_text = os.environ.get(
+        'MAGNETOMETER_PERIOD_MIN_VALID_DAYS_PERCENT',
+        parser.get('plots', 'period_min_valid_days_percent',
+                   fallback=str(DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT)))
+    percent = _parse_threshold(value_text, DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT)
+    if not 0 < percent <= 100:
+        return DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT
+    return percent
+
+
 def _load_ini_parser(config_path):
     parser = configparser.ConfigParser()
     if not os.path.exists(config_path):

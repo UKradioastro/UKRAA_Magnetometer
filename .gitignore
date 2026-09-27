@@ -1,6 +1,7 @@
 # Local temporary validation output
 .tmp_*/
 examples/
+INTERMAGNET/
 
 # Python bytecode and cache files
 __pycache__/
