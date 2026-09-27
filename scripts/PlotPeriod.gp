@@ -7,9 +7,9 @@ plotPeriod = system("sh -lc 'printf %s \"${MAGNETOMETER_PLOT_PERIOD:-week}\"'")
 targetDate = system("sh -lc 'if [ -n \"${MAGNETOMETER_TARGET_DATE:-}\" ]; then printf %s \"$MAGNETOMETER_TARGET_DATE\"; else date -d yesterday +%Y-%m-%d; fi'")
 
 if (plotPeriod eq "day") {
-    if (plotFamily eq "XYZ") load basePath."/scripts/PlotDataXYZ.gp"
-    if (plotFamily eq "HDZ") load basePath."/scripts/PlotDataHDZ.gp"
-    if (plotFamily eq "BI") load basePath."/scripts/PlotDataBI.gp"
+    if (plotFamily eq "XYZ") { load basePath."/scripts/PlotDataXYZ.gp" }
+    if (plotFamily eq "HDZ") { load basePath."/scripts/PlotDataHDZ.gp" }
+    if (plotFamily eq "BI") { load basePath."/scripts/PlotDataBI.gp" }
     exit
 }
 

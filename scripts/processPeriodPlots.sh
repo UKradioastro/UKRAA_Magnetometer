@@ -12,7 +12,7 @@ log_msg() {
     write_log_entry "$1"
 }
 
-if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPeriodPlotAvailability.py" --write-status >> "$MAIN_LOG" 2>> "$ERROR_LOG"; then
+if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPeriodPlotAvailability.py" --write-status > /dev/null 2>> "$ERROR_LOG"; then
     log_msg "processPeriodPlots.sh : FAILED to write period plot availability" >> "$ERROR_LOG"
     exit 1
 fi
@@ -40,6 +40,8 @@ render_period() {
     return 1
 }
 
+PERIOD_FAILURES=0
+
 for period_name in week month 3month 6month year; do
     enabled=$(period_value "$period_name" enabled) || exit 1
     available=$(period_value "$period_name" available) || exit 1
@@ -57,7 +59,7 @@ for period_name in week month 3month 6month year; do
             esac
 
             if ! render_period "$period_name" "$family_name" "$plot_script"; then
-                exit 1
+                PERIOD_FAILURES=$((PERIOD_FAILURES + 1))
             fi
         else
             rm -f "$temp_plot"
@@ -65,5 +67,10 @@ for period_name in week month 3month 6month year; do
         fi
     done
 done
+
+if [ "$PERIOD_FAILURES" -gt 0 ]; then
+    log_msg "processPeriodPlots.sh : Completed period plot processing with $PERIOD_FAILURES failure(s)" >> "$MAIN_LOG"
+    exit 1
+fi
 
 log_msg "processPeriodPlots.sh : Completed period plot processing" >> "$MAIN_LOG"

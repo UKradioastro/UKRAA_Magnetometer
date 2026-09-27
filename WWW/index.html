@@ -560,9 +560,10 @@ function refreshPeriodPlots() {
       var cards = document.getElementById("periodPlotCards");
       cards.innerHTML = "";
 
-      Object.keys(status.periods).forEach(function(periodName) {
+      // status JSON keys are alphabetically sorted, so impose display order here
+      ["week", "month", "3month", "6month", "year"].forEach(function(periodName) {
         var period = status.periods[periodName];
-        if (!period.enabled) {
+        if (!period || !period.enabled) {
           return;
         }
 
