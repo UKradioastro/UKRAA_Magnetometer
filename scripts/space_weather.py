@@ -11,6 +11,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from magnetometer_common import log_message
+
 
 GFZ_URL = 'https://kp.gfz.de/app/json/'
 DONKI_URL = 'https://ccmc.gsfc.nasa.gov/DONKI-API/get/'
@@ -356,6 +358,6 @@ def update_cache(base_path, start_date, end_date, refresh_days=REFRESH_DAYS,
             merged_storms),
         paths['coverage']: _json_bytes(coverage),
     })
-    print('INFO: Cached space weather {} through {} ({} request range(s))'.format(
+    log_message('space_weather.py', 'Cached space weather {} through {} ({} request range(s))'.format(
         covered_start, covered_end, len(ranges)))
     return paths

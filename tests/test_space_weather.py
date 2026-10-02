@@ -1,11 +1,14 @@
 import csv
 import datetime
+import io
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
 import urllib.parse
+from contextlib import redirect_stdout
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -232,15 +235,21 @@ class SpaceWeatherTests(unittest.TestCase):
             first_start = datetime.date(2023, 1, 1)
             first_end = datetime.date(2023, 1, 5)
             calls = []
+            log_output = io.StringIO()
 
             def first_fetch(start, end):
                 calls.append((start, end))
                 return ([['2023-01-01 01:30:00', '2.000', 0],
                          ['2023-01-05 01:30:00', '3.000', 0]], [])
 
-            paths = space_weather.update_cache(
-                base_path, first_start, first_end, refresh_days=2,
-                range_fetcher=first_fetch)
+            with redirect_stdout(log_output):
+                paths = space_weather.update_cache(
+                    base_path, first_start, first_end, refresh_days=2,
+                    range_fetcher=first_fetch)
+            self.assertRegex(
+                log_output.getvalue(),
+                re.compile(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : '
+                           r'space_weather\.py\s+: Cached space weather'))
             self.assertEqual(calls, [(first_start, first_end)])
 
             def refresh_fetch(start, end):
