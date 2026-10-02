@@ -711,6 +711,13 @@ required days have at least 95% valid minute data: 7, 30, 90, 183, or 365 days.
 Until then, the webpage displays a data-availability placeholder. XYZ is always
 included; HDZ and BI honour the existing `plot_hdz` and `plot_bi` options.
 
+Historical Kp and storm/CME annotations can be enabled separately with
+`plot_period_spaceweather = true`. This uses GFZ Potsdam definitive Kp and NASA
+CCMC DONKI event data, cached under `data/spaceweather/`. It does not change
+the existing `plot_kp` NOAA forecast setting or the magnetic-data availability
+rule. The overlay is disabled by default; without cached weather data, the
+magnetic plot is still generated with an unavailable Kp panel.
+
 Archives are stored as:
 
 ```

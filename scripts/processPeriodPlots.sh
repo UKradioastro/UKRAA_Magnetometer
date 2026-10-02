@@ -12,6 +12,17 @@ log_msg() {
     write_log_entry "$1"
 }
 
+if ! SPACEWEATHER_OPTION=$(/usr/bin/python3 "$BASE_PATH/scripts/GetPeriodSpaceWeatherOption.py" 2>&1); then
+    log_msg "processPeriodPlots.sh : FAILED to read space-weather plot option: $SPACEWEATHER_OPTION" >> "$ERROR_LOG"
+    exit 1
+fi
+if [ "$SPACEWEATHER_OPTION" != "true" ] && [ "$SPACEWEATHER_OPTION" != "false" ]; then
+    log_msg "processPeriodPlots.sh : FAILED - unexpected space-weather option: '$SPACEWEATHER_OPTION'" >> "$ERROR_LOG"
+    exit 1
+fi
+
+PERIOD_TARGET_DATE=${MAGNETOMETER_TARGET_DATE:-$(date -d yesterday +%Y-%m-%d)}
+
 if ! MAGNETOMETER_BASE_PATH="$BASE_PATH" /usr/bin/python3 "$BASE_PATH/scripts/GetPeriodPlotAvailability.py" --write-status > /dev/null 2>> "$ERROR_LOG"; then
     log_msg "processPeriodPlots.sh : FAILED to write period plot availability" >> "$ERROR_LOG"
     exit 1
@@ -29,9 +40,15 @@ render_period() {
     local period_name=$1
     local family_name=$2
     local plot_script=$3
+    local command
 
-    if MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_PLOT_PERIOD="$period_name" \
-        su "$FILE_OWNER" -c "/usr/bin/gnuplot $BASE_PATH/scripts/$plot_script >> $MAIN_LOG 2>> $ERROR_LOG"; then
+    if [ "$SPACEWEATHER_OPTION" = "true" ]; then
+        command="MAGNETOMETER_BASE_PATH='$BASE_PATH' /usr/bin/python3 '$BASE_PATH/scripts/PlotPeriodSpaceWeather.py' --period '$period_name' --family '$family_name' --target-date '$PERIOD_TARGET_DATE'"
+    else
+        command="MAGNETOMETER_BASE_PATH='$BASE_PATH' MAGNETOMETER_PLOT_PERIOD='$period_name' /usr/bin/gnuplot '$BASE_PATH/scripts/$plot_script'"
+    fi
+
+    if su "$FILE_OWNER" -c "$command >> '$MAIN_LOG' 2>> '$ERROR_LOG'"; then
         log_msg "processPeriodPlots.sh : Completed $period_name $family_name plot" >> "$MAIN_LOG"
         return 0
     fi
@@ -39,6 +56,15 @@ render_period() {
     log_msg "processPeriodPlots.sh : FAILED $period_name $family_name plot" >> "$ERROR_LOG"
     return 1
 }
+
+if [ "$SPACEWEATHER_OPTION" = "true" ]; then
+    if su "$FILE_OWNER" -c "MAGNETOMETER_BASE_PATH='$BASE_PATH' /usr/bin/python3 '$BASE_PATH/scripts/UpdatePeriodSpaceWeather.py' --end-date '$PERIOD_TARGET_DATE' >> '$MAIN_LOG' 2>> '$ERROR_LOG'"; then
+        log_msg "processPeriodPlots.sh : Refreshed historical space-weather data" >> "$MAIN_LOG"
+    else
+        log_msg "processPeriodPlots.sh : WARNING - space-weather refresh failed; using cached data if available" >> "$MAIN_LOG"
+        log_msg "processPeriodPlots.sh : Space-weather refresh failed; period plots will continue" >> "$ERROR_LOG"
+    fi
+fi
 
 PERIOD_FAILURES=0
 

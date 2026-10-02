@@ -7,6 +7,9 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+### Added
+- Opt-in historical Kp and NASA DONKI storm/CME overlays for week-to-year plots, with a separate weather cache and best-effort refresh.
+
 ### Fixed
 - The updater's temporary installer handoff now works without a colocated `magnetometer-env.sh`, using the installation account and path already exported by the parent updater.
 

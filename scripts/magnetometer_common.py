@@ -276,6 +276,16 @@ def get_period_plot_options(base_path):
     }
 
 
+def get_period_spaceweather_option(base_path):
+    plot_ini_path = build_plot_ini_path(base_path)
+    parser = _load_ini_parser(plot_ini_path)
+    return _parse_bool(
+        os.environ.get(
+            'MAGNETOMETER_PLOT_PERIOD_SPACEWEATHER',
+            parser.get('plots', 'plot_period_spaceweather', fallback='false')),
+        False)
+
+
 DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT = 90.0
 
 
