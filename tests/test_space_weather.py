@@ -80,8 +80,61 @@ class SpaceWeatherTests(unittest.TestCase):
         query = urllib.parse.parse_qs(urllib.parse.urlparse(fetch.call_args_list[0].args[0]).query)
         self.assertEqual(query['status'], ['def'])
         self.assertEqual(query['index'], ['Kp'])
+        self.assertTrue(fetch.call_args_list[1].args[0].startswith(
+            'https://ccmc.gsfc.nasa.gov/DONKI-API/get/GST?'))
+        self.assertTrue(fetch.call_args_list[2].args[0].startswith(
+            'https://ccmc.gsfc.nasa.gov/DONKI-API/get/IPS?'))
         self.assertEqual(kp_rows, [['2023-04-23 19:30:00', '8.333', 4]])
         self.assertEqual(storm_rows, [])
+
+    def test_fetch_range_chunks_donki_requests_at_sixty_days(self):
+        start = datetime.date(2025, 9, 25)
+        end = datetime.date(2026, 10, 1)
+        with patch('space_weather.fetch_json', side_effect=[{'datetime': [], 'Kp': []}] +
+                   [[] for _ in range(14)]) as fetch:
+            kp_rows, storm_rows = space_weather.fetch_range(start, end, delay=0)
+
+        self.assertEqual(kp_rows, [])
+        self.assertEqual(storm_rows, [])
+        self.assertEqual(fetch.call_count, 15)
+        for index in range(1, fetch.call_count, 2):
+            gst_url = fetch.call_args_list[index].args[0]
+            ips_url = fetch.call_args_list[index + 1].args[0]
+            gst_query = urllib.parse.parse_qs(urllib.parse.urlparse(gst_url).query)
+            ips_query = urllib.parse.parse_qs(urllib.parse.urlparse(ips_url).query)
+            self.assertLessEqual(
+                (datetime.date.fromisoformat(gst_query['endDate'][0]) -
+                 datetime.date.fromisoformat(gst_query['startDate'][0])).days, 59)
+            self.assertEqual(gst_query['startDate'], ips_query['startDate'])
+            self.assertEqual(gst_query['endDate'], ips_query['endDate'])
+
+    def test_http_error_reports_server_body(self):
+        http_error = __import__('urllib.error').error.HTTPError(
+            'https://example.test/GST', 400, 'Bad Request', {},
+            __import__('io').BytesIO(b'API Error: Date range cannot exceed 60 days.'))
+        with self.assertRaisesRegex(ValueError, 'Date range cannot exceed 60 days'):
+            space_weather.fetch_json(
+                'https://example.test/GST', delay=0,
+                opener=lambda *_args, **_kwargs: (_ for _ in ()).throw(http_error),
+                sleep=lambda _delay: None)
+
+    def test_non_json_service_response_names_the_endpoint(self):
+        class HtmlResponse:
+            headers = {'Content-Type': 'text/html; charset=UTF-8'}
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self):
+                return b'<!DOCTYPE html><title>Service moved</title>'
+
+        with self.assertRaisesRegex(ValueError, 'Non-JSON response from https://example.test/GST'):
+            space_weather.fetch_json(
+                'https://example.test/GST', delay=0,
+                opener=lambda *_args, **_kwargs: HtmlResponse(), sleep=lambda _delay: None)
 
     def test_plot_script_contains_kp_storm_cme_and_source_context(self):
         window_start = datetime.datetime(2023, 4, 1)

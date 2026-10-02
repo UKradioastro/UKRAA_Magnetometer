@@ -13,10 +13,11 @@ import urllib.request
 
 
 GFZ_URL = 'https://kp.gfz.de/app/json/'
-DONKI_URL = 'https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/'
+DONKI_URL = 'https://ccmc.gsfc.nasa.gov/DONKI-API/get/'
 USER_AGENT = 'UKRAA-PicoMagnetometer/1.0'
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 REFRESH_DAYS = 45
+DONKI_MAX_RANGE_DAYS = 60
 
 
 def parse_time(text):
@@ -46,11 +47,24 @@ def fetch_json(url, delay=2.0, opener=None, sleep=None):
         try:
             with opener(request, timeout=45) as response:
                 content = response.read().decode('UTF-8')
-            data = json.loads(content) if content.strip() else []
+                content_type = response.headers.get('Content-Type', 'unknown')
+            if content.strip():
+                try:
+                    data = json.loads(content)
+                except json.JSONDecodeError as error:
+                    excerpt = ' '.join(content.split())[:120]
+                    raise ValueError(
+                        'Non-JSON response from {} ({}): {}'.format(
+                            url, content_type, excerpt)) from error
+            else:
+                data = []
             sleep(delay)
             return data
-        except urllib.error.HTTPError:
-            raise
+        except urllib.error.HTTPError as error:
+            body = error.read().decode('UTF-8', errors='replace')
+            excerpt = ' '.join(body.split())[:160]
+            raise ValueError('HTTP {} from {}: {}'.format(
+                error.code, url, excerpt)) from error
         except (urllib.error.URLError, TimeoutError) as error:
             if attempt == 2:
                 raise
@@ -145,13 +159,24 @@ def fetch_range(start_date, end_date, delay=2.0):
         'status': 'def',
     })
     kp_json = fetch_json(GFZ_URL + '?' + date_range, delay=delay)
-    donki_range = urllib.parse.urlencode({
-        'startDate': start_date.isoformat(), 'endDate': end_date.isoformat()})
-    storms_json = fetch_json(DONKI_URL + 'GST?' + donki_range, delay=delay)
-    shocks_json = fetch_json(DONKI_URL + 'IPS?' + donki_range, delay=delay)
-
-    if not isinstance(kp_json, dict) or not isinstance(storms_json, list) or not isinstance(shocks_json, list):
+    if not isinstance(kp_json, dict):
         raise ValueError('Unexpected space-weather response format')
+
+    storms_json = []
+    shocks_json = []
+    chunk_start = start_date
+    while chunk_start <= end_date:
+        chunk_end = min(
+            chunk_start + datetime.timedelta(days=DONKI_MAX_RANGE_DAYS - 1), end_date)
+        donki_range = urllib.parse.urlencode({
+            'startDate': chunk_start.isoformat(), 'endDate': chunk_end.isoformat()})
+        chunk_storms = fetch_json(DONKI_URL + 'GST?' + donki_range, delay=delay)
+        chunk_shocks = fetch_json(DONKI_URL + 'IPS?' + donki_range, delay=delay)
+        if not isinstance(chunk_storms, list) or not isinstance(chunk_shocks, list):
+            raise ValueError('Unexpected space-weather response format from DONKI')
+        storms_json.extend(chunk_storms)
+        shocks_json.extend(chunk_shocks)
+        chunk_start = chunk_end + datetime.timedelta(days=1)
 
     three_hour_rows, _, intervals = build_kp(kp_json)
     return three_hour_rows, build_storms(storms_json, shocks_json, intervals)

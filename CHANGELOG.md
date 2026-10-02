@@ -11,6 +11,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 - Opt-in historical Kp and NASA DONKI storm/CME overlays for week-to-year plots, with a separate weather cache and best-effort refresh.
 
 ### Fixed
+- Updated historical DONKI downloads to CCMC's API base introduced on September 30, 2026; requests are split below the 60-day limit, and non-JSON/HTTP responses now include endpoint diagnostics.
 - The updater's temporary installer handoff now works without a colocated `magnetometer-env.sh`, using the installation account and path already exported by the parent updater.
 
 ## [2026.09.6] - 2026-09-26
