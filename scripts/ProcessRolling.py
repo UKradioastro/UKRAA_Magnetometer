@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-import csv
 import datetime
 import json
 import math
 import os
 import statistics
 
-from magnetometer_common import RAW_FIELD_NAMES
 from magnetometer_common import build_day_path
 from magnetometer_common import calculate_hdzbi
 from magnetometer_common import ensure_directory
 from magnetometer_common import format_fixed
 from magnetometer_common import get_alert_thresholds
 from magnetometer_common import get_base_path
-from magnetometer_common import parse_raw_datetime
 from magnetometer_common import log_message
+from magnetometer_common import read_raw_rows
 from magnetometer_common import utc_now
 
 
@@ -104,29 +102,27 @@ def load_window_bins(base_path, window_start, window_end_exclusive):
         if not os.path.exists(raw_data_file):
             continue
 
-        with open(file=raw_data_file, mode='r', encoding='UTF-8') as raw_file:
-            raw_csv_reader = csv.DictReader(raw_file, RAW_FIELD_NAMES)
+        for raw_line in read_raw_rows(raw_data_file):
+            raw_datetime = raw_line['RawDateTime']
+            if raw_datetime < window_start or raw_datetime >= window_end_exclusive:
+                continue
 
-            for raw_line in raw_csv_reader:
-                raw_datetime = parse_raw_datetime(raw_line['RawDateTime'])
-                if raw_datetime < window_start or raw_datetime >= window_end_exclusive:
-                    continue
+            minute_index = int((raw_datetime - window_start).total_seconds() // 60)
+            minute_bin = minute_bins[minute_index]
 
-                minute_index = int((raw_datetime - window_start).total_seconds() // 60)
-                minute_bin = minute_bins[minute_index]
+            minute_bin['x_v'].append(raw_line['RawX_V'])
+            minute_bin['x_nt'].append(raw_line['RawX_nT'])
+            minute_bin['y_v'].append(raw_line['RawY_V'])
+            minute_bin['y_nt'].append(raw_line['RawY_nT'])
+            minute_bin['z_v'].append(raw_line['RawZ_V'])
+            minute_bin['z_nt'].append(raw_line['RawZ_nT'])
+            minute_bin['tmp36_degc'].append(raw_line['RawTMP36_degC'])
+            if not math.isnan(raw_line['RawDelta_nT']):
+                minute_bin['delta_nt'].append(raw_line['RawDelta_nT'])
 
-                minute_bin['x_v'].append(float(raw_line['RawX_V']))
-                minute_bin['x_nt'].append(float(raw_line['RawX_nT']))
-                minute_bin['y_v'].append(float(raw_line['RawY_V']))
-                minute_bin['y_nt'].append(float(raw_line['RawY_nT']))
-                minute_bin['z_v'].append(float(raw_line['RawZ_V']))
-                minute_bin['z_nt'].append(float(raw_line['RawZ_nT']))
-                minute_bin['tmp36_degc'].append(float(raw_line['RawTMP36_degC']))
-                minute_bin['delta_nt'].append(float(raw_line['RawDelta_nT']))
-
-                detector_name = str(raw_line['RawDetectorName'])
-                latest_sample_time = raw_datetime
-                samples_seen += 1
+            detector_name = raw_line['RawDetectorName']
+            latest_sample_time = raw_datetime
+            samples_seen += 1
 
     return minute_bins, detector_name, latest_sample_time, samples_seen
 

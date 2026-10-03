@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import configparser
+import csv
 import datetime
 import math
 import os
@@ -20,6 +21,68 @@ RAW_FIELD_NAMES = [
     'RawColour',
     'RawDetectorName',
 ]
+
+# Every logged Pico row with both values gives exactly 50,000 nT per volt; the
+# earliest 8-column rows recorded volts only, so nT is rebuilt from this.
+RAW_NT_PER_VOLT = 50000.0
+
+
+def _is_number(text):
+    try:
+        float(text)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+def parse_raw_row(row):
+    """Return one raw CSV row as a RAW_FIELD_NAMES dict, or None if unusable.
+
+    Supported layouts (datetime first, detector name last):
+      8  : X_V, Y_V, Z_V, TMP36, temperature, pressure
+      11 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, Delta_nT, Colour (current)
+      11 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, temperature, pressure
+      12 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, temperature, pressure, Delta_nT
+      13 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, temperature, pressure, Delta_nT, Colour
+    Layouts without Delta_nT report it as NaN.
+    """
+    row = [field.strip() for field in row]
+    count = len(row)
+    try:
+        timestamp = parse_raw_datetime(row[0])
+        if count == 8:
+            x_v, y_v, z_v = (float(value) for value in row[1:4])
+            values = [x_v, x_v * RAW_NT_PER_VOLT, y_v, y_v * RAW_NT_PER_VOLT,
+                      z_v, z_v * RAW_NT_PER_VOLT, float(row[4]), math.nan]
+            colour = ''
+        elif count == 11 and not _is_number(row[9]):
+            values = [float(value) for value in row[1:9]]
+            colour = row[9]
+        elif count == 11:
+            values = [float(value) for value in row[1:8]] + [math.nan]
+            colour = ''
+        elif count in (12, 13):
+            values = [float(value) for value in row[1:8]] + [float(row[10])]
+            colour = row[11] if count == 13 else ''
+        else:
+            return None
+    except (IndexError, TypeError, ValueError):
+        return None
+
+    parsed = {'RawDateTime': timestamp}
+    parsed.update(zip(RAW_FIELD_NAMES[1:9], values))
+    parsed['RawColour'] = colour
+    parsed['RawDetectorName'] = row[-1]
+    return parsed
+
+
+def read_raw_rows(raw_data_file):
+    """Yield parsed raw rows, skipping lines in an unrecognised layout."""
+    with open(file=raw_data_file, mode='r', encoding='UTF-8', errors='replace') as raw_file:
+        for row in csv.reader(raw_file):
+            parsed = parse_raw_row(row)
+            if parsed is not None:
+                yield parsed
 
 
 def format_fixed(value, decimal_places):

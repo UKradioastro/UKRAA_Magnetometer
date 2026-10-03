@@ -35,10 +35,10 @@ class SpaceWeatherTests(unittest.TestCase):
         })
 
         self.assertEqual(three_hour_rows, [
-            ['2023-04-23 01:30:00', '1.000', 0],
-            ['2023-04-23 04:30:00', '8.333', 4],
+            ['2023-04-23 01:30:00', '1.000', 0, 'def'],
+            ['2023-04-23 04:30:00', '8.333', 4, 'def'],
         ])
-        self.assertEqual(daily_rows, [['2023-04-23 12:00:00', '8.333', 4]])
+        self.assertEqual(daily_rows, [['2023-04-23 12:00:00', '8.333', 4, 'def']])
         self.assertEqual(intervals, [
             (datetime.datetime(2023, 4, 23, 0), 1.0),
             (datetime.datetime(2023, 4, 23, 3), 8.333),
@@ -74,21 +74,97 @@ class SpaceWeatherTests(unittest.TestCase):
                           (4.0, 4.667, 5.667, 6.667, 7.667, 8.667, 9.0)],
                          [0, 1, 2, 3, 4, 5, 5])
 
-    def test_fetch_range_requests_definitive_kp_and_normalizes_responses(self):
+    def test_fetch_range_includes_preliminary_kp_and_records_status(self):
         with patch('space_weather.fetch_json', side_effect=[
-                {'datetime': ['2023-04-23T18:00Z'], 'Kp': [8.333]}, [], []]) as fetch:
+                {'datetime': ['2023-04-23T15:00Z', '2023-04-23T18:00Z'],
+                 'Kp': [5.0, 8.333], 'status': ['def', 'pre']}, [], []]) as fetch:
             kp_rows, storm_rows = space_weather.fetch_range(
                 datetime.date(2023, 4, 23), datetime.date(2023, 4, 23))
 
         query = urllib.parse.parse_qs(urllib.parse.urlparse(fetch.call_args_list[0].args[0]).query)
-        self.assertEqual(query['status'], ['def'])
+        self.assertNotIn('status', query)
         self.assertEqual(query['index'], ['Kp'])
         self.assertTrue(fetch.call_args_list[1].args[0].startswith(
             'https://ccmc.gsfc.nasa.gov/DONKI-API/get/GST?'))
         self.assertTrue(fetch.call_args_list[2].args[0].startswith(
             'https://ccmc.gsfc.nasa.gov/DONKI-API/get/IPS?'))
-        self.assertEqual(kp_rows, [['2023-04-23 19:30:00', '8.333', 4]])
+        self.assertEqual(kp_rows, [
+            ['2023-04-23 16:30:00', '5.000', 1, 'def'],
+            ['2023-04-23 19:30:00', '8.333', 4, 'pre'],
+        ])
         self.assertEqual(storm_rows, [])
+
+    def test_cache_refetches_from_oldest_preliminary_kp_beyond_refresh_window(self):
+        with tempfile.TemporaryDirectory() as base_path:
+            start = datetime.date(2023, 1, 1)
+            space_weather.update_cache(
+                base_path, start, datetime.date(2023, 1, 10), refresh_days=2,
+                range_fetcher=lambda _start, _end: ([
+                    ['2023-01-02 01:30:00', '2.000', 0, 'def'],
+                    ['2023-01-04 01:30:00', '3.000', 0, 'pre'],
+                    ['2023-01-09 01:30:00', '3.000', 0, 'pre'],
+                ], []))
+            calls = []
+
+            def refresh_fetch(range_start, range_end):
+                calls.append((range_start, range_end))
+                return ([['2023-01-04 01:30:00', '3.333', 0, 'def'],
+                         ['2023-01-09 01:30:00', '3.000', 0, 'def']], [])
+
+            paths = space_weather.update_cache(
+                base_path, start, datetime.date(2023, 1, 11), refresh_days=2,
+                range_fetcher=refresh_fetch)
+
+            self.assertEqual(calls, [(datetime.date(2023, 1, 4), datetime.date(2023, 1, 11))])
+            with open(paths['kp_3hour'], mode='r', encoding='UTF-8', newline='') as cache_file:
+                rows = list(csv.reader(cache_file))
+            self.assertEqual(rows[0], ['DateTime', 'Kp', 'GLevel', 'Status'])
+            self.assertEqual(rows[1:], [
+                ['2023-01-02 01:30:00', '2.000', '0', 'def'],
+                ['2023-01-04 01:30:00', '3.333', '0', 'def'],
+                ['2023-01-09 01:30:00', '3.000', '0', 'def'],
+            ])
+            with open(paths['kp_daily'], mode='r', encoding='UTF-8', newline='') as daily_file:
+                daily_rows = list(csv.reader(daily_file))
+            self.assertEqual(daily_rows[0], ['DateTime', 'MaxKp', 'GLevel', 'Status'])
+            self.assertEqual([row[3] for row in daily_rows[1:]], ['def', 'def', 'def'])
+
+            calls.clear()
+            space_weather.update_cache(
+                base_path, start, datetime.date(2023, 1, 12), refresh_days=2,
+                range_fetcher=refresh_fetch)
+            self.assertEqual(calls, [(datetime.date(2023, 1, 11), datetime.date(2023, 1, 12))])
+
+    def test_legacy_cache_rows_without_status_are_treated_as_definitive(self):
+        self.assertIsNone(space_weather._oldest_provisional_date([
+            ['2023-01-02 01:30:00', '2.000', '0'],
+        ]))
+
+    def test_cache_upgrades_legacy_rows_and_marks_preliminary_days(self):
+        with tempfile.TemporaryDirectory() as base_path:
+            paths = space_weather.cache_paths(base_path)
+            os.makedirs(paths['directory'])
+            with open(paths['kp_3hour'], mode='w', encoding='UTF-8', newline='') as cache_file:
+                cache_file.write('DateTime,Kp,GLevel\n2023-01-01 22:30:00,2.000,0\n')
+            with open(paths['coverage'], mode='w', encoding='UTF-8') as coverage_file:
+                coverage_file.write('{"start_date": "2023-01-01", "end_date": "2023-01-01"}')
+
+            space_weather.update_cache(
+                base_path, datetime.date(2023, 1, 1), datetime.date(2023, 1, 2),
+                refresh_days=1, range_fetcher=lambda _start, _end: ([
+                    ['2023-01-02 01:30:00', '5.000', 1, 'def'],
+                    ['2023-01-02 04:30:00', '3.000', 0, 'pre'],
+                ], []))
+
+            with open(paths['kp_3hour'], mode='r', encoding='UTF-8', newline='') as cache_file:
+                rows = list(csv.reader(cache_file))
+            with open(paths['kp_daily'], mode='r', encoding='UTF-8', newline='') as daily_file:
+                daily_rows = list(csv.reader(daily_file))
+        self.assertEqual(rows[1], ['2023-01-01 22:30:00', '2.000', '0', 'def'])
+        self.assertEqual(daily_rows[1:], [
+            ['2023-01-01 12:00:00', '2.000', '0', 'def'],
+            ['2023-01-02 12:00:00', '5.000', '1', 'pre'],
+        ])
 
     def test_fetch_range_chunks_donki_requests_at_sixty_days(self):
         start = datetime.date(2025, 9, 25)
@@ -207,6 +283,32 @@ class SpaceWeatherTests(unittest.TestCase):
                 self.assertEqual(plot_file.read(), b'png-data')
             self.assertTrue(os.path.isfile(archive_path))
 
+    def test_preliminary_kp_is_shaded_lighter_and_listed_in_key(self):
+        with tempfile.TemporaryDirectory() as base_path:
+            kp_path = os.path.join(base_path, 'kp_daily.csv')
+            with open(kp_path, mode='w', encoding='UTF-8') as kp_file:
+                kp_file.write('DateTime,MaxKp,GLevel,Status\n'
+                              '2023-04-01 12:00:00,2.000,0,def\n'
+                              '2023-04-02 12:00:00,3.000,0,pre\n')
+            window = (datetime.datetime(2023, 4, 1), datetime.datetime(2023, 4, 2, 23, 59, 59))
+            self.assertTrue(PlotPeriodSpaceWeather.has_kp_data(kp_path, *window))
+            self.assertTrue(PlotPeriodSpaceWeather.has_preliminary_kp_data(kp_path, *window))
+            self.assertFalse(PlotPeriodSpaceWeather.has_preliminary_kp_data(
+                kp_path, window[0], datetime.datetime(2023, 4, 1, 23, 59, 59)))
+
+        script = PlotPeriodSpaceWeather.build_script(
+            'XYZ', '3month', window[0], window[1], 'summary.csv', kp_path, 86400, [],
+            'period.png', True, kp_preliminary=True)
+        self.assertIn('(strcol(4) eq "def") && $3==0', script)
+        self.assertIn('(strcol(4) ne "def") && $3==0 ? $2 : 1/0) with boxes lc rgb "#2f6f44" fs transparent solid 0.35', script)
+        self.assertIn('title "Preliminary Kp"', script)
+
+        definitive_only = PlotPeriodSpaceWeather.build_script(
+            'XYZ', '3month', window[0], window[1], 'summary.csv', kp_path, 86400, [],
+            'period.png', True)
+        self.assertNotIn('strcol(4)', definitive_only)
+        self.assertNotIn('Preliminary Kp', definitive_only)
+
     def test_plot_script_marks_missing_kp_without_losing_magnetic_panels(self):
         script = PlotPeriodSpaceWeather.build_script(
             'XYZ', 'week', datetime.datetime(2023, 4, 1),
@@ -265,9 +367,9 @@ class SpaceWeatherTests(unittest.TestCase):
             with open(paths['kp_3hour'], mode='r', encoding='UTF-8', newline='') as cache_file:
                 rows = list(csv.reader(cache_file))
             self.assertEqual(rows[1:], [
-                ['2023-01-01 01:30:00', '2.000', '0'],
-                ['2023-01-05 01:30:00', '4.000', '0'],
-                ['2023-01-06 01:30:00', '5.000', '1'],
+                ['2023-01-01 01:30:00', '2.000', '0', 'def'],
+                ['2023-01-05 01:30:00', '4.000', '0', 'def'],
+                ['2023-01-06 01:30:00', '5.000', '1', 'def'],
             ])
             with open(paths['coverage'], mode='r', encoding='UTF-8') as coverage_file:
                 self.assertEqual(json.load(coverage_file)['end_date'], '2023-01-06')

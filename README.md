@@ -712,8 +712,11 @@ Until then, the webpage displays a data-availability placeholder. XYZ is always
 included; HDZ and BI honour the existing `plot_hdz` and `plot_bi` options.
 
 Historical Kp and storm/CME annotations can be enabled separately with
-`plot_period_spaceweather = true`. This uses GFZ Potsdam definitive Kp and NASA
-CCMC DONKI event data, cached under `data/spaceweather/`. It does not change
+`plot_period_spaceweather = true`. This uses GFZ Potsdam Kp and NASA
+CCMC DONKI event data, cached under `data/spaceweather/`. GFZ definitive Kp
+lags by roughly one to two months, so recent days use GFZ preliminary Kp,
+drawn as lighter bars and labelled "Preliminary Kp" in the key; they are
+replaced automatically once GFZ publishes definitive values. It does not change
 the existing `plot_kp` NOAA forecast setting or the magnetic-data availability
 rule. The overlay is disabled by default; without cached weather data, the
 magnetic plot is still generated with an unavailable Kp panel.
@@ -734,6 +737,45 @@ To include already processed historical data after upgrading, run this once:
 ```
 /usr/bin/python3 ~/UKRAA_Magnetometer/scripts/ProcessDailySummary.py --all
 ```
+
+### Reprocessing historical raw data
+
+After a software update that changes how data is processed, or after copying
+older raw data files back into `~/UKRAA_Magnetometer/data/raw/`, rebuild the
+processed data from the raw archive:
+
+```
+sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh
+```
+
+For every raw day file up to yesterday this regenerates minute data, hourly
+data and the daily summaries, then refreshes the week to year period plots.
+Existing minute and hourly files for those days are overwritten. Daily plots
+for past days are not regenerated.
+
+Options:
+
+* `--from YYYY-MM-DD` / `--to YYYY-MM-DD` - limit the range of days
+* `--skip-hourly` - do not rebuild hourly data
+* `--skip-period-plots` - do not regenerate period plots
+* `--publish` - run `moveGraphs.sh` afterwards so the web page updates immediately
+* `--dry-run` - list the days that would be reprocessed without changing anything
+
+Example: preview, then reprocess January to September 2026:
+
+```
+sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh --from 2026-01-01 --to 2026-09-30 --dry-run
+sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh --from 2026-01-01 --to 2026-09-30
+```
+
+Several months of data can take a while on a Raspberry Pi. Progress is shown
+on screen and logged to `log-Magnetometer.txt`.
+
+Raw files written by earlier firmware are recognised automatically: the
+8-column voltage-only layout (nT is rebuilt at 50,000 nT per volt) and the
+11-, 12- and 13-column layouts that also logged temperature and pressure.
+Days logged without an activity (Delta) value show it as `nan`. Lines in any
+other layout are skipped rather than stopping the processing.
 
 ## Optional Remote FTP upload
 
@@ -815,6 +857,9 @@ sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometer.sh
 The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, existing configuration values, log files and temporary web files. When a release adds options or sections to an `.ini.example` template, the installer adds those missing defaults to the corresponding file in `config` without replacing site-specific values. It then updates the service, scheduled jobs and web files.
 
 The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
+
+If the release notes say processing has changed, rebuild your existing data
+with `reprocessData.sh` (see [Reprocessing historical raw data](#reprocessing-historical-raw-data)).
 
 [Back to Contents...](#contents)
 

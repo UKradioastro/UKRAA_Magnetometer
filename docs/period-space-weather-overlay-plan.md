@@ -86,8 +86,11 @@ separate from sensor data.
 
 Use GFZ Potsdam Kp data (CC BY 4.0; retain attribution on the plot) and NASA
 CCMC DONKI storm, interplanetary-shock and linked-CME records. Before release,
-verify what dates the chosen GFZ endpoint provides as definitive. Do not
-silently substitute forecast or preliminary values into a definitive series;
+verify what dates the chosen GFZ endpoint provides as definitive. GFZ
+definitive Kp lags by roughly one to two months, so recent dates use GFZ
+preliminary values, stored with their status, drawn visibly lighter with a
+"Preliminary Kp" key entry, and refetched until definitive values replace
+them. Never substitute forecast values into the historical series;
 unavailable dates should remain gaps unless a later change explicitly adds a
 second, clearly identified data source.
 

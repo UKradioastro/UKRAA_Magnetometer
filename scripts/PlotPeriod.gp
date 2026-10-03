@@ -46,8 +46,7 @@ set terminal pngcairo background "#ffffff" enhanced font "DejaVuSansCondensed,10
 set datafile separator ","
 set xdata time
 set timefmt "%Y-%m-%d %H:%M:%S"
-if (plotPeriod eq "week" || plotPeriod eq "month") set format x "%d %b"
-if (plotPeriod eq "3month" || plotPeriod eq "6month" || plotPeriod eq "year") set format x "%b\n%Y"
+set format x "%d %b\n%Y"
 set xrange [startDate." 00:00:00":endDate." 23:59:59"]
 set grid xtics ytics
 set key outside above center

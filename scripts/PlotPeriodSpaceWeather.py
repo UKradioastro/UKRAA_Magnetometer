@@ -9,6 +9,7 @@ import sys
 
 from magnetometer_common import get_base_path
 from magnetometer_common import get_target_date
+from space_weather import KP_STATUS_DEFINITIVE
 from space_weather import TIME_FORMAT
 from space_weather import parse_time
 
@@ -64,8 +65,18 @@ def load_storms(path):
 
 
 def has_kp_data(path, window_start, window_end):
+    return _kp_window_flags(path, window_start, window_end)[0]
+
+
+def has_preliminary_kp_data(path, window_start, window_end):
+    return _kp_window_flags(path, window_start, window_end)[1]
+
+
+def _kp_window_flags(path, window_start, window_end):
+    available = False
+    preliminary = False
     if not os.path.isfile(path):
-        return False
+        return available, preliminary
     with open(path, mode='r', encoding='UTF-8', newline='') as kp_file:
         for row in csv.DictReader(kp_file):
             timestamp = parse_time(row.get('DateTime'))
@@ -74,8 +85,11 @@ def has_kp_data(path, window_start, window_end):
             except (TypeError, ValueError):
                 continue
             if timestamp and window_start <= timestamp <= window_end and 0 <= kp_value <= 9:
-                return True
-    return False
+                available = True
+                if (row.get('Status') or KP_STATUS_DEFINITIVE) != KP_STATUS_DEFINITIVE:
+                    preliminary = True
+                    break
+    return available, preliminary
 
 
 def kp_text(kp_value):
@@ -93,7 +107,8 @@ def gp_time(value):
 
 
 def build_script(family, period_name, window_start, window_end, summary_path, kp_path,
-                 kp_bar_seconds, storms, output_path, kp_available, label='Pico'):
+                 kp_bar_seconds, storms, output_path, kp_available, label='Pico',
+                 kp_preliminary=False):
     panels = FAMILY_PANELS[family]
     rows = len(panels) + 1
     lines = [
@@ -103,7 +118,7 @@ def build_script(family, period_name, window_start, window_end, summary_path, kp
         'set datafile separator ","',
         'set xdata time',
         'set timefmt "%Y-%m-%d %H:%M:%S"',
-        'set format x "{}"'.format('%d %b' if period_name in ('week', 'month') else '%b\\n%Y'),
+        'set format x "%d %b\\n%Y"',
         'set xrange ["{}":"{}"]'.format(window_start.strftime(TIME_FORMAT),
                                            window_end.strftime(TIME_FORMAT)),
         'set grid xtics ytics',
@@ -185,9 +200,19 @@ def build_script(family, period_name, window_start, window_end, summary_path, kp
         ]
     else:
         plot_terms = []
+        definitive_filter = '(strcol(4) eq "{}") && '.format(
+            KP_STATUS_DEFINITIVE) if kp_preliminary else ''
         for level, (colour, key_title) in enumerate(LEVEL_STYLES):
-            plot_terms.append('{} using 1:($3=={} ? $2 : 1/0) with boxes lc rgb "{}" title "{}"'.format(
-                _gp_quote(kp_path), level, colour, key_title))
+            plot_terms.append('{} using 1:({}$3=={} ? $2 : 1/0) with boxes lc rgb "{}" title "{}"'.format(
+                _gp_quote(kp_path), definitive_filter, level, colour, key_title))
+        if kp_preliminary:
+            for level, (colour, _key_title) in enumerate(LEVEL_STYLES):
+                plot_terms.append(
+                    '{} using 1:((strcol(4) ne "{}") && $3=={} ? $2 : 1/0) with boxes '
+                    'lc rgb "{}" fs transparent solid 0.35 border notitle'.format(
+                        _gp_quote(kp_path), KP_STATUS_DEFINITIVE, level, colour))
+            plot_terms.append('1/0 with boxes lc rgb "#555555" fs transparent solid 0.35 border '
+                              'title "Preliminary Kp"')
         plot_terms.append('1/0 with points pt 9 ps 0.9 lc rgb "{}" title "CME launch to storm"'.format(
             CME_COLOUR))
         plot_terms.append('1/0 with points pt 7 ps 0.5 lc rgb "#000000" title "Shock at Earth"')
@@ -226,6 +251,7 @@ def main():
 
     kp_bar_seconds = 86400 if window_days > 31 else 10800
     kp_available = has_kp_data(weather_paths['kp'], window_start, window_end)
+    kp_preliminary = has_preliminary_kp_data(weather_paths['kp'], window_start, window_end)
     storms = load_storms(weather_paths['storms'])
     archive_directory = os.path.join(
         base_path, 'plots', arguments.period, arguments.family,
@@ -241,7 +267,8 @@ def main():
         arguments.period, arguments.family))
     script = build_script(
         arguments.family, arguments.period, window_start, window_end,
-        summary_path, weather_paths['kp'], kp_bar_seconds, storms, output_path, kp_available)
+        summary_path, weather_paths['kp'], kp_bar_seconds, storms, output_path, kp_available,
+        kp_preliminary=kp_preliminary)
     with open(script_path, mode='w', encoding='UTF-8', newline='\n') as script_file:
         script_file.write(script)
 

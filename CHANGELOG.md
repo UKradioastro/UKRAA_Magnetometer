@@ -9,8 +9,12 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ### Added
 - Opt-in historical Kp and NASA DONKI storm/CME overlays for week-to-year plots, with a separate weather cache and best-effort refresh.
+- `reprocessData.sh` rebuilds minute, hourly and daily summary data from the raw archive (optionally by date range) and refreshes period plots, for use after processing changes or restoring old raw data.
 
 ### Fixed
+- Raw data processing (minute, hourly and rolling) now reads raw files from earlier firmware: 8-column voltage-only files (nT rebuilt at 50,000 nT/V) no longer stop processing, and 11-, 12- and 13-column files with temperature and pressure no longer put those values into the Delta and detector-name fields. Unrecognised lines are skipped.
+- Period plot date axes now show day, month and year, so 3-month to year plots no longer repeat month-only labels.
+- Historical Kp overlays now include GFZ preliminary values, so the most recent month or so is no longer blank while definitive Kp is pending. Preliminary bars are drawn lighter with a "Preliminary Kp" key entry; cached 3-hour and daily values record their status and preliminary days are refetched until GFZ publishes definitive values.
 - Updated historical DONKI downloads to CCMC's API base introduced on September 30, 2026; requests are split below the 60-day limit, and non-JSON/HTTP responses now include endpoint diagnostics.
 - The updater's temporary installer handoff now works without a colocated `magnetometer-env.sh`, using the installation account and path already exported by the parent updater.
 
