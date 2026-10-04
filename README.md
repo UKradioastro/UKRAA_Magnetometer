@@ -36,6 +36,7 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [Optional Rolling alert Emails](#Optional-Rolling-alert-Emails)
 - [Optional Remote FTP upload](#Optional-Remote-FTP-upload)
 - [Updating the software](#updating-the-software)
+- [Reprocessing historical raw data](#reprocessing-historical-raw-data)
 - [Publishing a release](#publishing-a-release)
 - [License](#license)
 - [Contact us](#contact-us)
@@ -738,44 +739,8 @@ To include already processed historical data after upgrading, run this once:
 /usr/bin/python3 ~/UKRAA_Magnetometer/scripts/ProcessDailySummary.py --all
 ```
 
-### Reprocessing historical raw data
-
-After a software update that changes how data is processed, or after copying
-older raw data files back into `~/UKRAA_Magnetometer/data/raw/`, rebuild the
-processed data from the raw archive:
-
-```
-sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh
-```
-
-For every raw day file up to yesterday this regenerates minute data, hourly
-data and the daily summaries, then refreshes the week to year period plots.
-Existing minute and hourly files for those days are overwritten. Daily plots
-for past days are not regenerated.
-
-Options:
-
-* `--from YYYY-MM-DD` / `--to YYYY-MM-DD` - limit the range of days
-* `--skip-hourly` - do not rebuild hourly data
-* `--skip-period-plots` - do not regenerate period plots
-* `--publish` - run `moveGraphs.sh` afterwards so the web page updates immediately
-* `--dry-run` - list the days that would be reprocessed without changing anything
-
-Example: preview, then reprocess January to September 2026:
-
-```
-sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh --from 2026-01-01 --to 2026-09-30 --dry-run
-sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh --from 2026-01-01 --to 2026-09-30
-```
-
-Several months of data can take a while on a Raspberry Pi. Progress is shown
-on screen and logged to `log-Magnetometer.txt`.
-
-Raw files written by earlier firmware are recognised automatically: the
-8-column voltage-only layout (nT is rebuilt at 50,000 nT per volt) and the
-11-, 12- and 13-column layouts that also logged temperature and pressure.
-Days logged without an activity (Delta) value show it as `nan`. Lines in any
-other layout are skipped rather than stopping the processing.
+To rebuild minute, hourly and summary data from the raw files as well, see
+[Reprocessing historical raw data](#reprocessing-historical-raw-data).
 
 ## Optional Remote FTP upload
 
@@ -860,6 +825,69 @@ The updater requires an internet connection. It always selects the latest publis
 
 If the release notes say processing has changed, rebuild your existing data
 with `reprocessData.sh` (see [Reprocessing historical raw data](#reprocessing-historical-raw-data)).
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== -->
+## Reprocessing historical raw data
+
+After a software update that changes how data is processed, or after copying
+older raw data files back into `~/UKRAA_Magnetometer/data/raw/`, rebuild the
+processed data from the raw archive with `reprocessData.sh`:
+
+```
+cd ~/UKRAA_Magnetometer
+
+# see which days would be processed, without changing anything
+bash scripts/reprocessData.sh --dry-run
+
+# reprocess everything, then publish the plots
+sudo bash scripts/reprocessData.sh --publish
+
+# or just a range
+sudo bash scripts/reprocessData.sh --from 2026-04-01 --to 2026-10-03 --publish
+```
+
+For every raw day file up to yesterday this regenerates minute data, hourly
+data and the daily summaries, then refreshes the week to year period plots.
+Existing minute and hourly files for those days are overwritten. Daily plots
+for past days are not regenerated. Today's raw file, which is still being
+written, is never reprocessed. Only files named `YYYY-MM-DD.csv` are
+processed, so renamed copies such as `2026-05-01_old.csv` are ignored.
+
+Use `reprocessData.sh` rather than running `ProcessDataRaw.py` in a loop by
+hand. The script runs as the file owner, rebuilds the hourly data as well,
+and logs any failure for a day to `log-error.txt`.
+
+Options:
+
+* `--from YYYY-MM-DD` / `--to YYYY-MM-DD` - limit the range of days
+* `--skip-hourly` - do not rebuild hourly data
+* `--skip-period-plots` - do not regenerate period plots
+* `--publish` - run `moveGraphs.sh` afterwards so the web page updates immediately
+* `--dry-run` - list the days that would be reprocessed without changing anything
+
+Example: preview, then reprocess January to September 2026:
+
+```
+sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh --from 2026-01-01 --to 2026-09-30 --dry-run
+sudo bash ~/UKRAA_Magnetometer/scripts/reprocessData.sh --from 2026-01-01 --to 2026-09-30
+```
+
+Several months of data can take a while on a Raspberry Pi. Progress is shown
+on screen and logged to `log-Magnetometer.txt`; errors are logged with a
+timestamp to `log-error.txt`.
+
+Raw files written by earlier firmware are recognised automatically: the
+8-column voltage-only layout (nT is rebuilt at 50,000 nT per volt) and the
+11-, 12- and 13-column layouts that also logged temperature and pressure.
+Days logged without an activity (Delta) value show it as `nan`. Lines in any
+other layout are skipped rather than stopping the processing.
 
 [Back to Contents...](#contents)
 
