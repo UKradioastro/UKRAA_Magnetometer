@@ -18,6 +18,7 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 ### Changed
 - Space-weather log entries now use the standard timestamped log format. The cache entry reports the dates covered and the date ranges downloaded, plot entries report the window and Kp status, and a start entry shows the refresh range.
 - The README section "Reprocessing historical raw data" is now a top-level section after "Updating the software", with dry-run, full and date-range usage examples. It also recommends `reprocessData.sh` over hand-written `ProcessDataRaw.py` loops.
+- The README section "Things it can do with selectable options" now covers the NOAA aurora forecast, the planetary Kp forecast and the week-to-year plots, with links to each option's section. The week-to-year section now states the data rule correctly: a plot needs 90% of the days in its window (configurable), each with at least 95% minute coverage.
 
 ### Fixed
 - `reprocessData.sh` ignores raw files not named `YYYY-MM-DD.csv` (for example `2026-05-01_old.csv`) instead of passing their names to processing as dates. An invalid `MAGNETOMETER_TARGET_DATE` now gives a clear error message.

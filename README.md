@@ -31,9 +31,11 @@ Instructions for initial setting up of a Raspberry Pi4/5 are included in the **d
 - [PicoMagnetometer webpage](#picomagnetometer-webpage)
 - [Check PicoMagnetometer service is running](#check-PicoMagnetometer-service-is-running)
 - [Optional Post install operational checks](#Optional-Post-install-operational-checks)
+- [Optional HDZ and/or BI plots](#optional-hdz-andor-bi-plots)
 - [Optional NOAA aurora forecast panel](#Optional-NOAA-aurora-forecast-panel)
 - [Optional planetary Kp forecast panel](#Optional-planetary-Kp-forecast-panel)
 - [Optional Rolling alert Emails](#Optional-Rolling-alert-Emails)
+- [Optional week-to-year magnetic plots](#optional-week-to-year-magnetic-plots)
 - [Optional Remote FTP upload](#Optional-Remote-FTP-upload)
 - [Updating the software](#updating-the-software)
 - [Reprocessing historical raw data](#reprocessing-historical-raw-data)
@@ -199,26 +201,41 @@ A number of plots will be created:
 
 The raw data will also be processed on a continuous 5 minute basis, again via CRON, to generate a rolling 24 hour plot of X, Y and Z magnetic fields and % change of magnetic field for combined X and Y directions.  The latter used to predict the potential of visible Aurora activity.
 
-A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.  To access the webpage, see **PicoMagnetometer webpage** section for details.
+A simple web server and web page is set up on your RPi4/5, so that you can view your magnetometer's results on your desktop PC and/or smart phone when connected to your home network.  To access the webpage, see the [PicoMagnetometer webpage](#picomagnetometer-webpage) section for details.
 
-### Things it do with selectable options
+### Things it can do with selectable options
 
 #### Additional plots
 There is the option of the following additional rolling and daily plots
 * H, D and Z (Local horizontal plane, declination angle and up/down)
 * B and I (Total strength of Earth’s magnetic field and angle of Earth’s magnetic field)
 
-These are configurable through `plot.ini` file, see **Optional HDZ and/or BI plots** section for details.
+These are configurable through `plot.ini` file, see the [Optional HDZ and/or BI plots](#optional-hdz-andor-bi-plots) section for details.
+
+#### NOAA aurora forecast
+There is the option of showing the latest NOAA 30-minute aurora forecast image, for the northern or southern hemisphere, on the webpage.
+
+This is configurable through the `plot.ini` file, see the [Optional NOAA aurora forecast panel](#optional-noaa-aurora-forecast-panel) section for details.
+
+#### Planetary Kp forecast
+There is the option of showing the NOAA planetary Kp forecast chart, updated hourly and colour coded by the NOAA G-scale, on the webpage.
+
+This is configurable through the `plot.ini` file, see the [Optional planetary Kp forecast panel](#optional-planetary-kp-forecast-panel) section for details.
+
+#### Long-period graphs (week to year)
+There is the option of producing week, month, 3-month, 6-month and year plots of XYZ (and HDZ and BI where enabled), using one value per complete day. Each graph appears once enough complete days of data are available. Historical Kp and geomagnetic storm/CME markers can optionally be added to these plots.
+
+This is configurable through the `plot.ini` file, see the [Optional week-to-year magnetic plots](#optional-week-to-year-magnetic-plots) section for details.
 
 #### Email alerts
 There is the option of receiving email alerts when an activity threshold is passed.
 
-This is configurable through the `alerts.ini` file, see **Optional Rolling alert Emails** section for details.
+This is configurable through the `alerts.ini` file, see the [Optional Rolling alert Emails](#optional-rolling-alert-emails) section for details.
 
 #### Upload, via FTP, to external hosted website 
 There is the option of uploading all generated plot to an externally hosted webpage.
 
-This is configurable through the `remote-upload.ini` file, see **Optional Remote FTP upload** section for details.
+This is configurable through the `remote-upload.ini` file, see the [Optional Remote FTP upload](#optional-remote-ftp-upload) section for details.
 
 
 [Back to Contents...](#contents)
@@ -707,8 +724,12 @@ plot_6month = true
 plot_year = true
 ```
 
-Each period is a trailing window ending on yesterday. A graph appears after all
-required days have at least 95% valid minute data: 7, 30, 90, 183, or 365 days.
+Each period is a trailing window ending on yesterday: 7, 30, 90, 183, or 365
+days. A day counts as complete when it has at least 95% valid minute data, and
+a graph appears once at least 90% of the days in its window are complete (for
+example 165 of 183 days for the 6-month plot). The 90% can be changed with
+`period_min_valid_days_percent` in `plot.ini`. Each night the log records how
+many complete days each enabled period has and how many it needs.
 Until then, the webpage displays a data-availability placeholder. XYZ is always
 included; HDZ and BI honour the existing `plot_hdz` and `plot_bi` options.
 
