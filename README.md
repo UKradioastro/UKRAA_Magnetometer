@@ -742,6 +742,15 @@ To include already processed historical data after upgrading, run this once:
 To rebuild minute, hourly and summary data from the raw files as well, see
 [Reprocessing historical raw data](#reprocessing-historical-raw-data).
 
+
+[Back to Contents...](#contents)
+
+&nbsp;
+
+---
+
+&nbsp;
+<!-- =============================================================================== --> 
 ## Optional Remote FTP upload
 
 Within the **~/UKRAA_Magnetometer/config** folder there is a file named **remote-upload.ini**.
