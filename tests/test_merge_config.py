@@ -13,12 +13,13 @@ import MergeConfig
 
 class MergeConfigTests(unittest.TestCase):
     def test_adds_missing_options_without_replacing_existing_values(self):
-        template_text = '[plots]\nplot_hdz = false\nplot_kp = false\n'
+        template_text = ('[plots]\nplot_hdz = false\nplot_kp = false\n'
+                 'plot_period_spaceweather = false\n')
         config_text = '# Site setting\n[plots]\nplot_hdz = true\n'
 
         additions, result = self._merge(template_text, config_text)
 
-        self.assertEqual(additions, ['plots.plot_kp'])
+        self.assertEqual(additions, ['plots.plot_kp', 'plots.plot_period_spaceweather'])
         self.assertIn('# Site setting', result)
         self.assertIn('plot_hdz = true', result)
         self.assertIn('plot_kp = false', result)
@@ -30,6 +31,14 @@ class MergeConfigTests(unittest.TestCase):
 
         self.assertEqual(additions, ['heartbeat.hour_utc'])
         self.assertIn('[heartbeat]\nhour_utc = 9', result)
+
+    def test_upgrade_preserves_enabled_spaceweather_overlay(self):
+        additions, result = self._merge(
+            '[plots]\nplot_period_spaceweather = false\n',
+            '[plots]\nplot_period_spaceweather = true\n')
+
+        self.assertEqual(additions, [])
+        self.assertIn('plot_period_spaceweather = true', result)
 
     def test_complete_configuration_is_unchanged(self):
         config_text = '[plots]\nplot_hdz = true\n'

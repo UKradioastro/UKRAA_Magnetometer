@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 import configparser
+import csv
 import datetime
 import math
 import os
 import subprocess
+import sys
 
 
 RAW_FIELD_NAMES = [
@@ -21,6 +23,68 @@ RAW_FIELD_NAMES = [
     'RawDetectorName',
 ]
 
+# Every logged Pico row with both values gives exactly 50,000 nT per volt; the
+# earliest 8-column rows recorded volts only, so nT is rebuilt from this.
+RAW_NT_PER_VOLT = 50000.0
+
+
+def _is_number(text):
+    try:
+        float(text)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+def parse_raw_row(row):
+    """Return one raw CSV row as a RAW_FIELD_NAMES dict, or None if unusable.
+
+    Supported layouts (datetime first, detector name last):
+      8  : X_V, Y_V, Z_V, TMP36, temperature, pressure
+      11 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, Delta_nT, Colour (current)
+      11 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, temperature, pressure
+      12 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, temperature, pressure, Delta_nT
+      13 : X_V, X_nT, Y_V, Y_nT, Z_V, Z_nT, TMP36, temperature, pressure, Delta_nT, Colour
+    Layouts without Delta_nT report it as NaN.
+    """
+    row = [field.strip() for field in row]
+    count = len(row)
+    try:
+        timestamp = parse_raw_datetime(row[0])
+        if count == 8:
+            x_v, y_v, z_v = (float(value) for value in row[1:4])
+            values = [x_v, x_v * RAW_NT_PER_VOLT, y_v, y_v * RAW_NT_PER_VOLT,
+                      z_v, z_v * RAW_NT_PER_VOLT, float(row[4]), math.nan]
+            colour = ''
+        elif count == 11 and not _is_number(row[9]):
+            values = [float(value) for value in row[1:9]]
+            colour = row[9]
+        elif count == 11:
+            values = [float(value) for value in row[1:8]] + [math.nan]
+            colour = ''
+        elif count in (12, 13):
+            values = [float(value) for value in row[1:8]] + [float(row[10])]
+            colour = row[11] if count == 13 else ''
+        else:
+            return None
+    except (IndexError, TypeError, ValueError):
+        return None
+
+    parsed = {'RawDateTime': timestamp}
+    parsed.update(zip(RAW_FIELD_NAMES[1:9], values))
+    parsed['RawColour'] = colour
+    parsed['RawDetectorName'] = row[-1]
+    return parsed
+
+
+def read_raw_rows(raw_data_file):
+    """Yield parsed raw rows, skipping lines in an unrecognised layout."""
+    with open(file=raw_data_file, mode='r', encoding='UTF-8', errors='replace') as raw_file:
+        for row in csv.reader(raw_file):
+            parsed = parse_raw_row(row)
+            if parsed is not None:
+                yield parsed
+
 
 def format_fixed(value, decimal_places):
     if math.isnan(value):
@@ -32,7 +96,12 @@ def format_fixed(value, decimal_places):
 def get_target_date(default_days_ago=1):
     target_date = os.environ.get('MAGNETOMETER_TARGET_DATE')
     if target_date:
-        return datetime.datetime.strptime(target_date, '%Y-%m-%d').date()
+        try:
+            return datetime.datetime.strptime(target_date, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValueError(
+                "MAGNETOMETER_TARGET_DATE '{}' is not a YYYY-MM-DD date".format(
+                    target_date)) from None
 
     return (datetime.datetime.now() - datetime.timedelta(default_days_ago)).date()
 
@@ -112,6 +181,21 @@ def format_log_entry(timestamp, source_name, message):
 
 def log_message(source_name, message):
     print(format_log_entry(datetime.datetime.now(), source_name, message))
+
+
+def log_error(source_name, message):
+    print(format_log_entry(datetime.datetime.now(), source_name, message),
+          file=sys.stderr, flush=True)
+
+
+def _log_uncaught_exception(exc_type, exc_value, exc_traceback):
+    # Python tracebacks carry no timestamp; prefix one so log-error.txt shows when it happened
+    script_name = os.path.basename(sys.argv[0]) if sys.argv and sys.argv[0] else 'python'
+    log_error(script_name, 'ERROR - unhandled {}: {}'.format(exc_type.__name__, exc_value))
+    sys.__excepthook__(exc_type, exc_value, exc_traceback)
+
+
+sys.excepthook = _log_uncaught_exception
 
 
 def build_raw_day_path(base_path, current_time):
@@ -274,6 +358,16 @@ def get_period_plot_options(base_path):
             False)
         for period_name in period_names
     }
+
+
+def get_period_spaceweather_option(base_path):
+    plot_ini_path = build_plot_ini_path(base_path)
+    parser = _load_ini_parser(plot_ini_path)
+    return _parse_bool(
+        os.environ.get(
+            'MAGNETOMETER_PLOT_PERIOD_SPACEWEATHER',
+            parser.get('plots', 'plot_period_spaceweather', fallback='false')),
+        False)
 
 
 DEFAULT_PERIOD_MIN_VALID_DAYS_PERCENT = 90.0

@@ -2,12 +2,10 @@
 
 #imports
 import datetime
-import csv
 import os
 import math
 import statistics
 
-from magnetometer_common import RAW_FIELD_NAMES
 from magnetometer_common import build_day_path
 from magnetometer_common import build_month_path
 from magnetometer_common import calculate_hdzbi
@@ -15,8 +13,8 @@ from magnetometer_common import ensure_directory
 from magnetometer_common import format_fixed
 from magnetometer_common import get_base_path
 from magnetometer_common import get_target_date
-from magnetometer_common import parse_raw_datetime
 from magnetometer_common import log_message
+from magnetometer_common import read_raw_rows
 
 # logfile message helper
 def log_msg(message):
@@ -43,32 +41,30 @@ def median_or_nan(values):
         return statistics.median(values)
 
     return math.nan
-def load_minute_bins(raw_data_file, raw_field_names, target_date):
+def load_minute_bins(raw_data_file, target_date):
     minute_bins = create_empty_minute_bins(1440)
     detector_name = ''
 
-    with open(file=raw_data_file, mode='r', encoding='UTF-8') as raw_file:
-        raw_csv_reader = csv.DictReader(raw_file, raw_field_names)
+    for raw_line in read_raw_rows(raw_data_file):
+        raw_datetime = raw_line['RawDateTime']
 
-        for raw_line in raw_csv_reader:
-            raw_datetime = parse_raw_datetime(raw_line['RawDateTime'])
+        if raw_datetime.date() != target_date:
+            continue
 
-            if raw_datetime.date() != target_date:
-                continue
+        minute_index = (raw_datetime.hour * 60) + raw_datetime.minute
+        minute_bin = minute_bins[minute_index]
 
-            minute_index = (raw_datetime.hour * 60) + raw_datetime.minute
-            minute_bin = minute_bins[minute_index]
+        minute_bin['x_v'].append(raw_line['RawX_V'])
+        minute_bin['x_nt'].append(raw_line['RawX_nT'])
+        minute_bin['y_v'].append(raw_line['RawY_V'])
+        minute_bin['y_nt'].append(raw_line['RawY_nT'])
+        minute_bin['z_v'].append(raw_line['RawZ_V'])
+        minute_bin['z_nt'].append(raw_line['RawZ_nT'])
+        minute_bin['tmp36_degc'].append(raw_line['RawTMP36_degC'])
+        if not math.isnan(raw_line['RawDelta_nT']):
+            minute_bin['delta_nt'].append(raw_line['RawDelta_nT'])
 
-            minute_bin['x_v'].append(float(raw_line['RawX_V']))
-            minute_bin['x_nt'].append(float(raw_line['RawX_nT']))
-            minute_bin['y_v'].append(float(raw_line['RawY_V']))
-            minute_bin['y_nt'].append(float(raw_line['RawY_nT']))
-            minute_bin['z_v'].append(float(raw_line['RawZ_V']))
-            minute_bin['z_nt'].append(float(raw_line['RawZ_nT']))
-            minute_bin['tmp36_degc'].append(float(raw_line['RawTMP36_degC']))
-            minute_bin['delta_nt'].append(float(raw_line['RawDelta_nT']))
-
-            detector_name = str(raw_line['RawDetectorName'])
+        detector_name = raw_line['RawDetectorName']
 
     return minute_bins, detector_name
 
@@ -78,9 +74,6 @@ BasePath = get_base_path()
 
 log_msg('Started processing yesterdays magnetometer data for ' \
       + TargetDate.strftime('%Y-%m-%d'))
-
-# Set file headers for data file structure
-RawFieldNames = RAW_FIELD_NAMES
 
 # Set path for data file structure
 
@@ -128,7 +121,7 @@ ProcessedTime = StartTime_datetime - minute
 # number of 1 minutes in a day
 n = 1440
 
-MinuteBins, DetectorName = load_minute_bins(RawDataFile, RawFieldNames, TargetDate)
+MinuteBins, DetectorName = load_minute_bins(RawDataFile, TargetDate)
 
 # open file to store data in and replace existing content
 with open(file=ProcessedDataFile, mode='w', encoding='UTF-8') as ProcessedData:

@@ -42,6 +42,11 @@ plot_3month = false
 plot_6month = false
 plot_year = false
 
+# Add historical GFZ Kp and NASA DONKI storm/CME context to the period plots.
+# This is independent of plot_kp, which controls the NOAA Kp forecast image.
+# Enabling this does not change period availability or magnetic processing.
+plot_period_spaceweather = false
+
 # Percentage of days in each period window that must be complete (at least
 # 95% of minutes recorded) before that period plot is produced. Missing days
 # are shown as gaps. For example 90 means 27 of 30 days for the month plot.

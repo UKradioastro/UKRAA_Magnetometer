@@ -7,7 +7,25 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+## [2026.10.0] - 2026-10-04
+
+### Added
+- Opt-in historical Kp and NASA DONKI storm/CME overlays for week-to-year plots, with a separate weather cache and best-effort refresh.
+- `reprocessData.sh` rebuilds minute, hourly and daily summary data from the raw archive (optionally by date range) and refreshes period plots, for use after processing changes or restoring old raw data.
+- Period plot processing now logs, for each enabled plot, how many complete days are in its window against how many are needed (with the window dates and thresholds), and how many more days are needed when a plot is skipped. Skips caused by `plot.ini` settings name the setting.
+- Uncaught Python errors now write a timestamped line naming the script and error to `log-error.txt` before the traceback, so it is clear when each error occurred.
+
+### Changed
+- Space-weather log entries now use the standard timestamped log format. The cache entry reports the dates covered and the date ranges downloaded, plot entries report the window and Kp status, and a start entry shows the refresh range.
+- The README section "Reprocessing historical raw data" is now a top-level section after "Updating the software", with dry-run, full and date-range usage examples. It also recommends `reprocessData.sh` over hand-written `ProcessDataRaw.py` loops.
+- The README section "Things it can do with selectable options" now covers the NOAA aurora forecast, the planetary Kp forecast and the week-to-year plots, with links to each option's section. The week-to-year section now states the data rule correctly: a plot needs 90% of the days in its window (configurable), each with at least 95% minute coverage.
+
 ### Fixed
+- `reprocessData.sh` ignores raw files not named `YYYY-MM-DD.csv` (for example `2026-05-01_old.csv`) instead of passing their names to processing as dates. An invalid `MAGNETOMETER_TARGET_DATE` now gives a clear error message.
+- Raw data processing (minute, hourly and rolling) now reads raw files from earlier firmware: 8-column voltage-only files (nT rebuilt at 50,000 nT/V) no longer stop processing, and 11-, 12- and 13-column files with temperature and pressure no longer put those values into the Delta and detector-name fields. Unrecognised lines are skipped.
+- Period plot date axes now show day, month and year, so 3-month to year plots no longer repeat month-only labels.
+- Historical Kp overlays now include GFZ preliminary values, so the most recent month or so is no longer blank while definitive Kp is pending. Preliminary bars are drawn lighter with a "Preliminary Kp" key entry; cached 3-hour and daily values record their status and preliminary days are refetched until GFZ publishes definitive values.
+- Updated historical DONKI downloads to CCMC's API base introduced on September 30, 2026; requests are split below the 60-day limit, and non-JSON/HTTP responses now include endpoint diagnostics.
 - The updater's temporary installer handoff now works without a colocated `magnetometer-env.sh`, using the installation account and path already exported by the parent updater.
 
 ## [2026.09.6] - 2026-09-26
