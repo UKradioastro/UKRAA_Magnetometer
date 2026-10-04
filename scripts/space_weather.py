@@ -75,7 +75,7 @@ def fetch_json(url, delay=2.0, opener=None, sleep=None):
             if attempt == 2:
                 raise
             reason = getattr(error, 'reason', error)
-            print('WARNING: retrying space-weather request after {}'.format(reason))
+            log_message('space_weather.py', 'WARNING - retrying space-weather request after {}'.format(reason))
             sleep(delay * 5)
 
 
@@ -394,6 +394,8 @@ def update_cache(base_path, start_date, end_date, refresh_days=REFRESH_DAYS,
             merged_storms),
         paths['coverage']: _json_bytes(coverage),
     })
-    log_message('space_weather.py', 'Cached space weather {} through {} ({} request range(s))'.format(
-        covered_start, covered_end, len(ranges)))
+    fetched = ', '.join('{} to {}'.format(range_start, range_end)
+                        for range_start, range_end in ranges)
+    log_message('space_weather.py', 'Updated Kp and storm cache, now covers {} to {} (downloaded {})'.format(
+        covered_start, covered_end, fetched or 'nothing'))
     return paths

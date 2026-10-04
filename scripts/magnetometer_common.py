@@ -6,6 +6,7 @@ import datetime
 import math
 import os
 import subprocess
+import sys
 
 
 RAW_FIELD_NAMES = [
@@ -95,7 +96,12 @@ def format_fixed(value, decimal_places):
 def get_target_date(default_days_ago=1):
     target_date = os.environ.get('MAGNETOMETER_TARGET_DATE')
     if target_date:
-        return datetime.datetime.strptime(target_date, '%Y-%m-%d').date()
+        try:
+            return datetime.datetime.strptime(target_date, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValueError(
+                "MAGNETOMETER_TARGET_DATE '{}' is not a YYYY-MM-DD date".format(
+                    target_date)) from None
 
     return (datetime.datetime.now() - datetime.timedelta(default_days_ago)).date()
 
@@ -175,6 +181,21 @@ def format_log_entry(timestamp, source_name, message):
 
 def log_message(source_name, message):
     print(format_log_entry(datetime.datetime.now(), source_name, message))
+
+
+def log_error(source_name, message):
+    print(format_log_entry(datetime.datetime.now(), source_name, message),
+          file=sys.stderr, flush=True)
+
+
+def _log_uncaught_exception(exc_type, exc_value, exc_traceback):
+    # Python tracebacks carry no timestamp; prefix one so log-error.txt shows when it happened
+    script_name = os.path.basename(sys.argv[0]) if sys.argv and sys.argv[0] else 'python'
+    log_error(script_name, 'ERROR - unhandled {}: {}'.format(exc_type.__name__, exc_value))
+    sys.__excepthook__(exc_type, exc_value, exc_traceback)
+
+
+sys.excepthook = _log_uncaught_exception
 
 
 def build_raw_day_path(base_path, current_time):

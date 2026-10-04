@@ -101,6 +101,11 @@ if [ -d "$RAW_ROOT" ]; then
     # ISO dates sort and compare correctly as plain strings
     while IFS= read -r raw_file; do
         day=$(basename "$raw_file" .csv)
+        # ignore renamed copies such as 2026-05-01_old.csv
+        if ! valid_date "$day"; then
+            echo "Ignoring raw file that is not named YYYY-MM-DD.csv: $raw_file"
+            continue
+        fi
         if [ -n "$FROM_DATE" ] && [[ "$day" < "$FROM_DATE" ]]; then
             continue
         fi

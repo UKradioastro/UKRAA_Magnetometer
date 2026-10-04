@@ -351,7 +351,9 @@ class SpaceWeatherTests(unittest.TestCase):
             self.assertRegex(
                 log_output.getvalue(),
                 re.compile(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : '
-                           r'space_weather\.py\s+: Cached space weather'))
+                           r'space_weather\.py\s+: Updated Kp and storm cache, '
+                           r'now covers 2023-01-01 to 2023-01-05 '
+                           r'\(downloaded 2023-01-01 to 2023-01-05\)'))
             self.assertEqual(calls, [(first_start, first_end)])
 
             def refresh_fetch(start, end):

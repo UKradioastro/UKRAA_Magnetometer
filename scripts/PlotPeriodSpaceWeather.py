@@ -5,10 +5,11 @@ import csv
 import datetime
 import os
 import subprocess
-import sys
 
 from magnetometer_common import get_base_path
 from magnetometer_common import get_target_date
+from magnetometer_common import log_error
+from magnetometer_common import log_message
 from space_weather import KP_STATUS_DEFINITIVE
 from space_weather import TIME_FORMAT
 from space_weather import parse_time
@@ -31,6 +32,7 @@ LEVEL_STYLES = [
 ]
 CME_COLOUR = '#1f5fbf'
 PANEL_HEIGHT = 250
+LOG_SOURCE = 'PlotPeriodSpaceWeather.py'
 PERIOD_DAY_COUNTS = {'week': 7, 'month': 30, '3month': 90, '6month': 183, 'year': 365}
 
 
@@ -246,7 +248,7 @@ def main():
         'storms': os.path.join(base_path, 'data', 'spaceweather', 'storms.csv'),
     }
     if not os.path.isfile(summary_path):
-        print('ERROR: daily summary missing: ' + summary_path, file=sys.stderr)
+        log_error(LOG_SOURCE, 'ERROR - daily summary missing: ' + summary_path)
         return 1
 
     kp_bar_seconds = 86400 if window_days > 31 else 10800
@@ -275,18 +277,25 @@ def main():
     try:
         result = subprocess.run(['gnuplot', script_path], capture_output=True, text=True)
     except FileNotFoundError:
-        print('ERROR: gnuplot is not installed; script written to ' + script_path, file=sys.stderr)
+        log_error(LOG_SOURCE, 'ERROR - gnuplot is not installed; script written to ' + script_path)
         return 1
     if result.returncode != 0 or not os.path.isfile(output_path):
-        print('ERROR: gnuplot failed: ' + result.stderr.strip(), file=sys.stderr)
+        log_error(LOG_SOURCE, 'ERROR - {} {} gnuplot failed: {}'.format(
+            arguments.period, arguments.family, result.stderr.strip()))
         return 1
 
     with open(output_path, 'rb') as source_file, open(temp_path, 'wb') as target_file:
         target_file.write(source_file.read())
     os.chmod(output_path, 0o644)
     os.chmod(temp_path, 0o644)
-    print('INFO: Plotted {} {} with {} Kp data'.format(
-        arguments.period, arguments.family, 'available' if kp_available else 'unavailable'))
+    if kp_preliminary:
+        kp_note = 'including preliminary Kp'
+    elif kp_available:
+        kp_note = 'with Kp'
+    else:
+        kp_note = 'no Kp data available'
+    log_message(LOG_SOURCE, 'Plotted {} {} space-weather plot for {} to {} ({})'.format(
+        arguments.period, arguments.family, window_start.date(), target_date, kp_note))
     return 0
 
 

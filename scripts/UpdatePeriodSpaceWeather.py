@@ -7,6 +7,8 @@ import sys
 from magnetometer_common import get_base_path
 from magnetometer_common import get_period_plot_options
 from magnetometer_common import get_target_date
+from magnetometer_common import log_error
+from magnetometer_common import log_message
 from space_weather import REFRESH_DAYS
 from space_weather import fetch_range
 from space_weather import update_cache
@@ -44,6 +46,8 @@ def main():
     base_path = get_base_path()
     end_date = arguments.end_date or get_target_date()
     start_date = required_start_date(end_date, get_period_plot_options(base_path))
+    log_message('UpdatePeriodSpaceWeather.py',
+                'Started Kp and storm refresh for {} to {}'.format(start_date, end_date))
 
     try:
         update_cache(
@@ -51,7 +55,8 @@ def main():
             refresh_days=REFRESH_DAYS,
             range_fetcher=lambda start, end: fetch_range(start, end, delay=arguments.delay))
     except (OSError, TypeError, ValueError, TimeoutError) as error:
-        print('WARNING: space-weather refresh failed: {}'.format(error), file=sys.stderr)
+        log_error('UpdatePeriodSpaceWeather.py',
+                  'WARNING - space-weather refresh failed: {}'.format(error))
         return 1
 
     return 0
