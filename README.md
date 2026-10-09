@@ -843,15 +843,53 @@ Combined test helper:
 <!-- =============================================================================== -->
 ## Updating the software
 
-After a release has been published on GitHub, run the updater already installed on the RPi:
+After a release has been published on GitHub, units with 2026.10.1 or later
+installed can run the updater already installed on the RPi:
 
 ```
 sudo bash ~/UKRAA_Magnetometer/scripts/updateMagnetometer.sh
 ```
 
-The updater downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, existing configuration values, log files and temporary web files. When a release adds options or sections to an `.ini.example` template, the installer adds those missing defaults to the corresponding file in `config` without replacing site-specific values. It then updates the service, scheduled jobs and web files.
+The updater runs from a temporary copy so replacing the installed scripts
+cannot interrupt the running update. It downloads the latest GitHub release, checks that its tag matches the release `VERSION`, and updates the program files. It preserves recorded data, plot archives, existing configuration values, log files and temporary web files. When a release adds options or sections to an `.ini.example` template, the installer adds those missing defaults to the corresponding file in `config` without replacing site-specific values. It then updates the service, scheduled jobs and web files.
 
 The updater requires an internet connection. It always selects the latest published GitHub release; it does not use ordinary repository checkout or `git pull`.
+
+### One-time upgrade from 2026.10.0 or earlier
+
+The older updater can overwrite itself while Bash is still reading it,
+causing `unexpected EOF while looking for matching '"'` after the
+"Updating code..." message. Publishing the fixed updater does not repair
+the old copy already running on a unit.
+
+For the existing preproduction units, once 2026.10.1 is published, download
+the fixed updater outside the installation directory and run it. This also
+avoids the temporary-copy environment issue in releases before 2026.10.0:
+
+```bash
+curl -fL --retry 3 \
+  https://raw.githubusercontent.com/UKradioastro/UKRAA_Magnetometer/2026.10.1/scripts/updateMagnetometer.sh \
+  -o "$HOME/updateMagnetometer-recovery.sh" &&
+sudo env \
+  MAGNETOMETER_BASE_PATH="$HOME/UKRAA_Magnetometer" \
+  MAGNETOMETER_FILE_OWNER="$(id -un)" \
+  bash "$HOME/updateMagnetometer-recovery.sh"
+```
+
+These commands also recover an update interrupted by the self-overwrite
+error. If the code version is already current but installation is incomplete,
+the updater retries the installation.
+
+Wait for `POST_UPDATE_CHECKS: PASS`, then check that readings and rolling
+plots on the webpage continue advancing. After success, remove the recovery
+copy:
+
+```bash
+rm -- "$HOME/updateMagnetometer-recovery.sh"
+```
+
+Use the normal update command for subsequent releases. If the update fails,
+retain the recovery copy and the terminal output for diagnosis.
 
 If the release notes say processing has changed, rebuild your existing data
 with `reprocessData.sh` (see [Reprocessing historical raw data](#reprocessing-historical-raw-data)).

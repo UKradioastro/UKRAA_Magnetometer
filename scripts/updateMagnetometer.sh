@@ -10,15 +10,6 @@ else
 	FILE_OWNER=${MAGNETOMETER_FILE_OWNER:?MAGNETOMETER_FILE_OWNER must be set}
 	FILE_GROUP=$(id -gn "$FILE_OWNER")
 fi
-REPOSITORY=${MAGNETOMETER_GITHUB_REPOSITORY:-UKradioastro/UKRAA_Magnetometer}
-WORK_DIR=$(mktemp -d)
-SCRIPT_COPY="$WORK_DIR/updateMagnetometer.sh"
-
-cleanup() {
-	rm -rf "$WORK_DIR"
-}
-trap cleanup EXIT
-
 if [ "$(id -u)" -ne 0 ]; then
 	echo "Please run this updater with sudo."
 	exit 1
@@ -39,8 +30,25 @@ if [ ! -d "$BASE_PATH/scripts" ]; then
 	exit 1
 fi
 
-cp "$0" "$SCRIPT_COPY"
-chmod 700 "$SCRIPT_COPY"
+# Bash parses this entire block before the worker can replace the installed script.
+if [ "${1:-}" != "--update-worker" ]; then
+	WORK_DIR=$(mktemp -d)
+	SCRIPT_COPY="$WORK_DIR/updateMagnetometer.sh"
+	cleanup() {
+		rm -rf "$WORK_DIR"
+	}
+	trap cleanup EXIT
+
+	cp "$0" "$SCRIPT_COPY"
+	chmod 700 "$SCRIPT_COPY"
+	export MAGNETOMETER_BASE_PATH="$BASE_PATH" MAGNETOMETER_FILE_OWNER="$FILE_OWNER"
+	bash "$SCRIPT_COPY" --update-worker "$WORK_DIR"
+	exit $?
+fi
+
+WORK_DIR=${2:?Missing temporary update directory}
+SCRIPT_COPY="$WORK_DIR/updateMagnetometer.sh"
+REPOSITORY=${MAGNETOMETER_GITHUB_REPOSITORY:-UKradioastro/UKRAA_Magnetometer}
 
 release_json=$(curl -fsSL -H 'Accept: application/vnd.github+json' \
 	"https://api.github.com/repos/$REPOSITORY/releases/latest")

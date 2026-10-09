@@ -7,6 +7,15 @@ This project uses calendar versioning in the format `YYYY.MM.patch`.
 
 ## [Unreleased]
 
+## [2026.10.1] - 2026-10-09
+
+### Fixed
+- The updater now runs the entire update from a temporary copy before replacing installed files, preventing its own replacement from causing an unexpected EOF/unmatched quote error. The launcher preserves the worker's exit status and removes temporary files on success or failure.
+- Added offline updater regression tests for self-replacement, current-version and interrupted-install retries, copy failures, installer failures, post-update check failures, and temporary-directory cleanup.
+
+### Changed
+- The README documents the one-time download-and-run upgrade procedure for preproduction units running 2026.10.0 or earlier. Those units must use this procedure to install the fixed updater; subsequent releases can use the normal update command.
+
 ## [2026.10.0] - 2026-10-04
 
 ### Added
